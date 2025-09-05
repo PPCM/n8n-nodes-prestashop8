@@ -30,7 +30,7 @@
 
 ### Installation
 ```bash
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 ```
 
 ### Basic Configuration
@@ -55,8 +55,8 @@ npm install n8n-prestashop8-node
 ## 🔗 Additional Resources
 
 ### Community & Support
-- **[GitHub Repository](https://github.com/PPCM/n8n-prestashop8-node)** - Source code and issues
-- **[npm Package](https://www.npmjs.com/package/n8n-prestashop8-node)** - Official package
+- **[GitHub Repository](https://github.com/PPCM/n8n-nodes-prestashop8)** - Source code and issues
+- **[npm Package](https://www.npmjs.com/package/n8n-nodes-prestashop8)** - Official package
 - **[n8n Community](https://community.n8n.io)** - Forum discussions
 - **[PrestaShop Documentation](https://devdocs.prestashop-project.org/8/webservice/)** - API reference
 

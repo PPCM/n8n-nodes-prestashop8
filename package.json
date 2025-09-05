@@ -1,5 +1,5 @@
 {
-  "name": "n8n-prestashop8-node",
+  "name": "n8n-nodes-prestashop8",
   "version": "1.0.0",
   "description": "Nœud n8n personnalisé pour PrestaShop 8 avec support CRUD complet et conversion XML/JSON automatique",
   "keywords": [
@@ -10,17 +10,17 @@
     "api"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/PPCM/n8n-prestashop8-node#readme",
+  "homepage": "https://github.com/PPCM/n8n-nodes-prestashop8#readme",
   "author": {
     "name": "PPCM",
     "email": "contact@ppcm.dev"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PPCM/n8n-prestashop8-node.git"
+    "url": "https://github.com/PPCM/n8n-nodes-prestashop8.git"
   },
   "bugs": {
-    "url": "https://github.com/PPCM/n8n-prestashop8-node/issues"
+    "url": "https://github.com/PPCM/n8n-nodes-prestashop8/issues"
   },
   "engines": {
     "node": ">=16.10",

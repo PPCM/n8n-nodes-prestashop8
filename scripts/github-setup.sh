@@ -37,10 +37,10 @@ fi
 # Configurer le remote GitHub
 echo -e "${YELLOW}🔗 Configuration du remote GitHub...${NC}"
 if git remote | grep -q "origin"; then
-    git remote set-url origin https://github.com/PPCM/n8n-prestashop8-node.git
+    git remote set-url origin https://github.com/PPCM/n8n-nodes-prestashop8.git
     echo -e "${GREEN}✅ Remote origin mis à jour${NC}"
 else
-    git remote add origin https://github.com/PPCM/n8n-prestashop8-node.git
+    git remote add origin https://github.com/PPCM/n8n-nodes-prestashop8.git
     echo -e "${GREEN}✅ Remote origin ajouté${NC}"
 fi
 
@@ -117,7 +117,7 @@ echo ""
 echo -e "${BLUE}🎯 Prochaines étapes :${NC}"
 echo "1. ${YELLOW}Créer le repository sur GitHub :${NC}"
 echo "   https://github.com/new"
-echo "   Repository name: n8n-prestashop8-node"
+echo "   Repository name: n8n-nodes-prestashop8"
 echo "   Description: Comprehensive n8n community node for PrestaShop 8 integration with automatic XML/JSON conversion"
 echo ""
 
@@ -146,4 +146,4 @@ echo "   - Twitter/LinkedIn"
 echo ""
 
 echo -e "${GREEN}🎉 Configuration GitHub terminée !${NC}"
-echo -e "${BLUE}Repository prêt pour GitHub : https://github.com/PPCM/n8n-prestashop8-node${NC}"
+echo -e "${BLUE}Repository prêt pour GitHub : https://github.com/PPCM/n8n-nodes-prestashop8${NC}"

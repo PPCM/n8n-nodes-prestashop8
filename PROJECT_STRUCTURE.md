@@ -3,7 +3,7 @@
 ## 🏗️ Complete Project Organization
 
 ```
-n8n-prestashop8-node/
+n8n-nodes-prestashop8/
 ├── 📁 Source Code & Build
 │   ├── nodes/PrestaShop8/           # Node implementation
 │   │   ├── PrestaShop8.node.ts           # Main node logic
@@ -55,7 +55,7 @@ n8n-prestashop8-node/
 │   └── test-example.js             # Testing example
 │
 ├── 📁 Distribution & Legacy
-│   ├── n8n-prestashop8-node-1.0.0.tgz  # npm package
+│   ├── n8n-nodes-prestashop8-1.0.0.tgz  # npm package
 │   ├── README_EN.md                     # English README (source)
 │   ├── README_GITHUB.md                 # GitHub optimized README
 │   ├── README_FULL.md                   # Complete README backup

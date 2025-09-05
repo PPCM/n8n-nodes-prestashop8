@@ -10,7 +10,7 @@ git push -u origin main
 git push --tags
 
 echo "✅ Code pushed to GitHub!"
-echo "🌐 Repository: https://github.com/PPCM/n8n-prestashop8-node"
+echo "🌐 Repository: https://github.com/PPCM/n8n-nodes-prestashop8"
 
 # Afficher les prochaines étapes
 echo ""

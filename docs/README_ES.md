@@ -1,10 +1,10 @@
 # n8n PrestaShop 8 Node
 
-[![npm version](https://badge.fury.io/js/n8n-prestashop8-node.svg)](https://www.npmjs.com/package/n8n-prestashop8-node)
-[![Downloads](https://img.shields.io/npm/dt/n8n-prestashop8-node.svg)](https://www.npmjs.com/package/n8n-prestashop8-node)
-[![GitHub license](https://img.shields.io/github/license/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/issues)
-[![GitHub stars](https://img.shields.io/github/stars/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/stargazers)
+[![npm version](https://badge.fury.io/js/n8n-nodes-prestashop8.svg)](https://www.npmjs.com/package/n8n-nodes-prestashop8)
+[![Downloads](https://img.shields.io/npm/dt/n8n-nodes-prestashop8.svg)](https://www.npmjs.com/package/n8n-nodes-prestashop8)
+[![GitHub license](https://img.shields.io/github/license/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/blob/main/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/issues)
+[![GitHub stars](https://img.shields.io/github/stars/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/stargazers)
 
 Un nodo comunitario completo de n8n para integración con PrestaShop 8 con conversión automática XML/JSON y soporte CRUD completo.
 
@@ -33,7 +33,7 @@ Un nodo comunitario completo de n8n para integración con PrestaShop 8 con conve
 
 ### Instalación
 ```bash
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 ```
 
 ### Configuración de PrestaShop
@@ -170,7 +170,7 @@ Cron → PrestaShop 8 Node → Calcular KPIs → Email Report
 - **Timeout** → Aumentar timeout en opciones de debug
 
 ### Obtener Ayuda
-- 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-prestashop8-node/issues)** - Bugs y preguntas
+- 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-nodes-prestashop8/issues)** - Bugs y preguntas
 - 🌐 **[Comunidad n8n](https://community.n8n.io)** - Discusiones del foro
 - 📖 **[Documentación](./INSTALLATION_ES.md)** - Guías detalladas
 
@@ -180,8 +180,8 @@ Cron → PrestaShop 8 Node → Calcular KPIs → Email Report
 
 ### Inicio Rápido para Desarrollo
 ```bash
-git clone https://github.com/PPCM/n8n-prestashop8-node.git
-cd n8n-prestashop8-node
+git clone https://github.com/PPCM/n8n-nodes-prestashop8.git
+cd n8n-nodes-prestashop8
 npm install
 npm run dev  # Modo watch
 ```

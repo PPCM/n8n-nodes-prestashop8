@@ -8,7 +8,7 @@
 
 ```bash
 # Installation en 1 commande
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 
 # Configuration simple
 Base URL: https://your-store.com/api
@@ -151,7 +151,7 @@ graph TD
 ### **Étape 1 : Installation** (2 minutes)
 ```bash
 # Dans votre environnement n8n
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 ```
 
 ### **Étape 2 : Configuration PrestaShop** (5 minutes)
@@ -212,8 +212,8 @@ API Key: YOUR_GENERATED_KEY
 
 ### **Option 1 : Test Rapide** (Recommandé)
 ```bash
-git clone https://github.com/PPCM/n8n-prestashop8-node.git
-cd n8n-prestashop8-node  
+git clone https://github.com/PPCM/n8n-nodes-prestashop8.git
+cd n8n-nodes-prestashop8  
 npm install
 npm run build
 npm test
@@ -221,7 +221,7 @@ npm test
 
 ### **Option 2 : Installation Production**
 ```bash
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 # Configurer credentials
 # Créer premier workflow
 ```
@@ -240,7 +240,7 @@ Contactez-nous pour une démo personnalisée avec vos données PrestaShop !
 - 📝 **CHANGELOG.md** - Nouveautés
 
 ### **Support**
-- 💬 **GitHub Issues** - [Bugs et questions](https://github.com/PPCM/n8n-prestashop8-node/issues)
+- 💬 **GitHub Issues** - [Bugs et questions](https://github.com/PPCM/n8n-nodes-prestashop8/issues)
 - 🌐 **n8n Community** - Forum discussions
 - 📧 **Email** - Support premium
 
@@ -257,7 +257,7 @@ Le nœud PrestaShop 8 transforme radicalement votre approche de l'automation e-c
 
 **Simple, puissant, professionnel.**
 
-👉 **[Installer maintenant](https://www.npmjs.com/package/n8n-prestashop8-node)**
+👉 **[Installer maintenant](https://www.npmjs.com/package/n8n-nodes-prestashop8)**
 
 ---
 

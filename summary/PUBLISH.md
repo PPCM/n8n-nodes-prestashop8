@@ -34,16 +34,16 @@ npm login
 npm publish
 
 # Ou avec le fichier .tgz
-npm publish n8n-prestashop8-node-1.0.0.tgz
+npm publish n8n-nodes-prestashop8-1.0.0.tgz
 ```
 
 #### 4. Vérification
 ```bash
 # Vérifier la publication
-npm view n8n-prestashop8-node
+npm view n8n-nodes-prestashop8
 
 # Tester l'installation
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 ```
 
 ## 🌐 Partage Communauté
@@ -67,7 +67,7 @@ I'm excited to share a new community node for **PrestaShop 8** integration!
 
 ## 📦 Installation
 ```bash
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 ```
 
 ## 🎯 Key Features
@@ -93,15 +93,15 @@ Anyone using PrestaShop 8? Would love your feedback! 🙌
 
 ### GitHub Repository
 
-**URL** : https://github.com/PPCM/n8n-prestashop8-node
+**URL** : https://github.com/PPCM/n8n-nodes-prestashop8
 
 **README Structure** :
 ```markdown
 # n8n PrestaShop 8 Node
 
-[![npm version](https://badge.fury.io/js/n8n-prestashop8-node.svg)](https://www.npmjs.com/package/n8n-prestashop8-node)
-[![Downloads](https://img.shields.io/npm/dt/n8n-prestashop8-node.svg)](https://www.npmjs.com/package/n8n-prestashop8-node)
-[![GitHub](https://img.shields.io/github/license/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/blob/main/LICENSE)
+[![npm version](https://badge.fury.io/js/n8n-nodes-prestashop8.svg)](https://www.npmjs.com/package/n8n-nodes-prestashop8)
+[![Downloads](https://img.shields.io/npm/dt/n8n-nodes-prestashop8.svg)](https://www.npmjs.com/package/n8n-nodes-prestashop8)
+[![GitHub](https://img.shields.io/github/license/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/blob/main/LICENSE)
 
 A comprehensive n8n community node for PrestaShop 8 integration with automatic XML/JSON conversion.
 
@@ -139,7 +139,7 @@ Link: [npm package]
 • Advanced filters
 • TypeScript native
 
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 
 #ecommerce #automation #opensource
 ```
@@ -153,9 +153,9 @@ npm install n8n-prestashop8-node
 ```yaml
 - name: PrestaShop 8
   description: Comprehensive PrestaShop 8 integration with automatic XML/JSON conversion
-  package: n8n-prestashop8-node
+  package: n8n-nodes-prestashop8
   author: PPCM
-  repository: https://github.com/PPCM/n8n-prestashop8-node
+  repository: https://github.com/PPCM/n8n-nodes-prestashop8
   tags: [ecommerce, prestashop, xml, json, crud]
   resources: [products, customers, orders, categories, stocks]
 ```

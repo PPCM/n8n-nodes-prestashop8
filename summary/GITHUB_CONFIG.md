@@ -1,7 +1,7 @@
 # 🔧 Configuration GitHub - Étapes Finales
 
 ## ✅ Status Actuel
-- ✅ **Code poussé** vers https://github.com/PPCM/n8n-prestashop8-node
+- ✅ **Code poussé** vers https://github.com/PPCM/n8n-nodes-prestashop8
 - ✅ **Tag v1.0.0** publié
 - ✅ **29 fichiers** en ligne
 - ⚠️ **2 vulnérabilités** détectées (dépendances) - à corriger
@@ -11,7 +11,7 @@
 ### 1. Settings & About
 **Dans GitHub > Repository > About (roue dentée)** :
 - **Description** : `Comprehensive n8n community node for PrestaShop 8 integration with automatic XML/JSON conversion`
-- **Website** : `https://www.npmjs.com/package/n8n-prestashop8-node` (après publication npm)
+- **Website** : `https://www.npmjs.com/package/n8n-nodes-prestashop8` (après publication npm)
 - **Topics** : 
   ```
   n8n
@@ -64,18 +64,18 @@ npm publish
 
 ### 3. Vérifier publication
 ```bash
-npm view n8n-prestashop8-node
+npm view n8n-nodes-prestashop8
 ```
 
 ## 🌐 Badges GitHub
 
 Ajoutez ces badges au début du README.md :
 ```markdown
-[![npm version](https://badge.fury.io/js/n8n-prestashop8-node.svg)](https://www.npmjs.com/package/n8n-prestashop8-node)
-[![Downloads](https://img.shields.io/npm/dt/n8n-prestashop8-node.svg)](https://www.npmjs.com/package/n8n-prestashop8-node)
-[![GitHub license](https://img.shields.io/github/license/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/issues)
-[![GitHub stars](https://img.shields.io/github/stars/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/stargazers)
+[![npm version](https://badge.fury.io/js/n8n-nodes-prestashop8.svg)](https://www.npmjs.com/package/n8n-nodes-prestashop8)
+[![Downloads](https://img.shields.io/npm/dt/n8n-nodes-prestashop8.svg)](https://www.npmjs.com/package/n8n-nodes-prestashop8)
+[![GitHub license](https://img.shields.io/github/license/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/blob/main/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/issues)
+[![GitHub stars](https://img.shields.io/github/stars/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/stargazers)
 ```
 
 ## 🚀 Partage Communauté

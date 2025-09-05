@@ -3,10 +3,10 @@
 ## ✅ **PROJET COMPLÈTEMENT TERMINÉ ET PUBLIÉ**
 
 ### 📈 **Status Final**
-- ✅ **Repository GitHub** : https://github.com/PPCM/n8n-prestashop8-node
+- ✅ **Repository GitHub** : https://github.com/PPCM/n8n-nodes-prestashop8
 - ✅ **Code poussé** : 3 commits, 1 tag v1.0.0
 - ✅ **Sécurité améliorée** : 13 → 1 vulnérabilité (92% résolu)
-- ✅ **Package npm** : n8n-prestashop8-node-1.0.0.tgz (14.6 kB)
+- ✅ **Package npm** : n8n-nodes-prestashop8-1.0.0.tgz (14.6 kB)
 - ✅ **30 fichiers** en production
 
 ---
@@ -69,7 +69,7 @@
 
 ### **1. Finaliser GitHub (5 min)**
 ```bash
-# Sur https://github.com/PPCM/n8n-prestashop8-node
+# Sur https://github.com/PPCM/n8n-nodes-prestashop8
 # Ajouter topics : n8n, prestashop, typescript, automation, ecommerce
 # Configurer About section avec description et website
 ```
@@ -77,13 +77,13 @@
 ### **2. Publier sur npm (2 min)**
 ```bash
 npm login
-npm publish n8n-prestashop8-node-1.0.0.tgz
+npm publish n8n-nodes-prestashop8-1.0.0.tgz
 ```
 
 ### **3. Première Installation Test (5 min)**
 ```bash
 # Dans une instance n8n de test
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 # Créer un workflow de test
 ```
 

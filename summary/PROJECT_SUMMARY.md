@@ -47,7 +47,7 @@
 
 ### Structure du Code
 ```
-n8n-prestashop8-node/
+n8n-nodes-prestashop8/
 ├── credentials/
 │   └── PrestaShop8Api.credentials.ts    # Authentification sécurisée
 ├── nodes/PrestaShop8/
@@ -73,8 +73,8 @@ n8n-prestashop8-node/
 ## 📦 Livrables
 
 ### ✅ Package npm
-- **Fichier** : `n8n-prestashop8-node-1.0.0.tgz` (14.1 kB)
-- **Installation** : `npm install n8n-prestashop8-node`
+- **Fichier** : `n8n-nodes-prestashop8-1.0.0.tgz` (14.1 kB)
+- **Installation** : `npm install n8n-nodes-prestashop8`
 - **Compatibilité** : n8n community nodes
 
 ### ✅ Documentation Complète
@@ -95,7 +95,7 @@ n8n-prestashop8-node/
 ### Installation Rapide
 ```bash
 # Installation
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 
 # Configuration PrestaShop
 # 1. Activer API Webservice
@@ -208,7 +208,7 @@ Le nœud n8n PrestaShop 8 est **complètement terminé** et prêt pour une utili
 1. **Installer** le package dans votre n8n
 2. **Configurer** vos credentials PrestaShop  
 3. **Créer** vos premiers workflows d'automation
-4. **Contribuer** sur [GitHub](https://github.com/PPCM/n8n-prestashop8-node)
+4. **Contribuer** sur [GitHub](https://github.com/PPCM/n8n-nodes-prestashop8)
 5. **Partager** avec la communauté n8n
 
 ---

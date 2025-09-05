@@ -21,7 +21,7 @@ Ce guide vous explique comment installer et configurer le nœud PrestaShop 8 dan
 
 ```bash
 # Dans votre dossier n8n ou globalement
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 
 # Redémarrez n8n
 npm restart n8n
@@ -33,8 +33,8 @@ n8n start
 
 ```bash
 # Cloner le repository
-git clone https://github.com/PPCM/n8n-prestashop8-node.git
-cd n8n-prestashop8-node
+git clone https://github.com/PPCM/n8n-nodes-prestashop8.git
+cd n8n-nodes-prestashop8
 
 # Installer les dépendances
 npm install
@@ -47,7 +47,7 @@ npm link
 
 # Dans votre dossier n8n
 cd /path/to/your/n8n
-npm link n8n-prestashop8-node
+npm link n8n-nodes-prestashop8
 
 # Redémarrer n8n
 npm restart n8n
@@ -59,7 +59,7 @@ Si vous utilisez n8n avec Docker :
 
 ```dockerfile
 # Ajoutez dans votre Dockerfile n8n
-RUN npm install n8n-prestashop8-node
+RUN npm install n8n-nodes-prestashop8
 ```
 
 Ou avec docker-compose :
@@ -78,7 +78,7 @@ services:
     # Installer le nœud au démarrage
     command: >
       bash -c "
-        npm install n8n-prestashop8-node &&
+        npm install n8n-nodes-prestashop8 &&
         n8n start
       "
 ```
@@ -215,11 +215,11 @@ Créez un workflow simple pour tester :
 #### ❌ "Node PrestaShop8 not found"
 ```bash
 # Vérifier l'installation
-npm list n8n-prestashop8-node
+npm list n8n-nodes-prestashop8
 
 # Réinstaller si nécessaire  
-npm uninstall n8n-prestashop8-node
-npm install n8n-prestashop8-node
+npm uninstall n8n-nodes-prestashop8
+npm install n8n-nodes-prestashop8
 
 # Redémarrer n8n
 ```
@@ -287,7 +287,7 @@ Checklist finale :
 - [ ] n8n fonctionne correctement  
 - [ ] PrestaShop 8+ avec Webservices activés
 - [ ] Clé API créée avec bonnes permissions
-- [ ] Package n8n-prestashop8-node installé
+- [ ] Package n8n-nodes-prestashop8 installé
 - [ ] Credentials configurées dans n8n
 - [ ] Test de connexion réussi
 - [ ] Premier workflow fonctionnel

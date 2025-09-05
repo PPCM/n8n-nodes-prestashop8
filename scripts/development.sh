@@ -97,7 +97,7 @@ package_project() {
 link_local() {
     echo -e "${YELLOW}🔗 Création du lien npm local...${NC}"
     npm link
-    echo -e "${GREEN}✅ Lien créé. Utilisez 'npm link n8n-prestashop8-node' dans votre projet n8n${NC}"
+    echo -e "${GREEN}✅ Lien créé. Utilisez 'npm link n8n-nodes-prestashop8' dans votre projet n8n${NC}"
 }
 
 # Suppression du lien

@@ -1,10 +1,10 @@
 # n8n PrestaShop 8 Node
 
-[![npm version](https://badge.fury.io/js/n8n-prestashop8-node.svg)](https://www.npmjs.com/package/n8n-prestashop8-node)
-[![Downloads](https://img.shields.io/npm/dt/n8n-prestashop8-node.svg)](https://www.npmjs.com/package/n8n-prestashop8-node)
-[![GitHub license](https://img.shields.io/github/license/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/issues)
-[![GitHub stars](https://img.shields.io/github/stars/PPCM/n8n-prestashop8-node)](https://github.com/PPCM/n8n-prestashop8-node/stargazers)
+[![npm version](https://badge.fury.io/js/n8n-nodes-prestashop8.svg)](https://www.npmjs.com/package/n8n-nodes-prestashop8)
+[![Downloads](https://img.shields.io/npm/dt/n8n-nodes-prestashop8.svg)](https://www.npmjs.com/package/n8n-nodes-prestashop8)
+[![GitHub license](https://img.shields.io/github/license/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/blob/main/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/issues)
+[![GitHub stars](https://img.shields.io/github/stars/PPCM/n8n-nodes-prestashop8)](https://github.com/PPCM/n8n-nodes-prestashop8/stargazers)
 
 Un nœud n8n communautaire complet pour l'intégration PrestaShop 8 avec conversion automatique XML/JSON.
 
@@ -26,7 +26,7 @@ Un nœud n8n communautaire complet pour l'intégration PrestaShop 8 avec convers
 ## 🚀 Installation
 
 ```bash
-npm install n8n-prestashop8-node
+npm install n8n-nodes-prestashop8
 ```
 
 ## ⚡ Démarrage Rapide
@@ -166,7 +166,7 @@ Cron → PrestaShop 8 Node → Calculate KPIs → Email Report
 - **Timeout** → Augmenter timeout dans options debug
 
 ### Obtenir de l'Aide
-- 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-prestashop8-node/issues)** - Bugs et questions
+- 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-nodes-prestashop8/issues)** - Bugs et questions
 - 🌐 **[n8n Community](https://community.n8n.io)** - Forum discussions
 - 📖 **[Documentation](./INSTALLATION.md)** - Guides détaillés
 
@@ -176,8 +176,8 @@ Les contributions sont les bienvenues ! Voici comment participer :
 
 ### Quick Start Développement
 ```bash
-git clone https://github.com/PPCM/n8n-prestashop8-node.git
-cd n8n-prestashop8-node
+git clone https://github.com/PPCM/n8n-nodes-prestashop8.git
+cd n8n-nodes-prestashop8
 npm install
 npm run dev  # Mode watch
 ```
@@ -234,7 +234,7 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](./LICENSE) pour plus d
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=PPCM/n8n-prestashop8-node&type=Date)](https://star-history.com/#PPCM/n8n-prestashop8-node&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=PPCM/n8n-nodes-prestashop8&type=Date)](https://star-history.com/#PPCM/n8n-nodes-prestashop8&Date)
 
 ---
 

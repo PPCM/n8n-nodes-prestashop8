@@ -79,8 +79,8 @@ Un nœud n8n personnalisé pour interagir avec PrestaShop 8 via son API Webservi
 
 1. **Cloner le repository**
    ```bash
-   git clone https://github.com/PPCM/n8n-prestashop8-node.git
-   cd n8n-prestashop8-node
+   git clone https://github.com/PPCM/n8n-nodes-prestashop8.git
+   cd n8n-nodes-prestashop8
    ```
 
 2. **Installer les dépendances**
@@ -96,12 +96,12 @@ Un nœud n8n personnalisé pour interagir avec PrestaShop 8 via son API Webservi
 4. **Installer le nœud dans n8n**
    ```bash
    # Via npm (recommandé)
-   npm install n8n-prestashop8-node
+   npm install n8n-nodes-prestashop8
    
    # Ou en local pour développement
    npm link
    cd /path/to/n8n
-   npm link n8n-prestashop8-node
+   npm link n8n-nodes-prestashop8
    ```
 
 ## ⚙️ Configuration PrestaShop
@@ -291,11 +291,11 @@ Activez "Mode Raw" pour :
 
 Les contributions sont les bienvenues ! 
 
-1. Fork le projet sur [GitHub](https://github.com/PPCM/n8n-prestashop8-node)
+1. Fork le projet sur [GitHub](https://github.com/PPCM/n8n-nodes-prestashop8)
 2. Créez une branche feature (`git checkout -b feature/amazing-feature`)
 3. Commitez vos changements (`git commit -m 'Add amazing feature'`)
 4. Push vers la branche (`git push origin feature/amazing-feature`)
-5. Ouvrez une Pull Request sur [GitHub](https://github.com/PPCM/n8n-prestashop8-node/pulls)
+5. Ouvrez une Pull Request sur [GitHub](https://github.com/PPCM/n8n-nodes-prestashop8/pulls)
 
 ## 📄 Licence
 
