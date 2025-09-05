@@ -58,15 +58,5 @@ export class PrestaShop8Api implements ICredentialType {
         'Output-Format': 'JSON',
       },
     },
-    rules: [
-      {
-        type: 'responseSuccessBody',
-        properties: {
-          key: 'prestashop',
-          value: undefined,
-          message: 'Connexion PrestaShop établie avec succès',
-        },
-      },
-    ],
   };
 }
