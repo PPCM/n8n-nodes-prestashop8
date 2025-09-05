@@ -1,0 +1,48 @@
+# Development files
+src/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build tools
+tsconfig.json
+gulpfile.js
+.eslintrc.js
+.prettierrc
+
+# Tests
+test/
+*.test.js
+*.test.ts
+
+# Documentation and summaries (not needed for end users)
+summary/
+docs/
+RENAME_SUMMARY.md
+PROJECT_STRUCTURE.md
+README_FULL.md
+README_GITHUB.md
+README_EN.md
+
+# Scripts
+scripts/
+
+# Git
+.git/
+.gitignore
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary
+tmp/
+temp/

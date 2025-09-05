@@ -45,3 +45,6 @@ coverage/
 # Temporary folders
 tmp/
 temp/
+
+# Project summaries and presentations (not needed in production)
+summary/
