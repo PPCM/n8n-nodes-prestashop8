@@ -163,6 +163,7 @@ Cron → PrestaShop 8 Node → Calculate KPIs → Email Report
 - **[🎯 Practical Examples](./docs/EXAMPLES_EN.md)** - Detailed use cases
 - **[🛠️ Installation Guide](./docs/INSTALLATION_EN.md)** - Step-by-step setup
 - **[📝 Changelog](./CHANGELOG.md)** - Updates and fixes
+- **[📋 Project Summaries](./summary/README.md)** - Executive summaries and presentations
 
 ## 🐛 Issues & Support
 
