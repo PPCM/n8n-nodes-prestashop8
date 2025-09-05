@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F6EFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#003D82;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="60" height="60" rx="12" fill="url(#gradient)"/>
+  <g transform="translate(8,8)">
+    <!-- P for PrestaShop -->
+    <path d="M6 8 L6 36 L10 36 L10 26 L18 26 C22 26 24 22 24 18 C24 14 22 8 18 8 Z M10 12 L18 12 C19 12 20 13 20 18 C20 23 19 22 18 22 L10 22 Z" fill="white"/>
+    <!-- 8 for version -->
+    <circle cx="32" cy="18" r="8" fill="none" stroke="white" stroke-width="3"/>
+    <circle cx="32" cy="14" r="3" fill="white"/>
+    <circle cx="32" cy="22" r="3" fill="white"/>
+    <!-- XML/JSON conversion symbol -->
+    <path d="M38 32 L44 32 M38 36 L44 36" stroke="white" stroke-width="2"/>
+    <path d="M36 34 L38 32 L36 30" stroke="white" stroke-width="2" fill="none"/>
+    <path d="M46 30 L44 32 L46 34" stroke="white" stroke-width="2" fill="none"/>
+  </g>
+</svg>

@@ -1,0 +1,72 @@
+{
+  "name": "n8n-prestashop8-node",
+  "version": "1.0.0",
+  "description": "Nœud n8n personnalisé pour PrestaShop 8 avec support CRUD complet et conversion XML/JSON automatique",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "prestashop",
+    "ecommerce",
+    "api"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/PPCM/n8n-prestashop8-node#readme",
+  "author": {
+    "name": "PPCM",
+    "email": "contact@ppcm.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PPCM/n8n-prestashop8-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PPCM/n8n-prestashop8-node/issues"
+  },
+  "engines": {
+    "node": ">=16.10",
+    "pnpm": ">=7.18"
+  },
+  "packageManager": "pnpm@7.18.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint -s",
+    "test": "node test-example.js",
+    "clean": "rm -rf dist",
+    "package": "npm run clean && npm run build && npm pack"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/PrestaShop8Api.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/PrestaShop8/PrestaShop8.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "@types/xml2js": "^0.4.14",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.29.0",
+    "eslint-plugin-n8n-nodes-base": "^1.11.0",
+    "gulp": "^4.0.2",
+    "n8n-workflow": "*",
+    "prettier": "^2.7.1",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "js2xmlparser": "^5.0.0",
+    "xml2js": "^0.6.2"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
