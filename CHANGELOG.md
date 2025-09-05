@@ -1,9 +1,104 @@
 # Changelog
 
+**🌍 Available in:** [English](#english) | [Français](#français) | [Deutsch](#deutsch) | [Español](#español)
+
+---
+
+## English
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+### [1.0.0] - 2024-01-XX
+
+#### Added
+- 🎉 **Initial release of PrestaShop 8 node**
+- ✅ **Complete CRUD support**: Create, Read, Update, Delete, Search
+- 🔄 **Automatic XML/JSON conversion** with PrestaShop structure simplification
+- ⚡ **Raw mode** for direct access to raw XML/JSON data
+- 🔍 **Advanced search** with filters, sorting, pagination
+- 🔐 **Secure authentication** via PrestaShop API key
+- 📱 **25+ supported resources**
+- 🏛️ **Intuitive user interface** with dynamic dropdown menus
+- 🧪 **Debug options**: URL display, headers, customizable timeout
+- 📚 **Complete documentation** with practical examples
+- 🌍 **Multilingual documentation**: English, French, German, Spanish
+
+---
+
+## Français
+
 Toutes les modifications notables de ce projet seront documentées dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+### [1.0.0] - 2024-01-XX
+
+#### Ajouté
+- 🎉 **Version initiale du nœud PrestaShop 8**
+- ✅ **Support CRUD complet** : Create, Read, Update, Delete, Search
+- 🔄 **Conversion automatique XML/JSON** avec simplification des structures PrestaShop
+- ⚡ **Mode Raw** pour accès direct aux données brutes XML/JSON
+- 🔍 **Recherche avancée** avec filtres, tri, pagination
+- 🔐 **Authentification sécurisée** via clé API PrestaShop
+- 📱 **25+ ressources supportées**
+- 🏛️ **Interface utilisateur intuitive** avec menus déroulants dynamiques
+- 🧪 **Options de debug** : affichage URL, headers, timeout personnalisable
+- 📚 **Documentation complète** avec exemples pratiques
+- 🌍 **Documentation multilingue** : Anglais, Français, Allemand, Espagnol
+
+---
+
+## Deutsch
+
+Alle bemerkenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
+
+Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
+und dieses Projekt folgt der [Semantischen Versionierung](https://semver.org/lang/de/).
+
+### [1.0.0] - 2024-01-XX
+
+#### Hinzugefügt
+- 🎉 **Erstveröffentlichung des PrestaShop 8 Nodes**
+- ✅ **Vollständige CRUD-Unterstützung**: Create, Read, Update, Delete, Search
+- 🔄 **Automatische XML/JSON-Konvertierung** mit Vereinfachung der PrestaShop-Strukturen
+- ⚡ **Raw-Modus** für direkten Zugang zu rohen XML/JSON-Daten
+- 🔍 **Erweiterte Suche** mit Filtern, Sortierung, Paginierung
+- 🔐 **Sichere Authentifizierung** über PrestaShop-API-Schlüssel
+- 📱 **25+ unterstützte Ressourcen**
+- 🏛️ **Intuitive Benutzeroberfläche** mit dynamischen Dropdown-Menüs
+- 🧪 **Debug-Optionen**: URL-Anzeige, Headers, anpassbare Timeouts
+- 📚 **Vollständige Dokumentation** mit praktischen Beispielen
+- 🌍 **Mehrsprachige Dokumentation**: Englisch, Französisch, Deutsch, Spanisch
+
+---
+
+## Español
+
+Todos los cambios notables de este proyecto serán documentados en este archivo.
+
+El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
+y este proyecto se adhiere al [Versionado Semántico](https://semver.org/lang/es/).
+
+### [1.0.0] - 2024-01-XX
+
+#### Agregado
+- 🎉 **Lanzamiento inicial del nodo PrestaShop 8**
+- ✅ **Soporte CRUD completo**: Create, Read, Update, Delete, Search
+- 🔄 **Conversión automática XML/JSON** con simplificación de estructuras PrestaShop
+- ⚡ **Modo Raw** para acceso directo a datos XML/JSON en bruto
+- 🔍 **Búsqueda avanzada** con filtros, ordenamiento, paginación
+- 🔐 **Autenticación segura** vía clave API de PrestaShop
+- 📱 **25+ recursos soportados**
+- 🏛️ **Interfaz de usuario intuitiva** con menús desplegables dinámicos
+- 🧪 **Opciones de debug**: visualización URL, headers, timeout personalizable
+- 📚 **Documentación completa** con ejemplos prácticos
+- 🌍 **Documentación multilingüe**: Inglés, Francés, Alemán, Español
+
+---
 
 ## [1.0.0] - 2024-01-XX
 

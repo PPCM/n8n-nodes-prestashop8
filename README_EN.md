@@ -9,12 +9,10 @@
 A comprehensive n8n community node for PrestaShop 8 integration with automatic XML/JSON conversion and full CRUD support.
 
 **🌍 Documentation Languages:**
-- 🇬🇧 **English** (this file) - [Examples](./docs/EXAMPLES_EN.md) | [Installation](./docs/INSTALLATION_EN.md)
-- 🇫🇷 [**Français**](./docs/README_FR.md) - [Exemples](./EXAMPLES.md) | [Installation](./INSTALLATION.md)
-- 🇩🇪 [**Deutsch**](./docs/README_DE.md) - [Beispiele](./docs/EXAMPLES_DE.md) | [Installation](./docs/INSTALLATION_DE.md)
-- 🇪🇸 [**Español**](./docs/README_ES.md) - [Ejemplos](./docs/EXAMPLES_ES.md) | [Instalación](./docs/INSTALLATION_ES.md)
-
-**📚 [Complete Documentation Hub](./docs/README.md)**
+- 🇬🇧 **English** (this file)
+- 🇫🇷 [**Français**](./docs/README_FR.md)
+- 🇩🇪 [**Deutsch**](./docs/README_DE.md) 
+- 🇪🇸 [**Español**](./docs/README_ES.md)
 
 [🚀 Quick Start](#quick-start) | [✨ Features](#features) | [📚 Documentation](#documentation) | [🎯 Examples](#examples) | [🤝 Contributing](#contributing)
 
