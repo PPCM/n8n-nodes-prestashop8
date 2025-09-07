@@ -126,8 +126,29 @@ export class PrestaShop8 implements INodeType {
     const returnData: INodeExecutionData[] = [];
     const credentials = await this.getCredentials('prestaShop8Api') as IPrestaShopCredentials;
 
-    const resource = this.getNodeParameter('resource', 0) as string;
-    const operation = this.getNodeParameter('operation', 0) as string;
+    // Récupérer le mode (variantes comme Postgres)
+    const mode = this.getNodeParameter('mode', 0) as string;
+    
+    // Si le mode n'est pas "custom", utiliser la resource et opération par défaut
+    let resource: string;
+    let operation: string;
+    
+    if (mode === 'custom') {
+      resource = this.getNodeParameter('resource', 0) as string;
+      operation = this.getNodeParameter('operation', 0) as string;
+    } else {
+      // Mapping des modes vers les ressources
+      const modeMapping: { [key: string]: string } = {
+        'products': 'products',
+        'orders': 'orders', 
+        'customers': 'customers',
+        'categories': 'categories',
+        'stock': 'stock_availables',
+      };
+      
+      resource = modeMapping[mode] || 'products';
+      operation = 'list'; // Opération par défaut pour les variantes
+    }
 
     for (let i = 0; i < items.length; i++) {
       try {

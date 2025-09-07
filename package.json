@@ -49,12 +49,7 @@
       "dist/credentials/PrestaShop8Api.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/PrestaShop8/PrestaShop8.node.js",
-      "dist/nodes/PrestaShop8/PrestaShop8Products.node.js",
-      "dist/nodes/PrestaShop8/PrestaShop8Orders.node.js",
-      "dist/nodes/PrestaShop8/PrestaShop8Customers.node.js",
-      "dist/nodes/PrestaShop8/PrestaShop8Categories.node.js",
-      "dist/nodes/PrestaShop8/PrestaShop8Stock.node.js"
+      "dist/nodes/PrestaShop8/PrestaShop8.node.js"
     ]
   },
   "devDependencies": {
