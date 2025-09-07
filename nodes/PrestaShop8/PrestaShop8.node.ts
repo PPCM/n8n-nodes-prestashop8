@@ -133,7 +133,7 @@ export class PrestaShop8 implements INodeType {
 
     for (let i = 0; i < items.length; i++) {
       try {
-        const rawMode = this.getNodeParameter('rawMode', i, false) as boolean;
+        const rawMode = this.getNodeParameter('debugOptions.rawMode', i, false) as boolean;
         let responseData: any;
         let requestUrl: string;
         
@@ -259,16 +259,9 @@ export class PrestaShop8 implements INodeType {
           case 'create': {
             let body: string;
 
-            if (rawMode) {
-              const manualXml = this.getNodeParameter('manualXml', i, '') as string;
-              if (manualXml) {
-                body = manualXml;
-              } else {
-                const data = this.getNodeParameter('data', i) as object;
-                body = buildPrestashopXml(resource, data);
-              }
-            } else {
-              const data = this.getNodeParameter('data', i) as object;
+            const data = this.getNodeParameter('data', i) as object;
+
+            if (!rawMode) {
               
               const validation = validateDataForResource(resource, data);
               if (!validation.isValid) {
@@ -278,8 +271,9 @@ export class PrestaShop8 implements INodeType {
                 );
               }
 
-              body = buildPrestashopXml(resource, data);
             }
+
+            body = buildPrestashopXml(resource, data);
 
             const options: IHttpRequestOptions = {
               method: 'POST' as IHttpRequestMethods,
@@ -312,17 +306,9 @@ export class PrestaShop8 implements INodeType {
 
             let body: string;
 
-            if (rawMode) {
-              const manualXml = this.getNodeParameter('manualXml', i, '') as string;
-              if (manualXml) {
-                body = manualXml;
-              } else {
-                const data = this.getNodeParameter('data', i) as object;
-                body = buildPrestashopXml(resource, { ...data, id });
-              }
-            } else {
-              const data = this.getNodeParameter('data', i) as object;
-              
+            const data = this.getNodeParameter('data', i) as object;
+            
+            if (!rawMode) {
               const validation = validateDataForResource(resource, data);
               if (!validation.isValid) {
                 throw new NodeOperationError(
@@ -330,9 +316,9 @@ export class PrestaShop8 implements INodeType {
                   `Invalid data: ${validation.errors.join(', ')}`
                 );
               }
-
-              body = buildPrestashopXml(resource, { ...data, id });
             }
+
+            body = buildPrestashopXml(resource, { ...data, id });
 
             const options: IHttpRequestOptions = {
               method: 'PUT' as IHttpRequestMethods,

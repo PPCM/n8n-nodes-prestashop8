@@ -111,20 +111,6 @@ export const PrestaShop8Description: INodeTypeDescription = {
       description: 'Operation to perform on the resource',
     },
 
-    // Raw Mode
-    {
-      displayName: 'Raw Mode',
-      name: 'rawMode',
-      type: 'boolean',
-      default: false,
-      displayOptions: {
-        show: {
-          operation: ['list', 'getById', 'search'],
-        },
-      },
-      description: 'Return raw PrestaShop XML/JSON format instead of simplified structure. Useful for accessing all original data fields.',
-    },
-
     // ID for specific operations
     {
       displayName: 'ID',
@@ -278,32 +264,21 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
     },
 
-    // Mode XML manuel pour le Raw Mode
+    // Debug Options
     {
-      displayName: 'XML Manuel',
-      name: 'manualXml',
-      type: 'string',
-      displayOptions: {
-        show: {
-          operation: ['create', 'update'],
-          rawMode: [true],
-        },
-      },
-      default: '',
-      description: 'PrestaShop XML to send directly (Raw Mode only)',
-      typeOptions: {
-        rows: 15,
-      },
-    },
-
-    // Options de debug
-    {
-      displayName: 'Options de debug',
+      displayName: 'Debug Options',
       name: 'debugOptions',
       type: 'collection',
       default: {},
-      placeholder: 'Ajouter une option',
+      placeholder: 'Add Option',
       options: [
+        {
+          displayName: 'Raw Mode',
+          name: 'rawMode',
+          type: 'boolean',
+          default: false,
+          description: 'Return raw PrestaShop XML format instead of simplified JSON. Useful for debugging and accessing all original data fields.',
+        },
         {
           displayName: 'Show Request URL',
           name: 'showUrl',
@@ -312,7 +287,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           description: 'Add request URL to the response',
         },
         {
-          displayName: 'Afficher headers',
+          displayName: 'Show Headers',
           name: 'showHeaders',
           type: 'boolean',
           default: false,
