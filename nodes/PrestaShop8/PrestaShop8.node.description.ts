@@ -4,8 +4,8 @@ import { PRESTASHOP_RESOURCES, FILTER_OPERATORS } from './types';
 export const PrestaShop8Description: INodeTypeDescription = {
   displayName: 'PrestaShop 8',
   name: 'prestaShop8',
-  icon: 'file:prestashop8.svg',
   group: ['transform'],
+  icon: 'file:prestashop8.svg' as any,
   version: 1,
   subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
   description: 'n8n node for PrestaShop 8 with automatic XML/JSON conversion and full CRUD support',

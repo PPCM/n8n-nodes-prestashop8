@@ -40,7 +40,8 @@
     "package": "npm run clean && npm run build && npm pack"
   },
   "files": [
-    "dist"
+    "dist",
+    "prestashop8.svg"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
