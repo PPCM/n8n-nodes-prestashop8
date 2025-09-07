@@ -193,7 +193,7 @@ export class PrestaShop8 implements INodeType {
               response = await this.helpers.httpRequest(options);
             }
             
-            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
+            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
           }
 
@@ -222,7 +222,7 @@ export class PrestaShop8 implements INodeType {
             };
 
             const response = await this.helpers.httpRequest(options);
-            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
+            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
           }
 
@@ -252,7 +252,7 @@ export class PrestaShop8 implements INodeType {
             };
 
             const response = await this.helpers.httpRequest(options);
-            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
+            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
           }
 
@@ -293,7 +293,7 @@ export class PrestaShop8 implements INodeType {
 
             requestUrl = options.url as string;
             const response = await this.helpers.httpRequest(options);
-            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
+            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
           }
 
@@ -338,7 +338,7 @@ export class PrestaShop8 implements INodeType {
 
             requestUrl = options.url as string;
             const response = await this.helpers.httpRequest(options);
-            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
+            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
           }
 
