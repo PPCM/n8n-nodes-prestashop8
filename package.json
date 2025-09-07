@@ -52,7 +52,10 @@
       "dist/nodes/PrestaShop8/PrestaShop8.node.js",
       "dist/nodes/PrestaShop8Products.node.js",
       "dist/nodes/PrestaShop8Orders.node.js",
-      "dist/nodes/PrestaShop8Customers.node.js"
+      "dist/nodes/PrestaShop8Customers.node.js",
+      "dist/nodes/PrestaShop8Categories.node.js",
+      "dist/nodes/PrestaShop8Stock.node.js",
+      "dist/nodes/PrestaShop8Execute.node.js"
     ]
   },
   "devDependencies": {
