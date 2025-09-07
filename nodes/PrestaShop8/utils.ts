@@ -2,6 +2,40 @@ import * as xml2js from 'xml2js';
 import * as js2xmlparser from 'js2xmlparser';
 
 /**
+ * Process PrestaShop response based on mode for optimal UX
+ */
+export function processResponseForMode(rawData: any, resource: string, mode: string): any {
+  // If raw mode or no mode specified, use standard simplification
+  if (!mode || mode === 'custom') {
+    return simplifyPrestashopResponse(rawData, resource);
+  }
+  
+  // For specialized modes, flatten the response structure
+  const simplified = simplifyPrestashopResponse(rawData, resource);
+  
+  // If it's an array response and we're in a specialized mode,
+  // return the array directly without the resource wrapper
+  if (Array.isArray(simplified)) {
+    return simplified;
+  }
+  
+  // If it's an object and contains the resource array, extract it
+  if (simplified && typeof simplified === 'object') {
+    // Check for common PrestaShop response patterns
+    const resourceKey = Object.keys(simplified).find(key => 
+      key === resource || key === resource + 's' || 
+      (Array.isArray(simplified[key]) && simplified[key].length > 0)
+    );
+    
+    if (resourceKey && Array.isArray(simplified[resourceKey])) {
+      return simplified[resourceKey];
+    }
+  }
+  
+  return simplified;
+}
+
+/**
  * Simplifies PrestaShop XML/JSON response to simplified JSON
  */
 export function simplifyPrestashopResponse(rawData: any, resource: string): any {

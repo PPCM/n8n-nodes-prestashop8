@@ -22,6 +22,7 @@ import {
   parseXmlToJson,
   buildUrlWithFilters,
   validateDataForResource,
+  processResponseForMode,
 } from './utils';
 
 // Helper function to build headers based on raw mode (backward compatibility)
@@ -155,6 +156,9 @@ export class PrestaShop8 implements INodeType {
         const rawMode = this.getNodeParameter('rawMode', i, false) as boolean;
         let responseData: any;
         let requestUrl: string;
+        
+        // Get mode for response processing
+        const currentMode = mode;
 
         switch (operation) {
           case 'list': {
@@ -209,7 +213,7 @@ export class PrestaShop8 implements INodeType {
               response = await this.helpers.httpRequest(options);
             }
             
-            responseData = rawMode ? response : simplifyPrestashopResponse(response, resource);
+            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
             break;
           }
 
@@ -238,7 +242,7 @@ export class PrestaShop8 implements INodeType {
             };
 
             const response = await this.helpers.httpRequest(options);
-            responseData = rawMode ? response : simplifyPrestashopResponse(response, resource);
+            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
             break;
           }
 
@@ -268,7 +272,7 @@ export class PrestaShop8 implements INodeType {
             };
 
             const response = await this.helpers.httpRequest(options);
-            responseData = rawMode ? response : simplifyPrestashopResponse(response, resource);
+            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
             break;
           }
 
@@ -315,7 +319,7 @@ export class PrestaShop8 implements INodeType {
 
             requestUrl = options.url as string;
             const response = await this.helpers.httpRequest(options);
-            responseData = rawMode ? response : simplifyPrestashopResponse(response, resource);
+            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
             break;
           }
 
@@ -368,7 +372,7 @@ export class PrestaShop8 implements INodeType {
 
             requestUrl = options.url as string;
             const response = await this.helpers.httpRequest(options);
-            responseData = rawMode ? response : simplifyPrestashopResponse(response, resource);
+            responseData = rawMode ? response : processResponseForMode(response, resource, currentMode);
             break;
           }
 
