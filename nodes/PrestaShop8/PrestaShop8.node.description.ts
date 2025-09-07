@@ -19,12 +19,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
       required: true,
     },
   ],
-  requestDefaults: {
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/xml',
-    },
-  },
+  // Note: Headers are set dynamically based on raw mode
   properties: [
     // Integrated documentation
     {
@@ -117,11 +112,16 @@ export const PrestaShop8Description: INodeTypeDescription = {
 
     // Raw Mode
     {
-      displayName: 'Mode Raw',
+      displayName: 'Raw Mode',
       name: 'rawMode',
       type: 'boolean',
       default: false,
-      description: 'If enabled, returns raw PrestaShop data (native XML/JSON) without automatic conversion',
+      displayOptions: {
+        show: {
+          operation: ['list', 'getById', 'search'],
+        },
+      },
+      description: 'Return raw PrestaShop XML/JSON format instead of simplified structure. Useful for accessing all original data fields.',
     },
 
     // ID for specific operations

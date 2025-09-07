@@ -24,6 +24,15 @@ import {
   validateDataForResource,
 } from './utils';
 
+// Helper function to build headers based on raw mode
+function buildHeaders(rawMode: boolean): any {
+  const headers: any = {};
+  if (!rawMode) {
+    headers['Output-Format'] = 'JSON';
+  }
+  return headers;
+}
+
 export class PrestaShop8 implements INodeType {
   description: INodeTypeDescription = PrestaShop8Description;
 
@@ -100,10 +109,10 @@ export class PrestaShop8 implements INodeType {
 
     const resource = this.getNodeParameter('resource', 0) as string;
     const operation = this.getNodeParameter('operation', 0) as string;
-    const rawMode = this.getNodeParameter('rawMode', 0, false) as boolean;
 
     for (let i = 0; i < items.length; i++) {
       try {
+        const rawMode = this.getNodeParameter('rawMode', i, false) as boolean;
         let responseData: any;
         let requestUrl: string;
 
@@ -124,9 +133,7 @@ export class PrestaShop8 implements INodeType {
                 username: credentials.apiKey,
                 password: '',
               },
-              headers: {
-                'Output-Format': 'JSON',
-              },
+              headers: buildHeaders(rawMode),
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
             };
 
@@ -154,9 +161,7 @@ export class PrestaShop8 implements INodeType {
                 username: credentials.apiKey,
                 password: '',
               },
-              headers: {
-                'Output-Format': 'JSON',
-              },
+              headers: buildHeaders(rawMode),
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
             };
 
@@ -185,9 +190,7 @@ export class PrestaShop8 implements INodeType {
                 username: credentials.apiKey,
                 password: '',
               },
-              headers: {
-                'Output-Format': 'JSON',
-              },
+              headers: buildHeaders(rawMode),
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
             };
 
@@ -231,7 +234,7 @@ export class PrestaShop8 implements INodeType {
               },
               headers: {
                 'Content-Type': 'application/xml',
-                'Output-Format': 'JSON',
+                ...(rawMode ? {} : { 'Output-Format': 'JSON' }),
               },
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
             };
@@ -283,7 +286,7 @@ export class PrestaShop8 implements INodeType {
               },
               headers: {
                 'Content-Type': 'application/xml',
-                'Output-Format': 'JSON',
+                ...(rawMode ? {} : { 'Output-Format': 'JSON' }),
               },
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
             };
@@ -308,9 +311,7 @@ export class PrestaShop8 implements INodeType {
                 username: credentials.apiKey,
                 password: '',
               },
-              headers: {
-                'Output-Format': 'JSON',
-              },
+              headers: buildHeaders(rawMode),
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
             };
 
