@@ -2,19 +2,13 @@ import * as xml2js from 'xml2js';
 import * as js2xmlparser from 'js2xmlparser';
 
 /**
- * Process PrestaShop response based on mode for optimal UX
+ * Process PrestaShop response for direct resource access
  */
-export function processResponseForMode(rawData: any, resource: string, mode: string): any {
-  // If raw mode or no mode specified, use standard simplification
-  if (!mode || mode === 'custom') {
-    return simplifyPrestashopResponse(rawData, resource);
-  }
-  
-  // For specialized modes, flatten the response structure
+export function processResponseForMode(rawData: any, resource: string, currentResource: string): any {
+  // First simplify with standard function
   const simplified = simplifyPrestashopResponse(rawData, resource);
   
-  // If it's an array response and we're in a specialized mode,
-  // return the array directly without the resource wrapper
+  // If it's already an array, return it directly
   if (Array.isArray(simplified)) {
     return simplified;
   }

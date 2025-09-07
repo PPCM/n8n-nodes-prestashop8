@@ -22,22 +22,20 @@ export const PrestaShop8Description: INodeTypeDescription = {
   ],
   // Note: Headers are set dynamically based on raw mode
   properties: [
-    // Mode de traitement (variantes comme Postgres)
+    // Resource selection (all PrestaShop resources)
     {
-      displayName: 'Mode',
-      name: 'mode',
+      displayName: 'Resource',
+      name: 'resource', 
       type: 'options',
-      options: [
-        { name: 'Products', value: 'products', description: 'Manage product catalog' },
-        { name: 'Orders', value: 'orders', description: 'Manage customer orders' },
-        { name: 'Customers', value: 'customers', description: 'Manage customer accounts' },
-        { name: 'Categories', value: 'categories', description: 'Manage product categories' },
-        { name: 'Stock', value: 'stock', description: 'Manage inventory levels' },
-        { name: 'Custom', value: 'custom', description: 'Full manual configuration' },
-        { name: 'machin', value: 'machin', description: 'Ceci est un test' },
-      ],
-      default: 'custom',
-      description: 'Choose the PrestaShop resource type to work with',
+      noDataExpression: true,
+      options: Object.values(PRESTASHOP_RESOURCES).map(resource => ({
+        name: resource.displayName,
+        value: resource.name,
+        description: resource.description,
+      })),
+      default: 'products',
+      required: true,
+      description: 'PrestaShop resource type to work with',
     },
 
     // Integrated documentation
@@ -94,27 +92,6 @@ export const PrestaShop8Description: INodeTypeDescription = {
       ],
     },
 
-    // Resource selection (only shown for custom configuration)
-    {
-      displayName: 'Resource',
-      name: 'resource',
-      type: 'options',
-      noDataExpression: true,
-      displayOptions: {
-        show: {
-          mode: ['custom'],
-        },
-      },
-      options: Object.values(PRESTASHOP_RESOURCES).map(resource => ({
-        name: resource.displayName,
-        value: resource.name,
-        description: resource.description,
-      })),
-      default: 'products',
-      required: true,
-      description: 'PrestaShop resource type to manipulate',
-    },
-
     // Operation selection
     {
       displayName: 'Operation',
@@ -123,7 +100,6 @@ export const PrestaShop8Description: INodeTypeDescription = {
       noDataExpression: true,
       displayOptions: {
         show: {
-          mode: ['custom'],
           resource: Object.keys(PRESTASHOP_RESOURCES),
         },
       },
