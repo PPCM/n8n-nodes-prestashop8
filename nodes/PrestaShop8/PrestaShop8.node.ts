@@ -160,7 +160,7 @@ export class PrestaShop8 implements INodeType {
             let response: any;
             
             if (rawMode) {
-              // En mode Raw, utilisons axios directement pour éviter le parsing automatique de n8n
+              // In Raw mode, use axios directly to avoid n8n automatic parsing
               const axios = require('axios');
               
               try {
@@ -173,7 +173,7 @@ export class PrestaShop8 implements INodeType {
                   },
                   headers: options.headers,
                   timeout: options.timeout || 30000,
-                  transformResponse: [(data: any) => data] // Garde la réponse brute
+                  transformResponse: [(data: any) => data] // Keep raw response
                 });
                 
                 response = axiosResponse.data;

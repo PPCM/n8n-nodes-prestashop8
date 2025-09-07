@@ -169,6 +169,10 @@ const translations = {
   "'Un email est requis pour créer un client'": "'An email is required to create a customer'",
   "'Un nom est requis pour créer un produit'": "'A name is required to create a product'",
   "'Un ID client est requis pour créer une commande'": "'A customer ID is required to create an order'",
+  
+  // Additional comments in node.ts
+  "// En mode Raw, utilisons axios directement pour éviter le parsing automatique de n8n": "// In Raw mode, use axios directly to avoid n8n automatic parsing",
+  "// Garde la réponse brute": "// Keep raw response",
   // Comments
   "// Documentation intégrée": "// Integrated documentation",
   "// Sélection de la ressource": "// Resource selection", 
