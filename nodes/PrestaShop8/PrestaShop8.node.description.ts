@@ -34,6 +34,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
         { name: 'Categories', value: 'categories', description: 'Manage product categories' },
         { name: 'Stock', value: 'stock', description: 'Manage inventory levels' },
         { name: 'Custom', value: 'custom', description: 'Full manual configuration' },
+        { name: 'machin', value: 'machin', description: 'Ceci est un test' },
       ],
       default: 'custom',
       description: 'Choose the PrestaShop resource type to work with',
