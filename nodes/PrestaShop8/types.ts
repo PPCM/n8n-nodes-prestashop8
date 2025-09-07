@@ -33,13 +33,13 @@ export interface IPrestaShopResource {
   supportsSearch: boolean;
 }
 
-// Ressources PrestaShop supportées
+// Supported PrestaShop resources
 export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
-  // Clients & CRM
+  // Customers & CRM
   customers: {
     name: 'customers',
-    displayName: 'Clients',
-    description: 'Gestion des clients de la boutique',
+    displayName: 'Customers',
+    description: 'Store customer management',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -60,7 +60,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   groups: {
     name: 'groups',
-    displayName: 'Groupes clients',
+    displayName: 'Customer Groups',
     description: 'Groupes de clients et tarifs',
     supportsCreate: true,
     supportsUpdate: true,
@@ -82,7 +82,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   customer_messages: {
     name: 'customer_messages',
-    displayName: 'Messages clients',
+    displayName: 'Customer Messages',
     description: 'Messages individuels des conversations',
     supportsCreate: true,
     supportsUpdate: true,
@@ -95,7 +95,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   // Catalogue produits
   products: {
     name: 'products',
-    displayName: 'Produits',
+    displayName: 'Products',
     description: 'Catalogue des produits de la boutique',
     supportsCreate: true,
     supportsUpdate: true,
@@ -106,8 +106,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   combinations: {
     name: 'combinations',
-    displayName: 'Déclinaisons produits',
-    description: 'Variantes et déclinaisons des produits',
+    displayName: 'Product Combinations',
+    description: 'Product variants and combinations',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -117,7 +117,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   stock_availables: {
     name: 'stock_availables',
-    displayName: 'Stock disponible',
+    displayName: 'Available Stock',
     description: 'Gestion des stocks produits',
     supportsCreate: false,
     supportsUpdate: true,
@@ -128,8 +128,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   categories: {
     name: 'categories',
-    displayName: 'Catégories',
-    description: 'Arborescence des catégories produits',
+    displayName: 'Categories',
+    description: 'Product category hierarchy',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -139,7 +139,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   manufacturers: {
     name: 'manufacturers',
-    displayName: 'Fabricants',
+    displayName: 'Manufacturers',
     description: 'Marques et fabricants',
     supportsCreate: true,
     supportsUpdate: true,
@@ -150,7 +150,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   suppliers: {
     name: 'suppliers',
-    displayName: 'Fournisseurs',
+    displayName: 'Suppliers',
     description: 'Fournisseurs des produits',
     supportsCreate: true,
     supportsUpdate: true,
@@ -161,8 +161,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   tags: {
     name: 'tags',
-    displayName: 'Étiquettes',
-    description: 'Tags et mots-clés produits',
+    displayName: 'Tags',
+    description: 'Product tags and keywords',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -172,8 +172,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   product_features: {
     name: 'product_features',
-    displayName: 'Caractéristiques produits',
-    description: 'Fonctionnalités et attributs produits',
+    displayName: 'Product Features',
+    description: 'Product features and attributes',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -183,7 +183,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   product_options: {
     name: 'product_options',
-    displayName: 'Options produits',
+    displayName: 'Product Options',
     description: 'Options de personnalisation',
     supportsCreate: true,
     supportsUpdate: true,
@@ -193,10 +193,10 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
     supportsSearch: true,
   },
 
-  // Commandes & ventes
+  // Orders & ventes
   orders: {
     name: 'orders',
-    displayName: 'Commandes',
+    displayName: 'Orders',
     description: 'Commandes de la boutique',
     supportsCreate: true,
     supportsUpdate: true,
@@ -207,7 +207,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   order_details: {
     name: 'order_details',
-    displayName: 'Détails commandes',
+    displayName: 'Order Details',
     description: 'Lignes des commandes',
     supportsCreate: false,
     supportsUpdate: true,
@@ -219,7 +219,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   order_histories: {
     name: 'order_histories',
     displayName: 'Historique commandes',
-    description: 'Changements d\'état des commandes',
+    description: 'Order status changes',
     supportsCreate: true,
     supportsUpdate: false,
     supportsDelete: false,
@@ -229,8 +229,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   order_states: {
     name: 'order_states',
-    displayName: 'États commandes',
-    description: 'États possibles des commandes',
+    displayName: 'Order States',
+    description: 'Possible order states',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -240,7 +240,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   carts: {
     name: 'carts',
-    displayName: 'Paniers',
+    displayName: 'Carts',
     description: 'Paniers d\'achat clients',
     supportsCreate: true,
     supportsUpdate: true,
@@ -251,8 +251,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   cart_rules: {
     name: 'cart_rules',
-    displayName: 'Règles panier',
-    description: 'Bons de réduction et promotions',
+    displayName: 'Cart Rules',
+    description: 'Discount vouchers and promotions',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -264,7 +264,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   // Transport & logistique
   carriers: {
     name: 'carriers',
-    displayName: 'Transporteurs',
+    displayName: 'Carriers',
     description: 'Modes de livraison et transporteurs',
     supportsCreate: true,
     supportsUpdate: true,
@@ -275,7 +275,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   zones: {
     name: 'zones',
-    displayName: 'Zones géographiques',
+    displayName: 'Geographic Zones',
     description: 'Zones de livraison',
     supportsCreate: true,
     supportsUpdate: true,
@@ -286,7 +286,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   countries: {
     name: 'countries',
-    displayName: 'Pays',
+    displayName: 'Countries',
     description: 'Liste des pays',
     supportsCreate: true,
     supportsUpdate: true,
@@ -297,8 +297,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   states: {
     name: 'states',
-    displayName: 'États/Régions',
-    description: 'États et régions par pays',
+    displayName: 'States/Regions',
+    description: 'States and regions by country',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -310,8 +310,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   // Paiements & finances
   currencies: {
     name: 'currencies',
-    displayName: 'Devises',
-    description: 'Devises acceptées',
+    displayName: 'Currencies',
+    description: 'Accepted currencies',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -331,7 +331,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
     supportsSearch: true,
   },
 
-  // CMS & médias
+  // CMS & Media
   content_management_system: {
     name: 'content_management_system',
     displayName: 'Pages CMS',
@@ -346,7 +346,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   images: {
     name: 'images',
     displayName: 'Images',
-    description: 'Images produits et catégories',
+    description: 'Product and category images',
     supportsCreate: true,
     supportsUpdate: false,
     supportsDelete: true,
@@ -359,7 +359,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   configurations: {
     name: 'configurations',
     displayName: 'Configuration',
-    description: 'Paramètres de la boutique',
+    description: 'Store settings',
     supportsCreate: false,
     supportsUpdate: true,
     supportsDelete: false,
@@ -369,8 +369,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   languages: {
     name: 'languages',
-    displayName: 'Langues',
-    description: 'Langues supportées',
+    displayName: 'Languages',
+    description: 'Supported languages',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -380,7 +380,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   shops: {
     name: 'shops',
-    displayName: 'Boutiques',
+    displayName: 'Shops',
     description: 'Boutiques multiples',
     supportsCreate: true,
     supportsUpdate: true,
@@ -391,14 +391,14 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
 };
 
-// Opérateurs de filtre disponibles
+// Available filter operators
 export const FILTER_OPERATORS = [
-  { name: 'Égal à', value: '=' },
-  { name: 'Différent de', value: '!=' },
-  { name: 'Supérieur à', value: '>' },
-  { name: 'Supérieur ou égal à', value: '>=' },
-  { name: 'Inférieur à', value: '<' },
-  { name: 'Inférieur ou égal à', value: '<=' },
+  { name: 'Equal to', value: '=' },
+  { name: 'Not equal to', value: '!=' },
+  { name: 'Greater than', value: '>' },
+  { name: 'Greater than or equal to', value: '>=' },
+  { name: 'Less than', value: '<' },
+  { name: 'Less than or equal to', value: '<=' },
   { name: 'Contient', value: 'LIKE' },
   { name: 'Ne contient pas', value: 'NOT LIKE' },
   { name: 'Commence par', value: 'BEGINS' },

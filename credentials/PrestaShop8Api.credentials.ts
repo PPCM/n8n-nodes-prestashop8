@@ -15,8 +15,8 @@ export class PrestaShop8Api implements ICredentialType {
       name: 'baseUrl',
       type: 'string',
       default: '',
-      placeholder: 'https://votre-boutique.com/api',
-      description: 'URL de base de l\'API PrestaShop (ex: https://votre-boutique.com/api)',
+      placeholder: 'https://your-store.com/api',
+      description: 'PrestaShop API base URL (e.g., https://your-store.com/api)',
       required: true,
     },
     {
@@ -27,7 +27,7 @@ export class PrestaShop8Api implements ICredentialType {
         password: true,
       },
       default: '',
-      description: 'Clé API PrestaShop générée dans le back-office (Paramètres avancés > Service Web)',
+      description: 'PrestaShop API key generated in back office (Advanced Parameters > Web Service)',
       required: true,
     },
     {
@@ -35,7 +35,7 @@ export class PrestaShop8Api implements ICredentialType {
       name: 'testConnection',
       type: 'boolean',
       default: false,
-      description: 'Tester automatiquement la connexion lors de la sauvegarde',
+      description: 'Automatically test the connection when saving credentials',
     },
   ];
 

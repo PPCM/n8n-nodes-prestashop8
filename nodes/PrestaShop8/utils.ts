@@ -2,14 +2,14 @@ import * as xml2js from 'xml2js';
 import * as js2xmlparser from 'js2xmlparser';
 
 /**
- * Simplifie la réponse XML/JSON de PrestaShop en JSON simplifié
+ * Simplifies PrestaShop XML/JSON response to simplified JSON
  */
 export function simplifyPrestashopResponse(rawData: any, resource: string): any {
   if (!rawData || typeof rawData !== 'object') {
     return rawData;
   }
 
-  // Si c'est déjà simplifié, retourner tel quel
+  // If already simplified, return as is
   if (!rawData.prestashop) {
     return rawData;
   }
@@ -23,7 +23,7 @@ export function simplifyPrestashopResponse(rawData: any, resource: string): any 
     data = data[resource + 's'];
   }
 
-  // Si c'est un tableau, traiter chaque élément
+  // If it's an array, process each element
   if (Array.isArray(data)) {
     return data.map(item => simplifyItem(item, resource));
   }
@@ -33,7 +33,7 @@ export function simplifyPrestashopResponse(rawData: any, resource: string): any 
 }
 
 /**
- * Simplifie un élément individuel
+ * Simplifies an individual element
  */
 function simplifyItem(item: any, resource: string): any {
   if (!item || typeof item !== 'object') {
@@ -76,7 +76,7 @@ function simplifyAssociation(assoc: any): any[] {
   }
 
   if (typeof assoc === 'object') {
-    // Cas d'une association avec un seul élément
+    // Case of an association with a single element
     const values = Object.values(assoc);
     if (values.length === 1 && Array.isArray(values[0])) {
       return (values[0] as any[]).map(item => {
@@ -96,12 +96,12 @@ function simplifyAssociation(assoc: any): any[] {
  */
 function convertFieldName(fieldName: string): string {
   return fieldName
-    .replace(/^id_/, '') // Supprimer le préfixe id_
+    .replace(/^id_/, '') // Remove id_ prefix
     .replace(/_([a-z])/g, (match, letter) => letter.toUpperCase()); // Convertir en camelCase
 }
 
 /**
- * Convertit les valeurs string en types appropriés
+ * Converts string values to appropriate types
  */
 function convertValue(value: any): any {
   if (typeof value !== 'string') {
@@ -117,7 +117,7 @@ function convertValue(value: any): any {
     return parseFloat(value);
   }
 
-  // Convertir les booléens
+  // Convert booleans
   if (value === 'true' || value === '1') {
     return true;
   }
@@ -130,7 +130,7 @@ function convertValue(value: any): any {
 }
 
 /**
- * Construit du XML PrestaShop à partir de JSON simplifié
+ * Builds PrestaShop XML from simplified JSON
  */
 export function buildPrestashopXml(resource: string, data: any): string {
   const convertedData = convertSimplifiedToPrestaShop(data, resource);
@@ -149,7 +149,7 @@ export function buildPrestashopXml(resource: string, data: any): string {
 }
 
 /**
- * Convertit JSON simplifié vers le format PrestaShop
+ * Converts simplified JSON to PrestaShop format
  */
 function convertSimplifiedToPrestaShop(data: any, resource: string): any {
   if (!data || typeof data !== 'object') {
@@ -162,7 +162,7 @@ function convertSimplifiedToPrestaShop(data: any, resource: string): any {
   for (const [key, value] of Object.entries(data)) {
     const prestashopKey = convertFromCamelCase(key);
 
-    // Détecter les associations (tableaux d'IDs)
+    // Detect associations (arrays of IDs)
     if (Array.isArray(value) && value.every(v => typeof v === 'number' || typeof v === 'string')) {
       associations[prestashopKey] = {
         [prestashopKey.slice(0, -1)]: value.map(id => ({ id: String(id) }))
@@ -172,7 +172,7 @@ function convertSimplifiedToPrestaShop(data: any, resource: string): any {
     }
   }
 
-  // Ajouter les associations si présentes
+  // Add associations if present
   if (Object.keys(associations).length > 0) {
     converted.associations = associations;
   }
@@ -181,10 +181,10 @@ function convertSimplifiedToPrestaShop(data: any, resource: string): any {
 }
 
 /**
- * Convertit camelCase vers snake_case avec préfixes PrestaShop
+ * Converts camelCase to snake_case with PrestaShop prefixes
  */
 function convertFromCamelCase(fieldName: string): string {
-  // Mapper certains champs spéciaux
+  // Map certain special fields
   const fieldMappings: { [key: string]: string } = {
     'manufacturerId': 'id_manufacturer',
     'categoryId': 'id_category',
@@ -208,7 +208,7 @@ function convertFromCamelCase(fieldName: string): string {
     return fieldMappings[fieldName];
   }
 
-  // Conversion générique camelCase vers snake_case
+  // Generic camelCase to snake_case conversion
   return fieldName
     .replace(/([A-Z])/g, '_$1')
     .toLowerCase()
@@ -251,7 +251,7 @@ export async function parseXmlToJson(xml: string): Promise<any> {
 }
 
 /**
- * Construit l'URL avec les paramètres de filtre
+ * Builds URL with filter parameters
  */
 export function buildUrlWithFilters(baseUrl: string, options: any): string {
   const url = new URL(baseUrl);
@@ -264,7 +264,7 @@ export function buildUrlWithFilters(baseUrl: string, options: any): string {
         const filterKey = `filter[${filter.field}]`;
         let filterValue = filter.value;
         
-        // Appliquer l'opérateur si ce n'est pas '='
+        // Apply operator if it's not '='
         if (filter.operator && filter.operator !== '=') {
           filterValue = `[${filter.operator}]${filterValue}`;
         }
@@ -274,7 +274,7 @@ export function buildUrlWithFilters(baseUrl: string, options: any): string {
     }
   }
 
-  // Ajouter les autres paramètres
+  // Add other parameters
   if (options.limit) params.append('limit', options.limit);
   if (options.sort) params.append('sort', options.sort);
   if (options.display) params.append('display', options.display);
@@ -291,33 +291,33 @@ export function buildUrlWithFilters(baseUrl: string, options: any): string {
 }
 
 /**
- * Valide les données avant envoi
+ * Validates data before sending
  */
 export function validateDataForResource(resource: string, data: any): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   if (!data || typeof data !== 'object') {
-    errors.push('Les données doivent être un objet valide');
+    errors.push('Data must be a valid object');
     return { isValid: false, errors };
   }
 
-  // Validations spécifiques par ressource
+  // Resource-specific validations
   switch (resource) {
     case 'customers':
       if (!data.email && !data.id) {
-        errors.push('Un email est requis pour créer un client');
+        errors.push('An email is required to create a customer');
       }
       break;
     
     case 'products':
       if (!data.name && !data.id) {
-        errors.push('Un nom est requis pour créer un produit');
+        errors.push('A name is required to create a product');
       }
       break;
     
     case 'orders':
       if (!data.customerId && !data.id) {
-        errors.push('Un ID client est requis pour créer une commande');
+        errors.push('A customer ID is required to create an order');
       }
       break;
   }

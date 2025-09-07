@@ -7,7 +7,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
   group: ['transform'],
   version: 1,
   subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-  description: 'Nœud n8n pour PrestaShop 8 avec conversion XML/JSON automatique et support CRUD complet',
+  description: 'n8n node for PrestaShop 8 with automatic XML/JSON conversion and full CRUD support',
   defaults: {
     name: 'PrestaShop 8',
   },
@@ -26,7 +26,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
     },
   },
   properties: [
-    // Documentation intégrée
+    // Integrated documentation
     {
       displayName: '📚 Documentation',
       name: 'documentation',
@@ -48,41 +48,41 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       options: [
         {
-          name: '🚀 Guide de démarrage rapide',
+          name: '🚀 Quick Start Guide',
           value: 'quickstart',
-          description: 'Configuration et premiers pas avec PrestaShop 8',
+          description: 'Configuration and first steps with PrestaShop 8',
         },
         {
-          name: '🔑 Authentification API',
+          name: '🔑 API Authentication',
           value: 'auth',
-          description: 'Configuration de la clé API PrestaShop',
+          description: 'PrestaShop API key configuration',
         },
         {
-          name: '🔄 Conversion XML/JSON',
+          name: '🔄 XML/JSON Conversion',
           value: 'conversion',
-          description: 'Comment fonctionne la simplification automatique',
+          description: 'How automatic simplification works',
         },
         {
-          name: '🔍 Recherche et filtres',
+          name: '🔍 Search and Filters',
           value: 'filters',
-          description: 'Utilisation des filtres PrestaShop avancés',
+          description: 'Using advanced PrestaShop filters',
         },
         {
-          name: '⚡ Mode Raw',
+          name: '⚡ Raw Mode',
           value: 'rawmode',
-          description: 'Utilisation du mode données brutes',
+          description: 'Using raw data mode',
         },
         {
-          name: '📝 Exemples pratiques',
+          name: '📝 Practical Examples',
           value: 'examples',
-          description: 'Cas d\'usage courants et exemples de code',
+          description: 'Common use cases and code examples',
         },
       ],
     },
 
-    // Sélection de la ressource
+    // Resource selection
     {
-      displayName: 'Ressource',
+      displayName: 'Resource',
       name: 'resource',
       type: 'options',
       noDataExpression: true,
@@ -93,12 +93,12 @@ export const PrestaShop8Description: INodeTypeDescription = {
       })),
       default: 'products',
       required: true,
-      description: 'Type de ressource PrestaShop à manipuler',
+      description: 'PrestaShop resource type to manipulate',
     },
 
-    // Sélection de l'opération
+    // Operation selection
     {
-      displayName: 'Opération',
+      displayName: 'Operation',
       name: 'operation',
       type: 'options',
       noDataExpression: true,
@@ -112,19 +112,19 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       default: 'list',
       required: true,
-      description: 'Opération à effectuer sur la ressource',
+      description: 'Operation to perform on the resource',
     },
 
-    // Mode Raw
+    // Raw Mode
     {
       displayName: 'Mode Raw',
       name: 'rawMode',
       type: 'boolean',
       default: false,
-      description: 'Si activé, retourne les données brutes PrestaShop (XML/JSON natif) sans conversion automatique',
+      description: 'If enabled, returns raw PrestaShop data (native XML/JSON) without automatic conversion',
     },
 
-    // ID pour les opérations spécifiques
+    // ID for specific operations
     {
       displayName: 'ID',
       name: 'id',
@@ -136,12 +136,12 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       default: '',
       required: true,
-      description: 'ID de l\'élément à récupérer, modifier ou supprimer',
+      description: 'ID of the item to retrieve, modify or delete',
     },
 
-    // Paramètres de pagination et tri
+    // Pagination and sorting parameters
     {
-      displayName: 'Options avancées',
+      displayName: 'Advanced Options',
       name: 'advancedOptions',
       type: 'collection',
       displayOptions: {
@@ -158,7 +158,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           type: 'string',
           default: '',
           placeholder: '20 ou 10,30',
-          description: 'Nombre d\'éléments à retourner (ex: 20) ou pagination (ex: 10,30)',
+          description: 'Number of items to return (e.g. 20) or pagination (e.g. 10,30)',
         },
         {
           displayName: 'Tri',
@@ -166,7 +166,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           type: 'string',
           default: '',
           placeholder: '[id_DESC] ou [name_ASC]',
-          description: 'Critère de tri (ex: [id_DESC], [name_ASC], [date_add_DESC])',
+          description: 'Sort criteria (e.g. [id_DESC], [name_ASC], [date_add_DESC])',
         },
         {
           displayName: 'Affichage',
@@ -184,16 +184,16 @@ export const PrestaShop8Description: INodeTypeDescription = {
               description: 'Champs essentiels uniquement',
             },
             {
-              name: 'Personnalisé',
+              name: 'Custom',
               value: 'custom',
-              description: 'Liste de champs spécifique',
+              description: 'Specific field list',
             },
           ],
           default: 'full',
-          description: 'Niveau de détail des données retournées',
+          description: 'Level of detail of returned data',
         },
         {
-          displayName: 'Champs personnalisés',
+          displayName: 'Custom Fields',
           name: 'customFields',
           type: 'string',
           displayOptions: {
@@ -203,7 +203,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           },
           default: '',
           placeholder: 'id,name,price,reference',
-          description: 'Liste des champs à retourner, séparés par des virgules',
+          description: 'List of fields to return, separated by commas',
         },
       ],
     },
@@ -235,15 +235,15 @@ export const PrestaShop8Description: INodeTypeDescription = {
               default: '',
               required: true,
               placeholder: 'name, reference, price, etc.',
-              description: 'Nom du champ à filtrer',
+              description: 'Name of field to filter',
             },
             {
-              displayName: 'Opérateur',
+              displayName: 'Operator',
               name: 'operator',
               type: 'options',
               options: FILTER_OPERATORS,
               default: '=',
-              description: 'Opérateur de comparaison',
+              description: 'Comparison operator',
             },
             {
               displayName: 'Valeur',
@@ -251,17 +251,17 @@ export const PrestaShop8Description: INodeTypeDescription = {
               type: 'string',
               default: '',
               required: true,
-              description: 'Valeur à rechercher',
+              description: 'Value to search for',
             },
           ],
         },
       ],
-      description: 'Filtres PrestaShop à appliquer à la recherche',
+      description: 'PrestaShop filters to apply to the search',
     },
 
-    // Données pour création/mise à jour
+    // Data for create/update
     {
-      displayName: 'Données',
+      displayName: 'Data',
       name: 'data',
       type: 'json',
       displayOptions: {
@@ -271,7 +271,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       default: '{}',
       required: true,
-      description: 'Données JSON à envoyer à PrestaShop (sera automatiquement converti en XML)',
+      description: 'JSON data to send to PrestaShop (will be automatically converted to XML)',
       typeOptions: {
         rows: 10,
       },
@@ -289,7 +289,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
         },
       },
       default: '',
-      description: 'XML PrestaShop à envoyer directement (Mode Raw uniquement)',
+      description: 'PrestaShop XML to send directly (Raw Mode only)',
       typeOptions: {
         rows: 15,
       },
@@ -304,25 +304,25 @@ export const PrestaShop8Description: INodeTypeDescription = {
       placeholder: 'Ajouter une option',
       options: [
         {
-          displayName: 'Afficher URL de requête',
+          displayName: 'Show Request URL',
           name: 'showUrl',
           type: 'boolean',
           default: false,
-          description: 'Ajouter l\'URL de requête dans la réponse',
+          description: 'Add request URL to the response',
         },
         {
           displayName: 'Afficher headers',
           name: 'showHeaders',
           type: 'boolean',
           default: false,
-          description: 'Ajouter les headers HTTP dans la réponse',
+          description: 'Add HTTP headers to the response',
         },
         {
           displayName: 'Timeout (ms)',
           name: 'timeout',
           type: 'number',
           default: 30000,
-          description: 'Timeout de la requête en millisecondes',
+          description: 'Request timeout in milliseconds',
         },
       ],
     },

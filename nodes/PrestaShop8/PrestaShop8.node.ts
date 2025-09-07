@@ -29,7 +29,7 @@ export class PrestaShop8 implements INodeType {
 
   methods = {
     loadOptions: {
-      // Charge les opérations dynamiquement selon la ressource
+      // Load operations dynamically based on resource
       async getOperations(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
         const resource = this.getCurrentNodeParameter('resource') as string;
         const resourceConfig = PRESTASHOP_RESOURCES[resource];
@@ -44,15 +44,15 @@ export class PrestaShop8 implements INodeType {
           operations.push({
             name: 'Lister tous',
             value: 'list',
-            description: `Récupérer tous les ${resourceConfig.displayName.toLowerCase()}`,
+            description: `Get all ${resourceConfig.displayName.toLowerCase()}`,
           });
         }
 
         if (resourceConfig.supportsGetById) {
           operations.push({
-            name: 'Récupérer par ID',
+            name: 'Get by ID',
             value: 'getById',
-            description: `Récupérer un ${resourceConfig.displayName.toLowerCase()} par son ID`,
+            description: `Get a ${resourceConfig.displayName.toLowerCase()} by its ID`,
           });
         }
 
@@ -60,23 +60,23 @@ export class PrestaShop8 implements INodeType {
           operations.push({
             name: 'Rechercher avec filtres',
             value: 'search',
-            description: `Rechercher des ${resourceConfig.displayName.toLowerCase()} avec des filtres avancés`,
+            description: `Search ${resourceConfig.displayName.toLowerCase()} with advanced filters`,
           });
         }
 
         if (resourceConfig.supportsCreate) {
           operations.push({
-            name: 'Créer',
+            name: 'Create',
             value: 'create',
-            description: `Créer un nouveau ${resourceConfig.displayName.toLowerCase()}`,
+            description: `Create a new ${resourceConfig.displayName.toLowerCase()}`,
           });
         }
 
         if (resourceConfig.supportsUpdate) {
           operations.push({
-            name: 'Mettre à jour',
+            name: 'Update',
             value: 'update',
-            description: `Mettre à jour un ${resourceConfig.displayName.toLowerCase()} existant`,
+            description: `Update an existing ${resourceConfig.displayName.toLowerCase()}`,
           });
         }
 
@@ -140,7 +140,7 @@ export class PrestaShop8 implements INodeType {
             const advancedOptions = this.getNodeParameter('advancedOptions', i, {}) as any;
             
             if (!id) {
-              throw new NodeOperationError(this.getNode(), 'ID requis pour cette opération');
+              throw new NodeOperationError(this.getNode(), 'ID required for this operation');
             }
 
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}/${id}`, {
@@ -214,7 +214,7 @@ export class PrestaShop8 implements INodeType {
               if (!validation.isValid) {
                 throw new NodeOperationError(
                   this.getNode(),
-                  `Données invalides: ${validation.errors.join(', ')}`
+                  `Invalid data: ${validation.errors.join(', ')}`
                 );
               }
 
@@ -246,7 +246,7 @@ export class PrestaShop8 implements INodeType {
             const id = this.getNodeParameter('id', i) as string;
             
             if (!id) {
-              throw new NodeOperationError(this.getNode(), 'ID requis pour cette opération');
+              throw new NodeOperationError(this.getNode(), 'ID required for this operation');
             }
 
             let body: string;
@@ -266,7 +266,7 @@ export class PrestaShop8 implements INodeType {
               if (!validation.isValid) {
                 throw new NodeOperationError(
                   this.getNode(),
-                  `Données invalides: ${validation.errors.join(', ')}`
+                  `Invalid data: ${validation.errors.join(', ')}`
                 );
               }
 
@@ -298,7 +298,7 @@ export class PrestaShop8 implements INodeType {
             const id = this.getNodeParameter('id', i) as string;
             
             if (!id) {
-              throw new NodeOperationError(this.getNode(), 'ID requis pour cette opération');
+              throw new NodeOperationError(this.getNode(), 'ID required for this operation');
             }
 
             const options: IHttpRequestOptions = {
@@ -319,17 +319,17 @@ export class PrestaShop8 implements INodeType {
 
             responseData = {
               success: true,
-              message: `${resource} avec l'ID ${id} supprimé avec succès`,
+              message: `${resource} with ID ${id} deleted successfully`,
               deletedId: id,
             };
             break;
           }
 
           default:
-            throw new NodeOperationError(this.getNode(), `Opération "${operation}" non supportée`);
+            throw new NodeOperationError(this.getNode(), `Operation "${operation}" not supported`);
         }
 
-        // Ajouter des métadonnées de debug si demandées
+        // Add debug metadata if requested
         const debugOptions = this.getNodeParameter('debugOptions', i, {}) as any;
         if (debugOptions.showUrl || debugOptions.showHeaders) {
           responseData = {
