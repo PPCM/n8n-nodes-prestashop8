@@ -24,13 +24,32 @@ import {
   validateDataForResource,
 } from './utils';
 
-// Helper function to build headers based on raw mode
+// Helper function to build headers based on raw mode (backward compatibility)
 function buildHeaders(rawMode: boolean): any {
   const headers: any = {};
-  if (!rawMode) {
+  if (rawMode) {
+    // En mode Raw, demandons explicitement le XML
+    headers['Output-Format'] = 'XML';
+  } else {
     headers['Output-Format'] = 'JSON';
   }
   return headers;
+}
+
+// Helper function to build request options based on raw mode
+function buildRequestOptions(rawMode: boolean, baseOptions: any): any {
+  const options = { ...baseOptions };
+  
+  // In raw mode, we want the XML response as-is (string)
+  if (rawMode) {
+    options.json = false; // Don't parse XML to JSON automatically
+  } else {
+    // In normal mode, we want JSON parsing
+    options.headers = options.headers || {};
+    options.headers['Output-Format'] = 'JSON';
+  }
+  
+  return options;
 }
 
 export class PrestaShop8 implements INodeType {
@@ -124,7 +143,7 @@ export class PrestaShop8 implements INodeType {
               limit: advancedOptions.limit,
               sort: advancedOptions.sort,
               display: advancedOptions.display === 'custom' ? advancedOptions.customFields : advancedOptions.display,
-            });
+            }, rawMode);
 
             const options: IHttpRequestOptions = {
               method: 'GET' as IHttpRequestMethods,
@@ -135,9 +154,40 @@ export class PrestaShop8 implements INodeType {
               },
               headers: buildHeaders(rawMode),
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
+              ...(rawMode ? { json: false } : {}),
             };
 
-            const response = await this.helpers.httpRequest(options);
+            let response: any;
+            
+            if (rawMode) {
+              // En mode Raw, utilisons axios directement pour éviter le parsing automatique de n8n
+              const axios = require('axios');
+              
+              try {
+                const axiosResponse = await axios({
+                  method: 'GET',
+                  url: requestUrl,
+                  auth: {
+                    username: credentials.apiKey,
+                    password: ''
+                  },
+                  headers: options.headers,
+                  timeout: options.timeout || 30000,
+                  transformResponse: [(data: any) => data] // Garde la réponse brute
+                });
+                
+                response = axiosResponse.data;
+              } catch (error: any) {
+                if (error.response) {
+                  response = error.response.data;
+                } else {
+                  throw error;
+                }
+              }
+            } else {
+              response = await this.helpers.httpRequest(options);
+            }
+            
             responseData = rawMode ? response : simplifyPrestashopResponse(response, resource);
             break;
           }
@@ -152,7 +202,7 @@ export class PrestaShop8 implements INodeType {
 
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}/${id}`, {
               display: advancedOptions.display === 'custom' ? advancedOptions.customFields : advancedOptions.display,
-            });
+            }, rawMode);
 
             const options: IHttpRequestOptions = {
               method: 'GET' as IHttpRequestMethods,
@@ -163,6 +213,7 @@ export class PrestaShop8 implements INodeType {
               },
               headers: buildHeaders(rawMode),
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
+              ...(rawMode ? { json: false } : {}),
             };
 
             const response = await this.helpers.httpRequest(options);
@@ -181,7 +232,7 @@ export class PrestaShop8 implements INodeType {
               limit: advancedOptions.limit,
               sort: advancedOptions.sort,
               display: advancedOptions.display === 'custom' ? advancedOptions.customFields : advancedOptions.display,
-            });
+            }, rawMode);
 
             const options: IHttpRequestOptions = {
               method: 'GET' as IHttpRequestMethods,
@@ -192,6 +243,7 @@ export class PrestaShop8 implements INodeType {
               },
               headers: buildHeaders(rawMode),
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
+              ...(rawMode ? { json: false } : {}),
             };
 
             const response = await this.helpers.httpRequest(options);
@@ -237,6 +289,7 @@ export class PrestaShop8 implements INodeType {
                 ...(rawMode ? {} : { 'Output-Format': 'JSON' }),
               },
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
+              ...(rawMode ? { json: false } : {}),
             };
 
             requestUrl = options.url as string;
@@ -289,6 +342,7 @@ export class PrestaShop8 implements INodeType {
                 ...(rawMode ? {} : { 'Output-Format': 'JSON' }),
               },
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
+              ...(rawMode ? { json: false } : {}),
             };
 
             requestUrl = options.url as string;
@@ -313,6 +367,7 @@ export class PrestaShop8 implements INodeType {
               },
               headers: buildHeaders(rawMode),
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
+              ...(rawMode ? { json: false } : {}),
             };
 
             requestUrl = options.url as string;

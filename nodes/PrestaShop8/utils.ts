@@ -253,7 +253,7 @@ export async function parseXmlToJson(xml: string): Promise<any> {
 /**
  * Builds URL with filter parameters
  */
-export function buildUrlWithFilters(baseUrl: string, options: any): string {
+export function buildUrlWithFilters(baseUrl: string, options: any, rawMode?: boolean): string {
   const url = new URL(baseUrl);
   const params = new URLSearchParams();
 
@@ -279,8 +279,10 @@ export function buildUrlWithFilters(baseUrl: string, options: any): string {
   if (options.sort) params.append('sort', options.sort);
   if (options.display) params.append('display', options.display);
 
-  // Toujours demander du JSON
-  params.append('output_format', 'JSON');
+  // Ajouter output_format seulement si pas en mode Raw
+  if (!rawMode) {
+    params.append('output_format', 'JSON');
+  }
 
   const paramString = params.toString();
   if (paramString) {
