@@ -71,7 +71,7 @@ export class PrestaShop8 implements INodeType {
 
         if (resourceConfig.supportsList) {
           operations.push({
-            name: 'Lister tous',
+            name: 'List all',
             value: 'list',
             description: `Get all ${resourceConfig.displayName.toLowerCase()}`,
           });
@@ -87,7 +87,7 @@ export class PrestaShop8 implements INodeType {
 
         if (resourceConfig.supportsSearch) {
           operations.push({
-            name: 'Rechercher avec filtres',
+            name: 'Search with filters',
             value: 'search',
             description: `Search ${resourceConfig.displayName.toLowerCase()} with advanced filters`,
           });
@@ -111,9 +111,9 @@ export class PrestaShop8 implements INodeType {
 
         if (resourceConfig.supportsDelete) {
           operations.push({
-            name: 'Supprimer',
+            name: 'Delete',
             value: 'delete',
-            description: `Supprimer un ${resourceConfig.displayName.toLowerCase()}`,
+            description: `Delete an existing ${resourceConfig.displayName.toLowerCase()}`,
           });
         }
 

@@ -137,10 +137,10 @@ export const PrestaShop8Description: INodeTypeDescription = {
         },
       },
       default: {},
-      placeholder: 'Ajouter une option',
+      placeholder: 'Add Option',
       options: [
         {
-          displayName: 'Limite',
+          displayName: 'Limit',
           name: 'limit',
           type: 'string',
           default: '',
@@ -148,7 +148,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           description: 'Number of items to return (e.g. 20) or pagination (e.g. 10,30)',
         },
         {
-          displayName: 'Tri',
+          displayName: 'Sort',
           name: 'sort',
           type: 'string',
           default: '',
@@ -156,19 +156,19 @@ export const PrestaShop8Description: INodeTypeDescription = {
           description: 'Sort criteria (e.g. [id_DESC], [name_ASC], [date_add_DESC])',
         },
         {
-          displayName: 'Affichage',
+          displayName: 'Display',
           name: 'display',
           type: 'options',
           options: [
             {
-              name: 'Complet',
+              name: 'Full',
               value: 'full',
-              description: 'Tous les champs disponibles',
+              description: 'All available fields',
             },
             {
               name: 'Minimal',
               value: 'minimal',
-              description: 'Champs essentiels uniquement',
+              description: 'Essential fields only',
             },
             {
               name: 'Custom',
@@ -233,7 +233,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
               description: 'Comparison operator',
             },
             {
-              displayName: 'Valeur',
+              displayName: 'Value',
               name: 'value',
               type: 'string',
               default: '',
