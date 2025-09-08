@@ -179,21 +179,24 @@ export const PrestaShop8Description: INodeTypeDescription = {
           default: 'full',
           description: 'Level of detail of returned data',
         },
-        {
-          displayName: 'Custom Fields',
-          name: 'customFields',
-          type: 'string',
-          displayOptions: {
-            show: {
-              '/operation': ['list', 'search'],
-              display: ['custom'],
-            },
-          },
-          default: '',
-          placeholder: '[id,name,price,reference]',
-          description: 'PrestaShop field list format: [field1,field2,field3] or comma-separated: field1,field2,field3',
-        },
+
       ],
+    },
+
+    // Custom Fields (appears when Display = Custom)
+    {
+      displayName: 'Custom Fields',
+      name: 'customFields',
+      type: 'string',
+      displayOptions: {
+        show: {
+          operation: ['list', 'search'],
+          'advancedOptions.display': ['custom'],
+        },
+      },
+      default: '',
+      placeholder: '[id,name,price,reference]',
+      description: 'PrestaShop field list format: [field1,field2,field3] or comma-separated: field1,field2,field3',
     },
 
     // Filtres de recherche

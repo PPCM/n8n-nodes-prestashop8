@@ -144,12 +144,13 @@ export class PrestaShop8 implements INodeType {
         switch (operation) {
           case 'list': {
             const advancedOptions = this.getNodeParameter('advancedOptions', i, {}) as any;
+            const customFields = this.getNodeParameter('customFields', i, '') as string;
             
             // Handle display parameter - minimal = no display param (IDs only)
             const displayValue = processDisplayParameter(
               advancedOptions.display,
               resource,
-              advancedOptions.customFields
+              customFields
             );
             
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, {
@@ -237,6 +238,7 @@ export class PrestaShop8 implements INodeType {
           case 'search': {
             const filtersParam = this.getNodeParameter('filters', i, {}) as any;
             const advancedOptions = this.getNodeParameter('advancedOptions', i, {}) as any;
+            const customFields = this.getNodeParameter('customFields', i, '') as string;
             
             const filters: IPrestaShopFilter[] = filtersParam.filter || [];
 
@@ -244,7 +246,7 @@ export class PrestaShop8 implements INodeType {
             const displayValue = processDisplayParameter(
               advancedOptions.display,
               resource,
-              advancedOptions.customFields
+              customFields
             );
 
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, {
