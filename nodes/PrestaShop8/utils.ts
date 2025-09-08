@@ -18,20 +18,21 @@ function cleanErrorMessage(message: string): string {
     // Remove any remaining trailing line patterns
     .replace(/\s*,?\s*line\s+\d+[,)]*\s*/gi, '')
     // Remove PHP file path patterns
-    .replace(/\s*,?\s*\([^)]*\.php[^)]*\)/gi, '')
-    // Clean up multiple consecutive commas and empty comma patterns
-    .replace(/,\s*,+/g, ',')
-    // Remove empty comma patterns like ", , , ,"
-    .replace(/,\s*,\s*/g, ',')
-    // Remove patterns of comma-space-comma
-    .replace(/(,\s*)+,/g, ',')
-    // Remove trailing commas, spaces, and comma sequences
-    .replace(/[,\s]+$/, '')
-    // Remove leading commas, spaces, and comma sequences
-    .replace(/^[,\s]+/, '')
-    // Final cleanup of any remaining multiple commas
-    .replace(/,{2,}/g, ',')
-    .trim();
+    .replace(/\s*,?\s*\([^)]*\.php[^)]*\)/gi, '');
+    
+  // Radical approach: split by comma, filter empty, rejoin
+  if (cleanedMessage.includes(',')) {
+    // Split by comma and filter out empty/whitespace-only elements
+    const parts = cleanedMessage.split(',')
+      .map(part => part.trim())
+      .filter(part => part.length > 0 && part !== '');
+    
+    // Rejoin with proper comma-space formatting
+    cleanedMessage = parts.join(', ');
+  } else {
+    // No commas, just trim
+    cleanedMessage = cleanedMessage.trim();
+  }
     
   return cleanedMessage;
 }
