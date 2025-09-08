@@ -19,12 +19,18 @@ function cleanErrorMessage(message: string): string {
     .replace(/\s*,?\s*line\s+\d+[,)]*\s*/gi, '')
     // Remove PHP file path patterns
     .replace(/\s*,?\s*\([^)]*\.php[^)]*\)/gi, '')
-    // Clean up multiple consecutive commas
+    // Clean up multiple consecutive commas and empty comma patterns
     .replace(/,\s*,+/g, ',')
-    // Remove trailing commas and whitespace
-    .replace(/\s*,+\s*$/, '')
-    // Remove leading commas and whitespace
-    .replace(/^\s*,+\s*/, '')
+    // Remove empty comma patterns like ", , , ,"
+    .replace(/,\s*,\s*/g, ',')
+    // Remove patterns of comma-space-comma
+    .replace(/(,\s*)+,/g, ',')
+    // Remove trailing commas, spaces, and comma sequences
+    .replace(/[,\s]+$/, '')
+    // Remove leading commas, spaces, and comma sequences
+    .replace(/^[,\s]+/, '')
+    // Final cleanup of any remaining multiple commas
+    .replace(/,{2,}/g, ',')
     .trim();
     
   return cleanedMessage;
