@@ -393,14 +393,14 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
 
 // Available filter operators
 export const FILTER_OPERATORS = [
-  { name: 'Equal to', value: '=' },
-  { name: 'Not equal to', value: '!=' },
-  { name: 'Greater than', value: '>' },
-  { name: 'Greater than or equal to', value: '>=' },
-  { name: 'Less than', value: '<' },
-  { name: 'Less than or equal to', value: '<=' },
-  { name: 'Contains', value: 'LIKE' },
-  { name: 'Does not contain', value: 'NOT LIKE' },
-  { name: 'Starts with', value: 'BEGINS' },
-  { name: 'Ends with', value: 'ENDS' },
+  { name: '= Equal to', value: '=' },
+  { name: '≠ Not equal to', value: '!=' },
+  { name: '> Greater than', value: '>' },
+  { name: '≥ Greater than or equal to', value: '>=' },
+  { name: '< Less than', value: '<' },
+  { name: '≤ Less than or equal to', value: '<=' },
+  { name: '∋ Contains', value: 'LIKE' },
+  { name: '∌ Does not contain', value: 'NOT LIKE' },
+  { name: '↦ Starts with', value: 'BEGINS' },
+  { name: '↤ Ends with', value: 'ENDS' },
 ];
