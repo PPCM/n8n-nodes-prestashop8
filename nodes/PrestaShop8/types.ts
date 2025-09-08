@@ -399,8 +399,8 @@ export const FILTER_OPERATORS = [
   { name: 'Greater than or equal to', value: '>=' },
   { name: 'Less than', value: '<' },
   { name: 'Less than or equal to', value: '<=' },
-  { name: 'Contient', value: 'LIKE' },
-  { name: 'Ne contient pas', value: 'NOT LIKE' },
-  { name: 'Commence par', value: 'BEGINS' },
-  { name: 'Finit par', value: 'ENDS' },
+  { name: 'Contains', value: 'LIKE' },
+  { name: 'Does not contain', value: 'NOT LIKE' },
+  { name: 'Starts with', value: 'BEGINS' },
+  { name: 'Ends with', value: 'ENDS' },
 ];

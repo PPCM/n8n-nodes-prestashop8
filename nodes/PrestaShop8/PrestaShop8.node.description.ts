@@ -233,7 +233,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
               default: '',
               required: true,
               placeholder: 'name, reference, price, etc.',
-              description: 'Name of field to filter',
+              description: 'Name of field to filter. Examples: name, reference, price, active, id_manufacturer, etc.',
             },
             {
               displayName: 'Operator',
@@ -241,7 +241,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
               type: 'options',
               options: FILTER_OPERATORS,
               default: '=',
-              description: 'Comparison operator',
+              description: 'Comparison operator. Examples: = (exact match), LIKE (contains text), > (greater than), >= (greater or equal), < (less than), <= (less or equal), != (not equal), BEGINS (starts with), ENDS (ends with)',
             },
             {
               displayName: 'Value',
@@ -249,7 +249,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
               type: 'string',
               default: '',
               required: true,
-              description: 'Value to search for',
+              placeholder: 'search value',
+              description: 'Value to search for. Examples: "Product Name" (for LIKE), "1" (for active), "29.99" (for price), etc.',
             },
           ],
         },
