@@ -10,7 +10,15 @@ export function processDisplayParameter(displayValue: string, resource: string, 
     // No display parameter = PrestaShop returns only IDs (minimal)
     return null;
   } else if (displayValue === 'custom' && customFields) {
-    return customFields;
+    // Normalize custom fields format to PrestaShop format [field1,field2,field3]
+    const fields = customFields.trim();
+    if (fields.startsWith('[') && fields.endsWith(']')) {
+      return fields; // Already in PrestaShop format
+    } else {
+      // Convert comma-separated to PrestaShop format
+      const fieldList = fields.split(',').map(f => f.trim()).filter(f => f).join(',');
+      return `[${fieldList}]`;
+    }
   } else if (displayValue === 'full') {
     return 'full';
   }

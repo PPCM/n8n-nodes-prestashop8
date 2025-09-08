@@ -185,12 +185,13 @@ export const PrestaShop8Description: INodeTypeDescription = {
           type: 'string',
           displayOptions: {
             show: {
+              '/operation': ['list', 'search'],
               display: ['custom'],
             },
           },
           default: '',
-          placeholder: 'id,name,price,reference',
-          description: 'List of fields to return, separated by commas',
+          placeholder: '[id,name,price,reference]',
+          description: 'PrestaShop field list format: [field1,field2,field3] or comma-separated: field1,field2,field3',
         },
       ],
     },
