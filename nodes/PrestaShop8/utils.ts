@@ -23,12 +23,12 @@ function cleanErrorMessage(message: string): string {
   // Radical approach: split by comma, filter empty, rejoin
   if (cleanedMessage.includes(',')) {
     // Split by comma and filter out empty/whitespace-only elements
-    const parts = cleanedMessage.split(',')
-      .map(part => part.trim())
-      .filter(part => part.length > 0 && part !== '');
+    const parts = cleanedMessage.split(',');
+    const trimmedParts = parts.map(part => part.trim());
+    const filteredParts = trimmedParts.filter(part => part.length > 0 && part !== '');
     
     // Rejoin with proper comma-space formatting
-    cleanedMessage = parts.join(', ');
+    cleanedMessage = filteredParts.join(', ');
   } else {
     // No commas, just trim
     cleanedMessage = cleanedMessage.trim();
@@ -77,7 +77,9 @@ export function extractPrestashopError(error: any): string {
             return cleanErrorMessage(msg);
           }
           return cleanErrorMessage(String(err));
-        });
+        })
+        .filter((msg: string) => msg && msg.trim().length > 0); // ← FILTRER APRÈS le nettoyage !
+        
         return errorMessages.join(', ');
       }
       if (data.message) {
