@@ -206,9 +206,9 @@ export const PrestaShop8Description: INodeTypeDescription = {
       description: 'PrestaShop field list format: [field1,field2,field3] or comma-separated: field1,field2,field3',
     },
 
-    // Filtres de recherche
+    // Search Filters
     {
-      displayName: 'Filtres de recherche',
+      displayName: 'Search Filters',
       name: 'filters',
       type: 'fixedCollection',
       displayOptions: {
@@ -217,17 +217,17 @@ export const PrestaShop8Description: INodeTypeDescription = {
         },
       },
       default: {},
-      placeholder: 'Ajouter un filtre',
+      placeholder: 'Add Filter',
       typeOptions: {
         multipleValues: true,
       },
       options: [
         {
           name: 'filter',
-          displayName: 'Filtre',
+          displayName: 'Filter',
           values: [
             {
-              displayName: 'Champ',
+              displayName: 'Field',
               name: 'field',
               type: 'string',
               default: '',
