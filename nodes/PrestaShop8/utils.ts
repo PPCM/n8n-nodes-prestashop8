@@ -179,6 +179,18 @@ export function processResponseForMode(rawData: any, resource: string, currentRe
     if (resourceKey && Array.isArray(simplified[resourceKey])) {
       return simplified[resourceKey];
     }
+    
+    // For single item responses (get by ID), unwrap the resource level
+    // e.g. { "product": { "id": "123", "name": "..." } } → { "id": "123", "name": "..." }
+    const singleResourceKey = Object.keys(simplified).find(key => 
+      (key === resource || key === resource.replace(/s$/, '')) && 
+      typeof simplified[key] === 'object' && 
+      !Array.isArray(simplified[key])
+    );
+    
+    if (singleResourceKey && simplified[singleResourceKey]) {
+      return simplified[singleResourceKey];
+    }
   }
   
   return simplified;
