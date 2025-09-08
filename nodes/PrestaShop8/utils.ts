@@ -2,6 +2,22 @@ import * as xml2js from 'xml2js';
 import * as js2xmlparser from 'js2xmlparser';
 
 /**
+ * Convert display parameter to PrestaShop-compatible format
+ * Returns null for minimal (no display parameter = IDs only)
+ */
+export function processDisplayParameter(displayValue: string, resource: string, customFields?: string): string | null {
+  if (displayValue === 'minimal') {
+    // No display parameter = PrestaShop returns only IDs (minimal)
+    return null;
+  } else if (displayValue === 'custom' && customFields) {
+    return customFields;
+  } else if (displayValue === 'full') {
+    return 'full';
+  }
+  return displayValue || 'full';
+}
+
+/**
  * Process PrestaShop response for direct resource access
  */
 export function processResponseForMode(rawData: any, resource: string, currentResource: string): any {
@@ -305,7 +321,7 @@ export function buildUrlWithFilters(baseUrl: string, options: any, rawMode?: boo
   // Add other parameters
   if (options.limit) params.append('limit', options.limit);
   if (options.sort) params.append('sort', options.sort);
-  if (options.display) params.append('display', options.display);
+  if (options.display !== null && options.display !== undefined) params.append('display', options.display);
 
   // Ajouter output_format seulement si pas en mode Raw
   if (!rawMode) {

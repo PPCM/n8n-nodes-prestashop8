@@ -23,6 +23,7 @@ import {
   buildUrlWithFilters,
   validateDataForResource,
   processResponseForMode,
+  processDisplayParameter,
 } from './utils';
 
 // Helper function to build headers based on raw mode (backward compatibility)
@@ -144,10 +145,17 @@ export class PrestaShop8 implements INodeType {
           case 'list': {
             const advancedOptions = this.getNodeParameter('advancedOptions', i, {}) as any;
             
+            // Handle display parameter - minimal = no display param (IDs only)
+            const displayValue = processDisplayParameter(
+              advancedOptions.display,
+              resource,
+              advancedOptions.customFields
+            );
+            
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, {
               limit: advancedOptions.limit,
               sort: advancedOptions.sort,
-              display: advancedOptions.display === 'custom' ? advancedOptions.customFields : advancedOptions.display,
+              display: displayValue,
             }, rawMode);
 
             const options: IHttpRequestOptions = {
@@ -232,11 +240,18 @@ export class PrestaShop8 implements INodeType {
             
             const filters: IPrestaShopFilter[] = filtersParam.filter || [];
 
+            // Handle display parameter - minimal = no display param (IDs only)
+            const displayValue = processDisplayParameter(
+              advancedOptions.display,
+              resource,
+              advancedOptions.customFields
+            );
+
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, {
               filters,
               limit: advancedOptions.limit,
               sort: advancedOptions.sort,
-              display: advancedOptions.display === 'custom' ? advancedOptions.customFields : advancedOptions.display,
+              display: displayValue,
             }, rawMode);
 
             const options: IHttpRequestOptions = {
