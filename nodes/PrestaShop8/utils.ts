@@ -9,11 +9,22 @@ function cleanErrorMessage(message: string): string {
     return message;
   }
   
-  // Remove PHP warnings and notices
-  const cleanedMessage = message
-    .replace(/\s*,?\s*\[PHP\s+(Warning|Notice|Error)\s+#\d+\][^,]*(?=\s*,|$)/gi, '')
-    .replace(/\s*,\s*$/, '') // Remove trailing comma and whitespace
-    .replace(/^\s*,\s*/, '') // Remove leading comma and whitespace  
+  // Remove PHP warnings, notices, and their residual patterns
+  let cleanedMessage = message
+    // Remove full PHP warning patterns
+    .replace(/\s*,?\s*\[PHP\s+(Warning|Notice|Error)\s+#\d+\][^,)]*(?=\s*[,)]|$)/gi, '')
+    // Remove residual line number patterns like "line 1333), line 1334)"
+    .replace(/\s*,?\s*line\s+\d+\)[^,)]*(?=\s*[,)]|$)/gi, '')
+    // Remove any remaining trailing line patterns
+    .replace(/\s*,?\s*line\s+\d+[,)]*\s*/gi, '')
+    // Remove PHP file path patterns
+    .replace(/\s*,?\s*\([^)]*\.php[^)]*\)/gi, '')
+    // Clean up multiple consecutive commas
+    .replace(/,\s*,+/g, ',')
+    // Remove trailing commas and whitespace
+    .replace(/\s*,+\s*$/, '')
+    // Remove leading commas and whitespace
+    .replace(/^\s*,+\s*/, '')
     .trim();
     
   return cleanedMessage;
