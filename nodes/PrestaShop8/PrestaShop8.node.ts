@@ -24,6 +24,8 @@ import {
   validateDataForResource,
   processResponseForMode,
   processDisplayParameter,
+  processSortParameter,
+  extractPrestashopError,
 } from './utils';
 
 // Helper function to build headers based on raw mode (backward compatibility)
@@ -419,19 +421,24 @@ export class PrestaShop8 implements INodeType {
         }
 
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        // Extract meaningful PrestaShop error message
+        const prestashopError = extractPrestashopError(error);
+        
         if (this.continueOnFail()) {
           returnData.push({
             json: {
-              error: errorMessage,
+              error: prestashopError,
               resource,
               operation,
+              originalError: error instanceof Error ? error.message : 'Unknown error',
             },
             pairedItem: { item: i },
           });
           continue;
         }
-        throw error;
+        
+        // Throw a new error with the PrestaShop message
+        throw new NodeOperationError(this.getNode(), prestashopError);
       }
     }
 

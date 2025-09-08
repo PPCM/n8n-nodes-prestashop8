@@ -2,6 +2,66 @@ import * as xml2js from 'xml2js';
 import * as js2xmlparser from 'js2xmlparser';
 
 /**
+ * Extract meaningful error message from PrestaShop response
+ */
+export function extractPrestashopError(error: any): string {
+  if (!error) return 'Unknown error occurred';
+  
+  // If it's an axios error with response
+  if (error.response && error.response.data) {
+    const data = error.response.data;
+    
+    // Try to parse XML error response
+    if (typeof data === 'string' && data.includes('<error>')) {
+      const errorMatch = data.match(/<error><!\[CDATA\[(.+?)\]\]><\/error>/);
+      if (errorMatch && errorMatch[1]) {
+        return errorMatch[1];
+      }
+    }
+    
+    // Try to parse JSON error response
+    if (typeof data === 'object') {
+      if (data.error) {
+        return typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+      }
+      if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+        return data.errors.join(', ');
+      }
+      if (data.message) {
+        return data.message;
+      }
+    }
+    
+    // Fallback to raw data if it's a string
+    if (typeof data === 'string') {
+      return data;
+    }
+  }
+  
+  // Fallback to error message
+  return error.message || 'PrestaShop API error occurred';
+}
+
+/**
+ * Normalize sort parameter to include _DESC by default
+ */
+export function processSortParameter(sortValue: string): string {
+  if (!sortValue || !sortValue.trim()) {
+    return '';
+  }
+  
+  const sort = sortValue.trim();
+  
+  // If already has _ASC or _DESC, return as-is
+  if (sort.includes('_ASC') || sort.includes('_DESC')) {
+    return sort;
+  }
+  
+  // Add _DESC by default
+  return `${sort}_DESC`;
+}
+
+/**
  * Convert display parameter to PrestaShop-compatible format
  * Returns null for minimal (no display parameter = IDs only)
  */
@@ -328,7 +388,10 @@ export function buildUrlWithFilters(baseUrl: string, options: any, rawMode?: boo
 
   // Add other parameters
   if (options.limit) params.append('limit', options.limit);
-  if (options.sort) params.append('sort', options.sort);
+  if (options.sort) {
+    const normalizedSort = processSortParameter(options.sort);
+    if (normalizedSort) params.append('sort', normalizedSort);
+  }
   if (options.display !== null && options.display !== undefined) params.append('display', options.display);
 
   // Ajouter output_format seulement si pas en mode Raw
