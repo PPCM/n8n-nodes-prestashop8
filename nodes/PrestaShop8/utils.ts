@@ -11,6 +11,11 @@ export function extractPrestashopError(error: any): string {
   if (error.response && error.response.data) {
     const data = error.response.data;
     
+    // Debug logging for complex error structures
+    if (typeof data === 'object' && data !== null) {
+      console.log('PrestaShop Error Structure:', JSON.stringify(data, null, 2));
+    }
+    
     // Try to parse XML error response
     if (typeof data === 'string' && data.includes('<error>')) {
       const errorMatch = data.match(/<error><!\[CDATA\[(.+?)\]\]><\/error>/);
@@ -25,10 +30,34 @@ export function extractPrestashopError(error: any): string {
         return typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
       }
       if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
-        return data.errors.join(', ');
+        // Handle array of error objects or strings
+        const errorMessages = data.errors.map((err: any) => {
+          if (typeof err === 'string') {
+            return err;
+          } else if (typeof err === 'object') {
+            // Try to extract meaningful message from error object
+            return err.message || err.error || err.code || JSON.stringify(err);
+          }
+          return String(err);
+        });
+        return errorMessages.join(', ');
       }
       if (data.message) {
         return data.message;
+      }
+      
+      // Handle PrestaShop specific error formats
+      if (data.prestashop && data.prestashop.error) {
+        return typeof data.prestashop.error === 'string' ? data.prestashop.error : JSON.stringify(data.prestashop.error);
+      }
+      
+      // Try to stringify the entire error object as last resort for objects
+      if (typeof data === 'object') {
+        try {
+          return JSON.stringify(data, null, 2);
+        } catch {
+          return String(data);
+        }
       }
     }
     
@@ -55,10 +84,10 @@ export function processSortParameter(sortValue: string): string {
   // If already has _ASC or _DESC, return as-is
   if (sort.includes('_ASC') || sort.includes('_DESC')) {
     return sort;
+  } else {
+    // Add _ASC by default
+    return `${sort}_ASC`;
   }
-  
-  // Add _DESC by default
-  return `${sort}_DESC`;
 }
 
 /**
