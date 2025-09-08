@@ -155,47 +155,56 @@ export const PrestaShop8Description: INodeTypeDescription = {
           placeholder: '[id_DESC] ou [name_ASC]',
           description: 'Sort criteria (e.g. [id_DESC], [name_ASC], [date_add_DESC])',
         },
-        {
-          displayName: 'Display',
-          name: 'display',
-          type: 'options',
-          options: [
-            {
-              name: 'Full',
-              value: 'full',
-              description: 'All available fields',
-            },
-            {
-              name: 'Minimal',
-              value: 'minimal',
-              description: 'Essential fields only',
-            },
-            {
-              name: 'Custom',
-              value: 'custom',
-              description: 'Specific field list',
-            },
-          ],
-          default: 'full',
-          description: 'Level of detail of returned data',
-        },
-        {
-          displayName: 'Custom Fields',
-          name: 'customFields',
-          type: 'string',
-          displayOptions: {
-            show: {
-              display: ['custom'],
-            },
-          },
-          default: '',
-          placeholder: '[id,name,price,reference]',
-          description: 'PrestaShop field list format: [field1,field2,field3] or comma-separated: field1,field2,field3',
-        },
+
       ],
     },
 
+    // Display options (for list and search operations)
+    {
+      displayName: 'Display',
+      name: 'display',
+      type: 'options',
+      displayOptions: {
+        show: {
+          operation: ['list', 'search'],
+        },
+      },
+      options: [
+        {
+          name: 'Full',
+          value: 'full',
+          description: 'All available fields',
+        },
+        {
+          name: 'Minimal',
+          value: 'minimal',
+          description: 'Essential fields only',
+        },
+        {
+          name: 'Custom',
+          value: 'custom',
+          description: 'Specific field list',
+        },
+      ],
+      default: 'full',
+      description: 'Level of detail of returned data',
+    },
 
+    // Custom Fields (appears directly when Display = Custom)
+    {
+      displayName: 'Custom Fields',
+      name: 'customFields',
+      type: 'string',
+      displayOptions: {
+        show: {
+          operation: ['list', 'search'],
+          display: ['custom'],
+        },
+      },
+      default: '',
+      placeholder: '[id,name,price,reference]',
+      description: 'PrestaShop field list format: [field1,field2,field3] or comma-separated: field1,field2,field3',
+    },
 
     // Filtres de recherche
     {
