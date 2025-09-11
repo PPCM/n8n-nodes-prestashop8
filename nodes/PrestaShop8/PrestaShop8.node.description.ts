@@ -241,8 +241,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
               type: 'options',
               options: FILTER_OPERATORS,
               default: '=',
-              requiresDataPath: 'single',
-              description: 'Comparison operator. Use Fixed mode for dropdown selection or Expression mode for dynamic values. Available operators: = (exact match), LIKE (contains text), > (greater than), >= (greater or equal), < (less than), <= (less or equal), != (not equal), BEGINS (starts with), ENDS (ends with)',
+              noDataExpression: true,
+              description: 'Comparison operator for filtering. Available operators: = (exact match), LIKE (contains text), > (greater than), >= (greater or equal), < (less than), <= (less or equal), != (not equal), BEGINS (starts with), ENDS (ends with)',
             },
             {
               displayName: 'Value',
