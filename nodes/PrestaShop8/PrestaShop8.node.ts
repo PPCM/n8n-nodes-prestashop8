@@ -361,7 +361,7 @@ export class PrestaShop8 implements INodeType {
             body = buildPrestashopXml(resource, { ...data, id });
 
             const options: IHttpRequestOptions = {
-              method: 'PUT' as IHttpRequestMethods,
+              method: 'PATCH' as IHttpRequestMethods,
               url: `${credentials.baseUrl}/${resource}/${id}`,
               body,
               auth: {
