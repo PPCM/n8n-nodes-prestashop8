@@ -501,9 +501,8 @@ export function validateDataForResource(resource: string, data: any, operation: 
     return { isValid: false, errors };
   }
 
-  // Only validate required fields for CREATE operations
-  // UPDATE operations can modify any field without requiring all mandatory fields
   if (operation === 'create') {
+    // CREATE: Validate required fields
     switch (resource) {
       case 'customers':
         if (!data.email && !data.id) {
@@ -523,10 +522,20 @@ export function validateDataForResource(resource: string, data: any, operation: 
         }
         break;
     }
+  } else if (operation === 'update') {
+    // UPDATE: Special validations
+    
+    // Check that at least one field is provided for update
+    const updateFields = Object.keys(data).filter(key => key !== 'id');
+    if (updateFields.length === 0) {
+      errors.push('At least one field must be provided for update (excluding id)');
+    }
+    
+    // Prevent ID modification in update operations
+    if (data.hasOwnProperty('id')) {
+      errors.push('Cannot modify id field in update operation. Use the ID parameter instead.');
+    }
   }
-  
-  // For UPDATE operations, we skip required field validation
-  // since we're modifying an existing resource
 
   return { isValid: errors.length === 0, errors };
 }
