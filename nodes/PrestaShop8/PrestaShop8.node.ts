@@ -56,6 +56,25 @@ function buildRequestOptions(rawMode: boolean, baseOptions: any): any {
   return options;
 }
 
+// Helper function to parse data parameter
+function parseDataParameter(executeFunctions: IExecuteFunctions, itemIndex: number): object {
+  let data = executeFunctions.getNodeParameter('data', itemIndex);
+  
+  // Parse JSON string if necessary
+  if (typeof data === 'string') {
+    try {
+      data = JSON.parse(data);
+    } catch (error) {
+      throw new NodeOperationError(
+        executeFunctions.getNode(),
+        `Invalid JSON in data field: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+  
+  return data as object;
+}
+
 export class PrestaShop8 implements INodeType {
   description: INodeTypeDescription = PrestaShop8Description;
 
@@ -280,7 +299,7 @@ export class PrestaShop8 implements INodeType {
           case 'create': {
             let body: string;
 
-            const data = this.getNodeParameter('data', i) as object;
+            const data = parseDataParameter(this, i);
 
             if (!rawMode) {
               
@@ -327,7 +346,7 @@ export class PrestaShop8 implements INodeType {
 
             let body: string;
 
-            const data = this.getNodeParameter('data', i) as object;
+            const data = parseDataParameter(this, i);
             
             if (!rawMode) {
               const validation = validateDataForResource(resource, data);
