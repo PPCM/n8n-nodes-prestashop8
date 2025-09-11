@@ -271,7 +271,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       default: '{}',
       required: true,
-      description: 'JSON data to send to PrestaShop (will be automatically converted to XML)',
+      placeholder: '{\n  "name": "Updated Product Name",\n  "price": "29.99",\n  "active": "1",\n  "description": "Updated product description"\n}',
+      description: 'JSON data to send to PrestaShop (automatically converted to XML). For Update: include only fields to modify. Example: {"name": "New Name", "price": "19.99", "active": "1"}. For Create: include all required fields for the resource.',
       typeOptions: {
         rows: 10,
       },
