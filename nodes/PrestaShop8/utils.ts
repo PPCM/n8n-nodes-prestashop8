@@ -493,7 +493,7 @@ export function buildUrlWithFilters(baseUrl: string, options: any, rawMode?: boo
 /**
  * Validates data before sending
  */
-export function validateDataForResource(resource: string, data: any): { isValid: boolean; errors: string[] } {
+export function validateDataForResource(resource: string, data: any, operation: string = 'create'): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   if (!data || typeof data !== 'object') {
@@ -501,26 +501,32 @@ export function validateDataForResource(resource: string, data: any): { isValid:
     return { isValid: false, errors };
   }
 
-  // Resource-specific validations
-  switch (resource) {
-    case 'customers':
-      if (!data.email && !data.id) {
-        errors.push('An email is required to create a customer');
-      }
-      break;
-    
-    case 'products':
-      if (!data.name && !data.id) {
-        errors.push('A name is required to create a product');
-      }
-      break;
-    
-    case 'orders':
-      if (!data.customerId && !data.id) {
-        errors.push('A customer ID is required to create an order');
-      }
-      break;
+  // Only validate required fields for CREATE operations
+  // UPDATE operations can modify any field without requiring all mandatory fields
+  if (operation === 'create') {
+    switch (resource) {
+      case 'customers':
+        if (!data.email && !data.id) {
+          errors.push('An email is required to create a customer');
+        }
+        break;
+      
+      case 'products':
+        if (!data.name && !data.id) {
+          errors.push('A name is required to create a product');
+        }
+        break;
+      
+      case 'orders':
+        if (!data.customerId && !data.id) {
+          errors.push('A customer ID is required to create an order');
+        }
+        break;
+    }
   }
+  
+  // For UPDATE operations, we skip required field validation
+  // since we're modifying an existing resource
 
   return { isValid: errors.length === 0, errors };
 }

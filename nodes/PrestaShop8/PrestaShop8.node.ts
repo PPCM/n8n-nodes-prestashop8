@@ -303,7 +303,7 @@ export class PrestaShop8 implements INodeType {
 
             if (!rawMode) {
               
-              const validation = validateDataForResource(resource, data);
+              const validation = validateDataForResource(resource, data, 'create');
               if (!validation.isValid) {
                 throw new NodeOperationError(
                   this.getNode(),
@@ -349,7 +349,7 @@ export class PrestaShop8 implements INodeType {
             const data = parseDataParameter(this, i);
             
             if (!rawMode) {
-              const validation = validateDataForResource(resource, data);
+              const validation = validateDataForResource(resource, data, 'update');
               if (!validation.isValid) {
                 throw new NodeOperationError(
                   this.getNode(),
