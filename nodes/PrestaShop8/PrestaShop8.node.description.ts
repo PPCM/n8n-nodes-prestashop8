@@ -259,6 +259,39 @@ export const PrestaShop8Description: INodeTypeDescription = {
       description: 'PrestaShop filters to apply to the search',
     },
 
+    // Required Fields Helper
+    {
+      displayName: 'Required Fields Guide',
+      name: 'requiredFieldsGuide',
+      type: 'notice',
+      displayOptions: {
+        show: {
+          operation: ['create'],
+        },
+      },
+      default: '',
+      typeOptions: {
+        theme: 'info',
+      },
+    },
+
+    // Show required fields for selected resource
+    {
+      displayName: 'Required Fields for This Resource',
+      name: 'showRequiredFields',
+      type: 'options',
+      displayOptions: {
+        show: {
+          operation: ['create'],
+        },
+      },
+      typeOptions: {
+        loadOptionsMethod: 'getRequiredFields',
+      },
+      default: '',
+      description: 'These are the required fields for this resource type. Use them in the Fields to Create section below.',
+    },
+
     // Fields for Create operation
     {
       displayName: 'Fields to Create',
@@ -283,26 +316,11 @@ export const PrestaShop8Description: INodeTypeDescription = {
             {
               displayName: 'Name',
               name: 'name',
-              type: 'options',
-              typeOptions: {
-                loadOptionsMethod: 'getRequiredFields',
-              },
+              type: 'string',
               default: '',
               required: true,
-              description: 'Name of the field to set. Required fields are listed first.',
-            },
-            {
-              displayName: 'Custom Field Name',
-              name: 'customName',
-              type: 'string',
-              displayOptions: {
-                show: {
-                  name: ['__custom__'],
-                },
-              },
-              default: '',
-              placeholder: 'Field name (e.g., description, active, name-1)',
-              description: 'Custom field name. For multilingual fields, use format: fieldname-langid (e.g., name-1, description-2).',
+              placeholder: 'Field name (e.g., name, price, active, name-1)',
+              description: 'Name of the field to set. Use the required fields shown above. For multilingual fields, use format: fieldname-langid (e.g., name-1, description-2).',
             },
             {
               displayName: 'Value',
@@ -316,7 +334,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           ],
         },
       ],
-      description: 'Fields to set for the new resource. Required fields are listed in the dropdown. Use "Custom Field" for additional fields.',
+      description: 'Fields to set for the new resource. Make sure to include all required fields shown above.',
     },
 
     // Fields to Update (Key-Value pairs like Set node)

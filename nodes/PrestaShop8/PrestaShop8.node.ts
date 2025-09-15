@@ -147,32 +147,43 @@ export class PrestaShop8 implements INodeType {
       
       // Load required fields for CREATE operation based on resource
       async getRequiredFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const resource = this.getCurrentNodeParameter('resource') as string;
-        const operation = this.getCurrentNodeParameter('operation') as string;
-        
-        // Only show for CREATE operation
-        if (operation !== 'create') {
-          return [];
+        try {
+          const resource = this.getCurrentNodeParameter('resource') as string;
+          
+          // Don't check operation here as it might not be set yet
+          if (!resource) {
+            return [{
+              name: 'Custom Field',
+              value: '__custom__',
+              description: 'Enter a custom field name',
+            }];
+          }
+          
+          // Import the required fields mapping
+          const { REQUIRED_FIELDS_BY_RESOURCE } = await import('./utils');
+          const requiredFields = REQUIRED_FIELDS_BY_RESOURCE[resource] || [];
+          
+          if (requiredFields.length === 0) {
+            return [{
+              name: 'No specific required fields',
+              value: 'none',
+              description: 'This resource has no specific required fields defined',
+            }];
+          }
+          
+          return requiredFields.map((field: string) => ({
+            name: field,
+            value: field,
+            description: `Required field: ${field}`,
+          }));
+        } catch (error) {
+          // Fallback in case of any error
+          return [{
+            name: 'Custom Field',
+            value: '__custom__',
+            description: 'Enter a custom field name',
+          }];
         }
-        
-        // Import the required fields mapping
-        const { REQUIRED_FIELDS_BY_RESOURCE } = await import('./utils');
-        const requiredFields = REQUIRED_FIELDS_BY_RESOURCE[resource] || [];
-        
-        const options = requiredFields.map((field: string) => ({
-          name: `${field} (Required)`,
-          value: field,
-          description: `Required field: ${field}`,
-        }));
-        
-        // Add custom field option at the end
-        options.push({
-          name: 'Custom Field',
-          value: '__custom__',
-          description: 'Enter a custom field name',
-        });
-        
-        return options;
       },
     },
   };
@@ -333,13 +344,7 @@ export class PrestaShop8 implements INodeType {
             let body: string;
 
             // Get fields to create (key-value pairs)
-            const rawFieldsToCreate = this.getNodeParameter('fieldsToCreate.field', i, []) as Array<{name: string, customName?: string, value: string}>;
-            
-            // Process fields: use customName if name is '__custom__'
-            const fieldsToCreate = rawFieldsToCreate.map(field => ({
-              name: field.name === '__custom__' ? (field.customName || '') : field.name,
-              value: field.value
-            }));
+            const fieldsToCreate = this.getNodeParameter('fieldsToCreate.field', i, []) as Array<{name: string, value: string}>;
             
             if (!rawMode) {
               // Validate that at least one field is provided
