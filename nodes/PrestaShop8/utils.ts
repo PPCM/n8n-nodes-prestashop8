@@ -627,7 +627,76 @@ export function buildUpdateXml(resource: string, id: string, fields: Array<{name
 }
 
 /**
- * Validates data before sending
+ * Required fields for each PrestaShop resource type
+ */
+const REQUIRED_FIELDS_BY_RESOURCE: {[key: string]: string[]} = {
+  'products': ['name', 'price', 'id_category_default'],
+  'categories': ['name', 'id_parent'],
+  'customers': ['firstname', 'lastname', 'email'],
+  'orders': ['id_customer', 'id_cart', 'payment', 'module'],
+  'addresses': ['firstname', 'lastname', 'address1', 'city', 'id_country', 'id_customer'],
+  'manufacturers': ['name', 'active'],
+  'suppliers': ['name', 'active'],
+  'languages': ['name', 'iso_code', 'active'],
+  'countries': ['iso_code', 'active'],
+  'currencies': ['name', 'iso_code', 'conversion_rate', 'active'],
+  'zones': ['name', 'active'],
+  'states': ['name', 'iso_code', 'id_country', 'active'],
+  'taxes': ['rate', 'active'],
+  'tax_rules': ['id_country', 'id_tax'],
+  'carriers': ['name', 'active'],
+  'order_states': ['name', 'color'],
+  'stock_availables': ['id_product', 'quantity'],
+  'images': ['id_product'],
+  'combinations': ['id_product'],
+  'tags': ['name', 'id_lang'],
+  'groups': ['name'],
+};
+
+/**
+ * Validates fields for CREATE operations (key-value pairs)
+ */
+export function validateFieldsForCreate(resource: string, fields: Array<{name: string, value: string}>): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  
+  // Get required fields for this resource
+  const requiredFields = REQUIRED_FIELDS_BY_RESOURCE[resource] || [];
+  
+  if (requiredFields.length === 0) {
+    // No specific validation for this resource, just check we have fields
+    if (fields.length === 0) {
+      errors.push(`At least one field must be provided to create ${resource}`);
+    }
+    return { isValid: errors.length === 0, errors };
+  }
+  
+  // Extract field names from provided fields (handling multilingual format)
+  const providedFieldNames = new Set<string>();
+  for (const field of fields) {
+    if (field.name) {
+      // Handle multilingual fields: name-1 → name
+      const baseFieldName = field.name.match(/^(.+)-\d+$/) ? field.name.split('-')[0] : field.name;
+      providedFieldNames.add(baseFieldName);
+    }
+  }
+  
+  // Check each required field
+  const missingFields: string[] = [];
+  for (const requiredField of requiredFields) {
+    if (!providedFieldNames.has(requiredField)) {
+      missingFields.push(requiredField);
+    }
+  }
+  
+  if (missingFields.length > 0) {
+    errors.push(`Missing required fields for ${resource}: ${missingFields.join(', ')}`);
+  }
+  
+  return { isValid: errors.length === 0, errors };
+}
+
+/**
+ * Validates data before sending (legacy function for backward compatibility)
  */
 export function validateDataForResource(resource: string, data: any, operation: string = 'create'): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
@@ -637,28 +706,7 @@ export function validateDataForResource(resource: string, data: any, operation: 
     return { isValid: false, errors };
   }
 
-  if (operation === 'create') {
-    // CREATE: Validate required fields
-    switch (resource) {
-      case 'customers':
-        if (!data.email && !data.id) {
-          errors.push('An email is required to create a customer');
-        }
-        break;
-      
-      case 'products':
-        if (!data.name && !data.id) {
-          errors.push('A name is required to create a product');
-        }
-        break;
-      
-      case 'orders':
-        if (!data.customerId && !data.id) {
-          errors.push('A customer ID is required to create an order');
-        }
-        break;
-    }
-  } else if (operation === 'update') {
+  if (operation === 'update') {
     // UPDATE: Special validations
     
     // Check that at least one field is provided for update

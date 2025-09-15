@@ -24,6 +24,7 @@ import {
   parseXmlToJson,
   buildUrlWithFilters,
   validateDataForResource,
+  validateFieldsForCreate,
   processResponseForMode,
   processDisplayParameter,
   processSortParameter,
@@ -327,6 +328,15 @@ export class PrestaShop8 implements INodeType {
                     `Field "${field.name}" must have a value`
                   );
                 }
+              }
+              
+              // Validate required fields for this resource
+              const validation = validateFieldsForCreate(resource, fieldsToCreate);
+              if (!validation.isValid) {
+                throw new NodeOperationError(
+                  this.getNode(),
+                  validation.errors.join('. ')
+                );
               }
             }
 
