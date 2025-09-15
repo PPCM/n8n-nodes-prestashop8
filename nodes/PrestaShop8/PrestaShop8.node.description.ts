@@ -306,7 +306,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
               default: '',
               required: true,
               placeholder: 'Field name (e.g., width, price, name)',
-              description: 'Name of the field to update',
+              description: 'Name of the field to update. For multilingual fields (like category names), try using Raw Mode if this field fails.',
             },
             {
               displayName: 'Value',

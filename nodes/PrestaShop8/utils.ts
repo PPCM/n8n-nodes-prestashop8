@@ -510,8 +510,20 @@ function escapeXml(unsafe: string): string {
  * Builds PrestaShop XML for Update operations using key-value pairs
  */
 export function buildUpdateXml(resource: string, id: string, fields: Array<{name: string, value: string}>): string {
-  // Convert resource to singular form for XML tag
-  const singularResource = resource.endsWith('s') ? resource.slice(0, -1) : resource;
+  // Convert resource to singular form for XML tag with special cases
+  const singularMap: {[key: string]: string} = {
+    'categories': 'category',
+    'addresses': 'address',
+    'countries': 'country',
+    'states': 'state',
+    'currencies': 'currency',
+    'languages': 'language',
+    'taxes': 'tax',
+    'tax_rules': 'tax_rule',
+    'zones': 'zone'
+  };
+  
+  const singularResource = singularMap[resource] || (resource.endsWith('s') ? resource.slice(0, -1) : resource);
   
   // Start with XML declaration and prestashop root with namespace
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
