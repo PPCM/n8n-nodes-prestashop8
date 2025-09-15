@@ -259,23 +259,67 @@ export const PrestaShop8Description: INodeTypeDescription = {
       description: 'PrestaShop filters to apply to the search',
     },
 
-    // Data for create/update
+    // Data for Create operation
     {
       displayName: 'Data',
       name: 'data',
       type: 'json',
       displayOptions: {
         show: {
-          operation: ['create', 'update'],
+          operation: ['create'],
         },
       },
       default: '{}',
       required: true,
-      placeholder: '{\n  "name": "Updated Product Name",\n  "price": "29.99",\n  "active": "1",\n  "description": "Updated product description"\n}',
-      description: 'JSON data to send to PrestaShop (automatically converted to XML). For Update: include only fields to modify. Example: {"name": "New Name", "price": "19.99", "active": "1"}. For Create: include all required fields for the resource.',
+      placeholder: '{\n  "name": "Product Name",\n  "price": "29.99",\n  "active": "1",\n  "description": "Product description"\n}',
+      description: 'JSON data to send to PrestaShop (automatically converted to XML). Include all required fields for the resource.',
       typeOptions: {
         rows: 10,
       },
+    },
+
+    // Fields to Update (Key-Value pairs like Set node)
+    {
+      displayName: 'Fields to Update',
+      name: 'fieldsToUpdate',
+      type: 'fixedCollection',
+      displayOptions: {
+        show: {
+          operation: ['update'],
+        },
+      },
+      default: {},
+      typeOptions: {
+        multipleValues: true,
+        sortable: true,
+      },
+      options: [
+        {
+          displayName: 'Field',
+          name: 'field',
+          values: [
+            {
+              displayName: 'Name',
+              name: 'name',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'Field name (e.g., width, price, name)',
+              description: 'Name of the field to update',
+            },
+            {
+              displayName: 'Value',
+              name: 'value',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'Field value',
+              description: 'Value to set. Will be properly escaped for XML.',
+            },
+          ],
+        },
+      ],
+      description: 'Fields to update in the resource. Add multiple field/value pairs as needed.',
     },
 
     // Debug Options

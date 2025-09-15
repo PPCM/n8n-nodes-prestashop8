@@ -491,6 +491,52 @@ export function buildUrlWithFilters(baseUrl: string, options: any, rawMode?: boo
 }
 
 /**
+ * Escapes XML special characters
+ */
+function escapeXml(unsafe: string): string {
+  return unsafe.replace(/[<>&'"]/g, function (c) {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case "'": return '&apos;';
+      case '"': return '&quot;';
+      default: return c;
+    }
+  });
+}
+
+/**
+ * Builds PrestaShop XML for Update operations using key-value pairs
+ */
+export function buildUpdateXml(resource: string, id: string, fields: Array<{name: string, value: string}>): string {
+  // Convert resource to singular form for XML tag
+  const singularResource = resource.endsWith('s') ? resource.slice(0, -1) : resource;
+  
+  let xml = '<prestashop>\n';
+  xml += `    <${singularResource}>\n`;
+  
+  // Add ID first
+  xml += `        <id>\n`;
+  xml += `            <![CDATA[${escapeXml(id)}]]>\n`;
+  xml += `        </id>\n`;
+  
+  // Add each field
+  for (const field of fields) {
+    if (field.name && field.value !== undefined) {
+      xml += `        <${field.name}>\n`;
+      xml += `            <![CDATA[${escapeXml(field.value.toString())}]]>\n`;
+      xml += `        </${field.name}>\n`;
+    }
+  }
+  
+  xml += `    </${singularResource}>\n`;
+  xml += '</prestashop>';
+  
+  return xml;
+}
+
+/**
  * Validates data before sending
  */
 export function validateDataForResource(resource: string, data: any, operation: string = 'create'): { isValid: boolean; errors: string[] } {

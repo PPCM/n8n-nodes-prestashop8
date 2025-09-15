@@ -19,6 +19,7 @@ import {
 import {
   simplifyPrestashopResponse,
   buildPrestashopXml,
+  buildUpdateXml,
   parseXmlToJson,
   buildUrlWithFilters,
   validateDataForResource,
@@ -346,19 +347,37 @@ export class PrestaShop8 implements INodeType {
 
             let body: string;
 
-            const data = parseDataParameter(this, i);
+            // Get fields to update (key-value pairs)
+            const fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.field', i, []) as Array<{name: string, value: string}>;
             
             if (!rawMode) {
-              const validation = validateDataForResource(resource, data, 'update');
-              if (!validation.isValid) {
+              // Validate that at least one field is provided
+              if (!fieldsToUpdate || fieldsToUpdate.length === 0) {
                 throw new NodeOperationError(
                   this.getNode(),
-                  `Invalid data: ${validation.errors.join(', ')}`
+                  'At least one field must be provided for update'
                 );
+              }
+              
+              // Validate that all fields have name and value
+              for (const field of fieldsToUpdate) {
+                if (!field.name || !field.name.trim()) {
+                  throw new NodeOperationError(
+                    this.getNode(),
+                    'All fields must have a name'
+                  );
+                }
+                if (field.value === undefined || field.value === null) {
+                  throw new NodeOperationError(
+                    this.getNode(),
+                    `Field "${field.name}" must have a value`
+                  );
+                }
               }
             }
 
-            body = buildPrestashopXml(resource, { ...data, id });
+            // Build XML using new format
+            body = buildUpdateXml(resource, id, fieldsToUpdate);
 
             const options: IHttpRequestOptions = {
               method: 'PATCH' as IHttpRequestMethods,
