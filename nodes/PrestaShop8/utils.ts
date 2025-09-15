@@ -530,10 +530,45 @@ export function buildUpdateXml(resource: string, id: string, fields: Array<{name
   xml += '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">\n';
   xml += `  <${singularResource}>\n`;
   
-  // Add each field (no specific order required, ID doesn't need to be first)
+  // Group fields by base name (for multilingual support)
+  const fieldGroups: {[key: string]: Array<{langId?: string, value: string}>} = {};
+  
   for (const field of fields) {
     if (field.name && field.value !== undefined) {
-      xml += `    <${field.name}><![CDATA[${escapeXml(field.value.toString())}]]></${field.name}>\n`;
+      // Check if field follows multilingual format: fieldname-langid
+      const multilingualMatch = field.name.match(/^(.+)-(\d+)$/);
+      
+      if (multilingualMatch) {
+        // Multilingual field: name-1, description-2, etc.
+        const [, fieldName, langId] = multilingualMatch;
+        if (!fieldGroups[fieldName]) {
+          fieldGroups[fieldName] = [];
+        }
+        fieldGroups[fieldName].push({ langId, value: field.value.toString() });
+      } else {
+        // Regular field
+        if (!fieldGroups[field.name]) {
+          fieldGroups[field.name] = [];
+        }
+        fieldGroups[field.name].push({ value: field.value.toString() });
+      }
+    }
+  }
+  
+  // Generate XML for each field group
+  for (const [fieldName, fieldValues] of Object.entries(fieldGroups)) {
+    if (fieldValues.some(f => f.langId)) {
+      // Multilingual field
+      xml += `    <${fieldName}>\n`;
+      for (const fieldValue of fieldValues) {
+        if (fieldValue.langId) {
+          xml += `      <language id="${fieldValue.langId}"><![CDATA[${escapeXml(fieldValue.value)}]]></language>\n`;
+        }
+      }
+      xml += `    </${fieldName}>\n`;
+    } else {
+      // Regular field (take first value if multiple)
+      xml += `    <${fieldName}><![CDATA[${escapeXml(fieldValues[0].value)}]]></${fieldName}>\n`;
     }
   }
   

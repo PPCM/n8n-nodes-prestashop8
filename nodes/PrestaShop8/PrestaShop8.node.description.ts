@@ -305,8 +305,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
               type: 'string',
               default: '',
               required: true,
-              placeholder: 'Field name (e.g., width, price, name)',
-              description: 'Name of the field to update. For multilingual fields (like category names), try using Raw Mode if this field fails.',
+              placeholder: 'Field name (e.g., width, price, name, name-1)',
+              description: 'Name of the field to update. For multilingual fields, use format: fieldname-langid (e.g., name-1 for name in language ID 1, description-2 for description in language ID 2).',
             },
             {
               displayName: 'Value',
@@ -320,7 +320,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           ],
         },
       ],
-      description: 'Fields to update in the resource. Add multiple field/value pairs as needed.',
+      description: 'Fields to update in the resource. Add multiple field/value pairs as needed. For multilingual fields (names, descriptions), use format: fieldname-langid (e.g., name-1, name-2 for different languages).',
     },
 
     // Debug Options
