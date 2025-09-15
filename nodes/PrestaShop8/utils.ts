@@ -507,29 +507,9 @@ function escapeXml(unsafe: string): string {
 }
 
 /**
- * Builds PrestaShop XML for Update operations using key-value pairs
+ * Builds PrestaShop XML structure for key-value pairs (shared by Create and Update)
  */
-export function buildUpdateXml(resource: string, id: string, fields: Array<{name: string, value: string}>): string {
-  // Convert resource to singular form for XML tag with special cases
-  const singularMap: {[key: string]: string} = {
-    'categories': 'category',
-    'addresses': 'address',
-    'countries': 'country',
-    'states': 'state',
-    'currencies': 'currency',
-    'languages': 'language',
-    'taxes': 'tax',
-    'tax_rules': 'tax_rule',
-    'zones': 'zone'
-  };
-  
-  const singularResource = singularMap[resource] || (resource.endsWith('s') ? resource.slice(0, -1) : resource);
-  
-  // Start with XML declaration and prestashop root with namespace
-  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  xml += '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">\n';
-  xml += `  <${singularResource}>\n`;
-  
+function buildFieldsXml(fields: Array<{name: string, value: string}>): string {
   // Group fields by base name (for multilingual support)
   const fieldGroups: {[key: string]: Array<{langId?: string, value: string}>} = {};
   
@@ -555,6 +535,8 @@ export function buildUpdateXml(resource: string, id: string, fields: Array<{name
     }
   }
   
+  let xml = '';
+  
   // Generate XML for each field group
   for (const [fieldName, fieldValues] of Object.entries(fieldGroups)) {
     if (fieldValues.some(f => f.langId)) {
@@ -571,6 +553,69 @@ export function buildUpdateXml(resource: string, id: string, fields: Array<{name
       xml += `    <${fieldName}><![CDATA[${escapeXml(fieldValues[0].value)}]]></${fieldName}>\n`;
     }
   }
+  
+  return xml;
+}
+
+/**
+ * Builds PrestaShop XML for Create operations using key-value pairs
+ */
+export function buildCreateXml(resource: string, fields: Array<{name: string, value: string}>): string {
+  // Convert resource to singular form for XML tag with special cases
+  const singularMap: {[key: string]: string} = {
+    'categories': 'category',
+    'addresses': 'address',
+    'countries': 'country',
+    'states': 'state',
+    'currencies': 'currency',
+    'languages': 'language',
+    'taxes': 'tax',
+    'tax_rules': 'tax_rule',
+    'zones': 'zone'
+  };
+  
+  const singularResource = singularMap[resource] || (resource.endsWith('s') ? resource.slice(0, -1) : resource);
+  
+  // Start with XML declaration and prestashop root with namespace
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">\n';
+  xml += `  <${singularResource}>\n`;
+  
+  // Add all fields (no ID for create)
+  xml += buildFieldsXml(fields);
+  
+  xml += `  </${singularResource}>\n`;
+  xml += '</prestashop>';
+  
+  return xml;
+}
+
+/**
+ * Builds PrestaShop XML for Update operations using key-value pairs
+ */
+export function buildUpdateXml(resource: string, id: string, fields: Array<{name: string, value: string}>): string {
+  // Convert resource to singular form for XML tag with special cases
+  const singularMap: {[key: string]: string} = {
+    'categories': 'category',
+    'addresses': 'address',
+    'countries': 'country',
+    'states': 'state',
+    'currencies': 'currency',
+    'languages': 'language',
+    'taxes': 'tax',
+    'tax_rules': 'tax_rule',
+    'zones': 'zone'
+  };
+  
+  const singularResource = singularMap[resource] || (resource.endsWith('s') ? resource.slice(0, -1) : resource);
+  
+  // Start with XML declaration and prestashop root with namespace
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">\n';
+  xml += `  <${singularResource}>\n`;
+  
+  // Add all fields using shared function
+  xml += buildFieldsXml(fields);
   
   // Add ID at the end
   xml += `    <id><![CDATA[${escapeXml(id)}]]></id>\n`;

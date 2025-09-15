@@ -259,23 +259,49 @@ export const PrestaShop8Description: INodeTypeDescription = {
       description: 'PrestaShop filters to apply to the search',
     },
 
-    // Data for Create operation
+    // Fields for Create operation
     {
-      displayName: 'Data',
-      name: 'data',
-      type: 'json',
+      displayName: 'Fields to Create',
+      name: 'fieldsToCreate',
+      type: 'fixedCollection',
       displayOptions: {
         show: {
           operation: ['create'],
         },
       },
-      default: '{}',
-      required: true,
-      placeholder: '{\n  "name": "Product Name",\n  "price": "29.99",\n  "active": "1",\n  "description": "Product description"\n}',
-      description: 'JSON data to send to PrestaShop (automatically converted to XML). Include all required fields for the resource.',
+      default: {},
+      placeholder: 'Add field',
       typeOptions: {
-        rows: 10,
+        multipleValues: true,
+        sortable: true,
       },
+      options: [
+        {
+          displayName: 'Field',
+          name: 'field',
+          values: [
+            {
+              displayName: 'Name',
+              name: 'name',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'Field name (e.g., name, price, active, name-1)',
+              description: 'Name of the field to set. For multilingual fields, use format: fieldname-langid (e.g., name-1, description-2).',
+            },
+            {
+              displayName: 'Value',
+              name: 'value',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'Field value',
+              description: 'Value to set. Will be properly escaped for XML.',
+            },
+          ],
+        },
+      ],
+      description: 'Fields to set for the new resource. Include all required fields for the resource type. For multilingual fields (names, descriptions), use format: fieldname-langid (e.g., name-1, name-2 for different languages).',
     },
 
     // Fields to Update (Key-Value pairs like Set node)

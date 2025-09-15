@@ -19,6 +19,7 @@ import {
 import {
   simplifyPrestashopResponse,
   buildPrestashopXml,
+  buildCreateXml,
   buildUpdateXml,
   parseXmlToJson,
   buildUrlWithFilters,
@@ -300,21 +301,37 @@ export class PrestaShop8 implements INodeType {
           case 'create': {
             let body: string;
 
-            const data = parseDataParameter(this, i);
-
+            // Get fields to create (key-value pairs)
+            const fieldsToCreate = this.getNodeParameter('fieldsToCreate.field', i, []) as Array<{name: string, value: string}>;
+            
             if (!rawMode) {
-              
-              const validation = validateDataForResource(resource, data, 'create');
-              if (!validation.isValid) {
+              // Validate that at least one field is provided
+              if (!fieldsToCreate || fieldsToCreate.length === 0) {
                 throw new NodeOperationError(
                   this.getNode(),
-                  `Invalid data: ${validation.errors.join(', ')}`
+                  'At least one field must be provided for create'
                 );
               }
-
+              
+              // Validate that all fields have name and value
+              for (const field of fieldsToCreate) {
+                if (!field.name || !field.name.trim()) {
+                  throw new NodeOperationError(
+                    this.getNode(),
+                    'All fields must have a name'
+                  );
+                }
+                if (field.value === undefined || field.value === null) {
+                  throw new NodeOperationError(
+                    this.getNode(),
+                    `Field "${field.name}" must have a value`
+                  );
+                }
+              }
             }
 
-            body = buildPrestashopXml(resource, data);
+            // Build XML using new format
+            body = buildCreateXml(resource, fieldsToCreate);
 
             const options: IHttpRequestOptions = {
               method: 'POST' as IHttpRequestMethods,
