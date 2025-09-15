@@ -283,11 +283,26 @@ export const PrestaShop8Description: INodeTypeDescription = {
             {
               displayName: 'Name',
               name: 'name',
-              type: 'string',
+              type: 'options',
+              typeOptions: {
+                loadOptionsMethod: 'getRequiredFields',
+              },
               default: '',
               required: true,
-              placeholder: 'Field name (e.g., name, price, active, name-1)',
-              description: 'Name of the field to set. For multilingual fields, use format: fieldname-langid (e.g., name-1, description-2).',
+              description: 'Name of the field to set. Required fields are listed first.',
+            },
+            {
+              displayName: 'Custom Field Name',
+              name: 'customName',
+              type: 'string',
+              displayOptions: {
+                show: {
+                  name: ['__custom__'],
+                },
+              },
+              default: '',
+              placeholder: 'Field name (e.g., description, active, name-1)',
+              description: 'Custom field name. For multilingual fields, use format: fieldname-langid (e.g., name-1, description-2).',
             },
             {
               displayName: 'Value',
@@ -301,7 +316,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           ],
         },
       ],
-      description: 'Fields to set for the new resource. Include all required fields for the resource type. For multilingual fields (names, descriptions), use format: fieldname-langid (e.g., name-1, name-2 for different languages).',
+      description: 'Fields to set for the new resource. Required fields are listed in the dropdown. Use "Custom Field" for additional fields.',
     },
 
     // Fields to Update (Key-Value pairs like Set node)

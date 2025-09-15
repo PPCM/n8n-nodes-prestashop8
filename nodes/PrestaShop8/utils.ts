@@ -629,7 +629,7 @@ export function buildUpdateXml(resource: string, id: string, fields: Array<{name
 /**
  * Required fields for each PrestaShop resource type
  */
-const REQUIRED_FIELDS_BY_RESOURCE: {[key: string]: string[]} = {
+export const REQUIRED_FIELDS_BY_RESOURCE: {[key: string]: string[]} = {
   'products': ['name', 'price', 'id_category_default'],
   'categories': ['name', 'id_parent'],
   'customers': ['firstname', 'lastname', 'email'],
