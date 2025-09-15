@@ -259,10 +259,269 @@ export const PrestaShop8Description: INodeTypeDescription = {
       description: 'PrestaShop filters to apply to the search',
     },
 
-    // Required Fields Helper
+    // === REQUIRED FIELDS FOR PRODUCTS ===
     {
-      displayName: 'Required Fields Guide',
-      name: 'requiredFieldsGuide',
+      displayName: 'Product Name',
+      name: 'productName',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['products'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: 'Enter product name (can be multilingual: use name-1, name-2)',
+      description: 'The product name. For multilingual stores, use field name "name-1" for language ID 1, "name-2" for language ID 2, etc.',
+    },
+    {
+      displayName: 'Product Price',
+      name: 'productPrice',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['products'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: '29.99',
+      description: 'The product price (without currency symbol). Use decimal format like "29.99".',
+    },
+    {
+      displayName: 'Default Category ID',
+      name: 'productCategoryId',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['products'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: '2',
+      description: 'The ID of the default category for this product. Usually "2" for the Home category.',
+    },
+
+    // === REQUIRED FIELDS FOR CATEGORIES ===
+    {
+      displayName: 'Category Name',
+      name: 'categoryName',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['categories'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: 'Enter category name (can be multilingual: use name-1, name-2)',
+      description: 'The category name. For multilingual stores, use field name "name-1" for language ID 1, "name-2" for language ID 2, etc.',
+    },
+    {
+      displayName: 'Parent Category ID',
+      name: 'categoryParentId',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['categories'],
+          operation: ['create'],
+        },
+      },
+      default: '1',
+      required: true,
+      placeholder: '1',
+      description: 'The ID of the parent category. Use "1" for root level categories, or the ID of an existing category.',
+    },
+
+    // === REQUIRED FIELDS FOR CUSTOMERS ===
+    {
+      displayName: 'Customer First Name',
+      name: 'customerFirstname',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['customers'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: 'John',
+      description: 'The customer\'s first name.',
+    },
+    {
+      displayName: 'Customer Last Name',
+      name: 'customerLastname',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['customers'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: 'Doe',
+      description: 'The customer\'s last name.',
+    },
+    {
+      displayName: 'Customer Email',
+      name: 'customerEmail',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['customers'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: 'john.doe@example.com',
+      description: 'The customer\'s email address. Must be unique.',
+    },
+
+    // === REQUIRED FIELDS FOR ADDRESSES ===
+    {
+      displayName: 'Address First Name',
+      name: 'addressFirstname',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['addresses'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: 'John',
+      description: 'First name for this address.',
+    },
+    {
+      displayName: 'Address Last Name',
+      name: 'addressLastname',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['addresses'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: 'Doe',
+      description: 'Last name for this address.',
+    },
+    {
+      displayName: 'Address Line 1',
+      name: 'addressAddress1',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['addresses'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: '123 Main Street',
+      description: 'Main address line (street, number).',
+    },
+    {
+      displayName: 'City',
+      name: 'addressCity',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['addresses'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: 'New York',
+      description: 'City name for this address.',
+    },
+    {
+      displayName: 'Country ID',
+      name: 'addressCountryId',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['addresses'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: '21',
+      description: 'ID of the country. Usually "21" for USA, "8" for France.',
+    },
+    {
+      displayName: 'Customer ID',
+      name: 'addressCustomerId',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['addresses'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: '1',
+      description: 'ID of the customer this address belongs to.',
+    },
+
+    // === REQUIRED FIELDS FOR MANUFACTURERS ===
+    {
+      displayName: 'Manufacturer Name',
+      name: 'manufacturerName',
+      type: 'string',
+      displayOptions: {
+        show: {
+          resource: ['manufacturers'],
+          operation: ['create'],
+        },
+      },
+      default: '',
+      required: true,
+      placeholder: 'Apple',
+      description: 'Name of the manufacturer or brand.',
+    },
+    {
+      displayName: 'Manufacturer Active',
+      name: 'manufacturerActive',
+      type: 'options',
+      displayOptions: {
+        show: {
+          resource: ['manufacturers'],
+          operation: ['create'],
+        },
+      },
+      options: [
+        {
+          name: 'Active',
+          value: '1',
+        },
+        {
+          name: 'Inactive',
+          value: '0',
+        },
+      ],
+      default: '1',
+      required: true,
+      description: 'Whether the manufacturer is active (visible) or not.',
+    },
+
+    // Additional Fields for CREATE (for non-required fields)
+    {
+      displayName: 'Additional Fields',
+      name: 'additionalFieldsSection',
       type: 'notice',
       displayOptions: {
         show: {
@@ -275,26 +534,9 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
     },
 
-    // Show required fields for selected resource
+    // Additional Fields for Create operation
     {
-      displayName: 'Required Fields for This Resource',
-      name: 'showRequiredFields',
-      type: 'options',
-      displayOptions: {
-        show: {
-          operation: ['create'],
-        },
-      },
-      typeOptions: {
-        loadOptionsMethod: 'getRequiredFields',
-      },
-      default: '',
-      description: 'These are the required fields for this resource type. Use them in the Fields to Create section below.',
-    },
-
-    // Fields for Create operation
-    {
-      displayName: 'Fields to Create',
+      displayName: 'Additional Fields',
       name: 'fieldsToCreate',
       type: 'fixedCollection',
       displayOptions: {
@@ -334,7 +576,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           ],
         },
       ],
-      description: 'Fields to set for the new resource. Make sure to include all required fields shown above.',
+      description: 'Additional optional fields for the resource. Required fields are provided above as dedicated input fields.',
     },
 
     // Fields to Update (Key-Value pairs like Set node)

@@ -343,8 +343,62 @@ export class PrestaShop8 implements INodeType {
           case 'create': {
             let body: string;
 
-            // Get fields to create (key-value pairs)
-            const fieldsToCreate = this.getNodeParameter('fieldsToCreate.field', i, []) as Array<{name: string, value: string}>;
+            // Get fields to create - collect required fields + additional fields
+            const fieldsToCreate: Array<{name: string, value: string}> = [];
+            
+            // Collect required fields based on resource
+            switch (resource) {
+              case 'products':
+                const productName = this.getNodeParameter('productName', i, '') as string;
+                const productPrice = this.getNodeParameter('productPrice', i, '') as string;
+                const productCategoryId = this.getNodeParameter('productCategoryId', i, '') as string;
+                if (productName) fieldsToCreate.push({ name: 'name', value: productName });
+                if (productPrice) fieldsToCreate.push({ name: 'price', value: productPrice });
+                if (productCategoryId) fieldsToCreate.push({ name: 'id_category_default', value: productCategoryId });
+                break;
+                
+              case 'categories':
+                const categoryName = this.getNodeParameter('categoryName', i, '') as string;
+                const categoryParentId = this.getNodeParameter('categoryParentId', i, '') as string;
+                if (categoryName) fieldsToCreate.push({ name: 'name', value: categoryName });
+                if (categoryParentId) fieldsToCreate.push({ name: 'id_parent', value: categoryParentId });
+                break;
+                
+              case 'customers':
+                const customerFirstname = this.getNodeParameter('customerFirstname', i, '') as string;
+                const customerLastname = this.getNodeParameter('customerLastname', i, '') as string;
+                const customerEmail = this.getNodeParameter('customerEmail', i, '') as string;
+                if (customerFirstname) fieldsToCreate.push({ name: 'firstname', value: customerFirstname });
+                if (customerLastname) fieldsToCreate.push({ name: 'lastname', value: customerLastname });
+                if (customerEmail) fieldsToCreate.push({ name: 'email', value: customerEmail });
+                break;
+                
+              case 'addresses':
+                const addressFirstname = this.getNodeParameter('addressFirstname', i, '') as string;
+                const addressLastname = this.getNodeParameter('addressLastname', i, '') as string;
+                const addressAddress1 = this.getNodeParameter('addressAddress1', i, '') as string;
+                const addressCity = this.getNodeParameter('addressCity', i, '') as string;
+                const addressCountryId = this.getNodeParameter('addressCountryId', i, '') as string;
+                const addressCustomerId = this.getNodeParameter('addressCustomerId', i, '') as string;
+                if (addressFirstname) fieldsToCreate.push({ name: 'firstname', value: addressFirstname });
+                if (addressLastname) fieldsToCreate.push({ name: 'lastname', value: addressLastname });
+                if (addressAddress1) fieldsToCreate.push({ name: 'address1', value: addressAddress1 });
+                if (addressCity) fieldsToCreate.push({ name: 'city', value: addressCity });
+                if (addressCountryId) fieldsToCreate.push({ name: 'id_country', value: addressCountryId });
+                if (addressCustomerId) fieldsToCreate.push({ name: 'id_customer', value: addressCustomerId });
+                break;
+                
+              case 'manufacturers':
+                const manufacturerName = this.getNodeParameter('manufacturerName', i, '') as string;
+                const manufacturerActive = this.getNodeParameter('manufacturerActive', i, '') as string;
+                if (manufacturerName) fieldsToCreate.push({ name: 'name', value: manufacturerName });
+                if (manufacturerActive) fieldsToCreate.push({ name: 'active', value: manufacturerActive });
+                break;
+            }
+            
+            // Add additional fields if any
+            const additionalFields = this.getNodeParameter('fieldsToCreate.field', i, []) as Array<{name: string, value: string}>;
+            fieldsToCreate.push(...additionalFields);
             
             if (!rawMode) {
               // Validate that at least one field is provided
