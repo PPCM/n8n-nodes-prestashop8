@@ -289,6 +289,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
         },
       },
       default: {},
+      placeholder: 'Add field',
       typeOptions: {
         multipleValues: true,
         sortable: true,

@@ -513,24 +513,22 @@ export function buildUpdateXml(resource: string, id: string, fields: Array<{name
   // Convert resource to singular form for XML tag
   const singularResource = resource.endsWith('s') ? resource.slice(0, -1) : resource;
   
-  let xml = '<prestashop>\n';
-  xml += `    <${singularResource}>\n`;
+  // Start with XML declaration and prestashop root with namespace
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">\n';
+  xml += `  <${singularResource}>\n`;
   
-  // Add ID first
-  xml += `        <id>\n`;
-  xml += `            <![CDATA[${escapeXml(id)}]]>\n`;
-  xml += `        </id>\n`;
-  
-  // Add each field
+  // Add each field (no specific order required, ID doesn't need to be first)
   for (const field of fields) {
     if (field.name && field.value !== undefined) {
-      xml += `        <${field.name}>\n`;
-      xml += `            <![CDATA[${escapeXml(field.value.toString())}]]>\n`;
-      xml += `        </${field.name}>\n`;
+      xml += `    <${field.name}><![CDATA[${escapeXml(field.value.toString())}]]></${field.name}>\n`;
     }
   }
   
-  xml += `    </${singularResource}>\n`;
+  // Add ID at the end
+  xml += `    <id><![CDATA[${escapeXml(id)}]]></id>\n`;
+  
+  xml += `  </${singularResource}>\n`;
   xml += '</prestashop>';
   
   return xml;
