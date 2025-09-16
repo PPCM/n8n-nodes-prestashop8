@@ -328,6 +328,10 @@ export class PrestaShop8 implements INodeType {
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
               ...(rawMode ? { json: false } : {}),
             };
+            
+            // Capture complete request information for debug
+            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource);
+            requestHeaders = requestDebugInfo.headers;
 
             const response = await this.helpers.httpRequest(options);
             responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
@@ -492,6 +496,11 @@ export class PrestaShop8 implements INodeType {
             };
 
             requestUrl = options.url as string;
+            
+            // Capture complete request information for debug (including XML body)
+            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource, body);
+            requestHeaders = requestDebugInfo.headers;
+            
             const response = await this.helpers.httpRequest(options);
             responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
@@ -555,6 +564,11 @@ export class PrestaShop8 implements INodeType {
             };
 
             requestUrl = options.url as string;
+            
+            // Capture complete request information for debug (including XML body)
+            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource, body);
+            requestHeaders = requestDebugInfo.headers;
+            
             const response = await this.helpers.httpRequest(options);
             responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
@@ -580,6 +594,11 @@ export class PrestaShop8 implements INodeType {
             };
 
             requestUrl = options.url as string;
+            
+            // Capture complete request information for debug
+            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource);
+            requestHeaders = requestDebugInfo.headers;
+            
             await this.helpers.httpRequest(options);
 
             responseData = {
