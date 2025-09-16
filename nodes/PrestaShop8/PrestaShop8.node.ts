@@ -43,6 +43,33 @@ function buildHeaders(rawMode: boolean): any {
   return headers;
 }
 
+/**
+ * Capture complete request information for debugging
+ */
+function captureRequestDebugInfo(options: any, credentials: any, rawMode: boolean, operation: string, resource: string, body?: string): any {
+  return {
+    method: options.method,
+    url: options.url,
+    headers: {
+      ...options.headers,
+      'Authorization': `Basic ${Buffer.from(credentials.apiKey + ':').toString('base64')}`,
+      'User-Agent': 'n8n-prestashop8-node/1.0.0',
+    },
+    authentication: {
+      type: 'Basic Auth',
+      username: credentials.apiKey,
+      password: '[HIDDEN]',
+      baseUrl: credentials.baseUrl,
+    },
+    operation: operation,
+    resource: resource,
+    mode: rawMode ? 'Raw XML' : 'JSON',
+    timeout: options.timeout,
+    ...(body && { body: body }),
+    ...(options.json !== undefined && { jsonParsing: options.json }),
+  };
+}
+
 // Helper function to build request options based on raw mode
 function buildRequestOptions(rawMode: boolean, baseOptions: any): any {
   const options = { ...baseOptions };
@@ -202,6 +229,7 @@ export class PrestaShop8 implements INodeType {
         let responseData: any;
         let requestUrl: string = '';
         let requestHeaders: any = {};
+        let requestDebugInfo: any = {};
         const rawMode = this.getNodeParameter('debugOptions.rawMode', i, false) as boolean;
         
         // Use resource for response processing  
@@ -238,11 +266,9 @@ export class PrestaShop8 implements INodeType {
               ...(rawMode ? { json: false } : {}),
             };
             
-            // Capture headers for debug
-            requestHeaders = {
-              ...options.headers,
-              'Authorization': `Basic ${Buffer.from(credentials.apiKey + ':').toString('base64')}`,
-            };
+            // Capture complete request information for debug
+            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource);
+            requestHeaders = requestDebugInfo.headers;
 
             let response: any;
             
@@ -571,20 +597,35 @@ export class PrestaShop8 implements INodeType {
         // Add debug metadata if requested
         const debugOptions = this.getNodeParameter('debugOptions', i, {}) as any;
         
-        // Capture headers for debug purposes if needed
-        if (debugOptions.showHeaders && Object.keys(requestHeaders).length === 0) {
-          requestHeaders = {
-            ...buildHeaders(rawMode),
-            'Authorization': `Basic ${Buffer.from(credentials.apiKey + ':').toString('base64')}`,
-            'User-Agent': 'n8n-prestashop8-node/1.0.0',
+        // Capture request information for debug purposes if needed
+        if (debugOptions.showHeaders && Object.keys(requestDebugInfo).length === 0) {
+          // Fallback if no request debug info was captured
+          requestDebugInfo = {
+            method: 'GET',
+            url: requestUrl,
+            headers: {
+              ...buildHeaders(rawMode),
+              'Authorization': `Basic ${Buffer.from(credentials.apiKey + ':').toString('base64')}`,
+              'User-Agent': 'n8n-prestashop8-node/1.0.0',
+            },
+            authentication: {
+              type: 'Basic Auth',
+              username: credentials.apiKey,
+              password: '[HIDDEN]',
+              baseUrl: credentials.baseUrl,
+            },
+            operation: operation,
+            resource: resource,
+            mode: rawMode ? 'Raw XML' : 'JSON',
           };
+          requestHeaders = requestDebugInfo.headers;
         }
         
         if (debugOptions.showUrl || debugOptions.showHeaders) {
           responseData = {
             data: responseData,
             ...(debugOptions.showUrl && { requestUrl }),
-            ...(debugOptions.showHeaders && { requestHeaders }),
+            ...(debugOptions.showHeaders && { requestInfo: requestDebugInfo }),
           };
         }
 

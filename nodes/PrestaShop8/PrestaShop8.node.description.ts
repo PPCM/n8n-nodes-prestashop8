@@ -647,11 +647,11 @@ export const PrestaShop8Description: INodeTypeDescription = {
           description: 'Add request URL to the response',
         },
         {
-          displayName: 'Show Headers',
+          displayName: 'Show Request Info',
           name: 'showHeaders',
           type: 'boolean',
           default: false,
-          description: 'Add complete HTTP headers sent to PrestaShop server to the response (includes Authorization, Content-Type, etc.)',
+          description: 'Add complete HTTP request information to the response (method, URL, headers, authentication, body, etc.) - useful for debugging API communication',
         },
         {
           displayName: 'Timeout (ms)',
