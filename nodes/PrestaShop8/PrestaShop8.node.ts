@@ -199,9 +199,10 @@ export class PrestaShop8 implements INodeType {
 
     for (let i = 0; i < items.length; i++) {
       try {
-        const rawMode = this.getNodeParameter('debugOptions.rawMode', i, false) as boolean;
         let responseData: any;
-        let requestUrl: string;
+        let requestUrl: string = '';
+        let requestHeaders: any = {};
+        const rawMode = this.getNodeParameter('debugOptions.rawMode', i, false) as boolean;
         
         // Use resource for response processing  
         const currentMode = resource;
@@ -235,6 +236,12 @@ export class PrestaShop8 implements INodeType {
               headers: buildHeaders(rawMode),
               timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
               ...(rawMode ? { json: false } : {}),
+            };
+            
+            // Capture headers for debug
+            requestHeaders = {
+              ...options.headers,
+              'Authorization': `Basic ${Buffer.from(credentials.apiKey + ':').toString('base64')}`,
             };
 
             let response: any;
@@ -563,10 +570,21 @@ export class PrestaShop8 implements INodeType {
 
         // Add debug metadata if requested
         const debugOptions = this.getNodeParameter('debugOptions', i, {}) as any;
+        
+        // Capture headers for debug purposes if needed
+        if (debugOptions.showHeaders && Object.keys(requestHeaders).length === 0) {
+          requestHeaders = {
+            ...buildHeaders(rawMode),
+            'Authorization': `Basic ${Buffer.from(credentials.apiKey + ':').toString('base64')}`,
+            'User-Agent': 'n8n-prestashop8-node/1.0.0',
+          };
+        }
+        
         if (debugOptions.showUrl || debugOptions.showHeaders) {
           responseData = {
             data: responseData,
             ...(debugOptions.showUrl && { requestUrl }),
+            ...(debugOptions.showHeaders && { requestHeaders }),
           };
         }
 

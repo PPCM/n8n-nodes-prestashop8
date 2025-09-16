@@ -651,7 +651,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           name: 'showHeaders',
           type: 'boolean',
           default: false,
-          description: 'Add HTTP headers to the response',
+          description: 'Add complete HTTP headers sent to PrestaShop server to the response (includes Authorization, Content-Type, etc.)',
         },
         {
           displayName: 'Timeout (ms)',
