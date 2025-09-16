@@ -18,12 +18,9 @@ import {
 } from './types';
 import {
   simplifyPrestashopResponse,
-  buildPrestashopXml,
   buildCreateXml,
   buildUpdateXml,
-  parseXmlToJson,
   buildUrlWithFilters,
-  validateDataForResource,
   validateFieldsForCreate,
   processResponseForMode,
   processDisplayParameter,
@@ -41,6 +38,118 @@ function buildHeaders(rawMode: boolean): any {
     headers['Output-Format'] = 'JSON';
   }
   return headers;
+}
+
+/**
+ * Build common HTTP request options
+ */
+function buildHttpOptions(method: IHttpRequestMethods, url: string, credentials: any, rawMode: boolean, timeout: number, body?: string): IHttpRequestOptions {
+  return {
+    method,
+    url,
+    auth: {
+      username: credentials.apiKey,
+      password: '',
+    },
+    headers: {
+      'Content-Type': 'application/xml',
+      ...(rawMode ? {} : { 'Output-Format': 'JSON' }),
+    },
+    timeout,
+    ...(rawMode ? { json: false } : {}),
+    ...(body && { body }),
+  };
+}
+
+/**
+ * Execute HTTP request with debug capture
+ */
+async function executeHttpRequest(
+  helpers: any,
+  options: IHttpRequestOptions,
+  credentials: any,
+  rawMode: boolean,
+  operation: string,
+  resource: string,
+  body?: string
+): Promise<{ response: any; debugInfo: any; url: string }> {
+  const requestUrl = options.url as string;
+  const debugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource, body);
+  
+  const response = await helpers.httpRequest(options);
+  
+  return {
+    response,
+    debugInfo,
+    url: requestUrl,
+  };
+}
+
+/**
+ * Collect required fields from individual input parameters
+ */
+function collectRequiredFields(executeFunctions: IExecuteFunctions, resource: string, itemIndex: number): Array<{name: string, value: string}> {
+  const fieldsToCreate: Array<{name: string, value: string}> = [];
+  
+  const fieldMappings: {[resource: string]: {[inputName: string]: string}} = {
+    products: {
+      productName: 'name-1',
+      productPrice: 'price',
+      productCategoryId: 'id_category_default'
+    },
+    categories: {
+      categoryName: 'name-1',
+      categoryParentId: 'id_parent'
+    },
+    customers: {
+      customerFirstname: 'firstname',
+      customerLastname: 'lastname',
+      customerEmail: 'email'
+    },
+    addresses: {
+      addressFirstname: 'firstname',
+      addressLastname: 'lastname',
+      addressAddress1: 'address1',
+      addressCity: 'city',
+      addressCountryId: 'id_country',
+      addressCustomerId: 'id_customer'
+    },
+    manufacturers: {
+      manufacturerName: 'name',
+      manufacturerActive: 'active'
+    }
+  };
+  
+  const mappings = fieldMappings[resource];
+  if (mappings) {
+    for (const [inputName, fieldName] of Object.entries(mappings)) {
+      const value = executeFunctions.getNodeParameter(inputName, itemIndex, '') as string;
+      if (value) {
+        fieldsToCreate.push({ name: fieldName, value });
+      }
+    }
+  }
+  
+  return fieldsToCreate;
+}
+
+/**
+ * Process response data into appropriate format
+ */
+function processResponseData(responseData: any, returnData: INodeExecutionData[], itemIndex: number): void {
+  if (Array.isArray(responseData)) {
+    responseData.forEach((item: any) => {
+      returnData.push({
+        json: item,
+        pairedItem: { item: itemIndex },
+      });
+    });
+  } else {
+    returnData.push({
+      json: responseData,
+      pairedItem: { item: itemIndex },
+    });
+  }
 }
 
 /**
@@ -70,40 +179,7 @@ function captureRequestDebugInfo(options: any, credentials: any, rawMode: boolea
   };
 }
 
-// Helper function to build request options based on raw mode
-function buildRequestOptions(rawMode: boolean, baseOptions: any): any {
-  const options = { ...baseOptions };
-  
-  // In raw mode, we want the XML response as-is (string)
-  if (rawMode) {
-    options.json = false; // Don't parse XML to JSON automatically
-  } else {
-    // In normal mode, we want JSON parsing
-    options.headers = options.headers || {};
-    options.headers['Output-Format'] = 'JSON';
-  }
-  
-  return options;
-}
 
-// Helper function to parse data parameter
-function parseDataParameter(executeFunctions: IExecuteFunctions, itemIndex: number): object {
-  let data = executeFunctions.getNodeParameter('data', itemIndex);
-  
-  // Parse JSON string if necessary
-  if (typeof data === 'string') {
-    try {
-      data = JSON.parse(data);
-    } catch (error) {
-      throw new NodeOperationError(
-        executeFunctions.getNode(),
-        `Invalid JSON in data field: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
-  }
-  
-  return data as object;
-}
 
 export class PrestaShop8 implements INodeType {
   description: INodeTypeDescription = PrestaShop8Description;
@@ -317,23 +393,16 @@ export class PrestaShop8 implements INodeType {
               display: advancedOptions.display === 'custom' ? advancedOptions.customFields : advancedOptions.display,
             }, rawMode);
 
-            const options: IHttpRequestOptions = {
-              method: 'GET' as IHttpRequestMethods,
-              url: requestUrl,
-              auth: {
-                username: credentials.apiKey,
-                password: '',
-              },
-              headers: buildHeaders(rawMode),
-              timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
-              ...(rawMode ? { json: false } : {}),
-            };
+            const timeout = this.getNodeParameter('debugOptions.timeout', i, 30000) as number;
+            const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
             
-            // Capture complete request information for debug
-            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource);
-            requestHeaders = requestDebugInfo.headers;
-
-            const response = await this.helpers.httpRequest(options);
+            const { response, debugInfo, url } = await executeHttpRequest(
+              this.helpers, options, credentials, rawMode, operation, resource
+            );
+            
+            requestUrl = url;
+            requestDebugInfo = debugInfo;
+            requestHeaders = debugInfo.headers;
             responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
           }
@@ -380,62 +449,8 @@ export class PrestaShop8 implements INodeType {
           case 'create': {
             let body: string;
 
-            // Get fields to create - collect required fields + additional fields
-            const fieldsToCreate: Array<{name: string, value: string}> = [];
-            
-            // Collect required fields based on resource
-            switch (resource) {
-              case 'products':
-                const productName = this.getNodeParameter('productName', i, '') as string;
-                const productPrice = this.getNodeParameter('productPrice', i, '') as string;
-                const productCategoryId = this.getNodeParameter('productCategoryId', i, '') as string;
-                // Auto-convert name to multilingual format for language ID 1
-                if (productName) {
-                  fieldsToCreate.push({ name: 'name-1', value: productName });
-                }
-                if (productPrice) fieldsToCreate.push({ name: 'price', value: productPrice });
-                if (productCategoryId) fieldsToCreate.push({ name: 'id_category_default', value: productCategoryId });
-                break;
-                
-              case 'categories':
-                const categoryName = this.getNodeParameter('categoryName', i, '') as string;
-                const categoryParentId = this.getNodeParameter('categoryParentId', i, '') as string;
-                // Auto-convert name to multilingual format for language ID 1
-                if (categoryName) fieldsToCreate.push({ name: 'name-1', value: categoryName });
-                if (categoryParentId) fieldsToCreate.push({ name: 'id_parent', value: categoryParentId });
-                break;
-                
-              case 'customers':
-                const customerFirstname = this.getNodeParameter('customerFirstname', i, '') as string;
-                const customerLastname = this.getNodeParameter('customerLastname', i, '') as string;
-                const customerEmail = this.getNodeParameter('customerEmail', i, '') as string;
-                if (customerFirstname) fieldsToCreate.push({ name: 'firstname', value: customerFirstname });
-                if (customerLastname) fieldsToCreate.push({ name: 'lastname', value: customerLastname });
-                if (customerEmail) fieldsToCreate.push({ name: 'email', value: customerEmail });
-                break;
-                
-              case 'addresses':
-                const addressFirstname = this.getNodeParameter('addressFirstname', i, '') as string;
-                const addressLastname = this.getNodeParameter('addressLastname', i, '') as string;
-                const addressAddress1 = this.getNodeParameter('addressAddress1', i, '') as string;
-                const addressCity = this.getNodeParameter('addressCity', i, '') as string;
-                const addressCountryId = this.getNodeParameter('addressCountryId', i, '') as string;
-                const addressCustomerId = this.getNodeParameter('addressCustomerId', i, '') as string;
-                if (addressFirstname) fieldsToCreate.push({ name: 'firstname', value: addressFirstname });
-                if (addressLastname) fieldsToCreate.push({ name: 'lastname', value: addressLastname });
-                if (addressAddress1) fieldsToCreate.push({ name: 'address1', value: addressAddress1 });
-                if (addressCity) fieldsToCreate.push({ name: 'city', value: addressCity });
-                if (addressCountryId) fieldsToCreate.push({ name: 'id_country', value: addressCountryId });
-                if (addressCustomerId) fieldsToCreate.push({ name: 'id_customer', value: addressCustomerId });
-                break;
-                
-              case 'manufacturers':
-                const manufacturerName = this.getNodeParameter('manufacturerName', i, '') as string;
-                const manufacturerActive = this.getNodeParameter('manufacturerActive', i, '') as string;
-                if (manufacturerName) fieldsToCreate.push({ name: 'name', value: manufacturerName });
-                if (manufacturerActive) fieldsToCreate.push({ name: 'active', value: manufacturerActive });
-                break;
-            }
+            // Collect required fields using factorized function
+            const fieldsToCreate = collectRequiredFields(this, resource, i);
             
             // Add additional fields if any
             const additionalFields = this.getNodeParameter('fieldsToCreate.field', i, []) as Array<{name: string, value: string}>;
@@ -479,29 +494,16 @@ export class PrestaShop8 implements INodeType {
             // Build XML using new format
             body = buildCreateXml(resource, fieldsToCreate);
 
-            const options: IHttpRequestOptions = {
-              method: 'POST' as IHttpRequestMethods,
-              url: `${credentials.baseUrl}/${resource}`,
-              body,
-              auth: {
-                username: credentials.apiKey,
-                password: '',
-              },
-              headers: {
-                'Content-Type': 'application/xml',
-                ...(rawMode ? {} : { 'Output-Format': 'JSON' }),
-              },
-              timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
-              ...(rawMode ? { json: false } : {}),
-            };
-
-            requestUrl = options.url as string;
+            const timeout = this.getNodeParameter('debugOptions.timeout', i, 30000) as number;
+            const options = buildHttpOptions('POST', `${credentials.baseUrl}/${resource}`, credentials, rawMode, timeout, body);
             
-            // Capture complete request information for debug (including XML body)
-            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource, body);
-            requestHeaders = requestDebugInfo.headers;
+            const { response, debugInfo, url } = await executeHttpRequest(
+              this.helpers, options, credentials, rawMode, operation, resource, body
+            );
             
-            const response = await this.helpers.httpRequest(options);
+            requestUrl = url;
+            requestDebugInfo = debugInfo;
+            requestHeaders = debugInfo.headers;
             responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
           }
@@ -547,29 +549,16 @@ export class PrestaShop8 implements INodeType {
             // Build XML using new format
             body = buildUpdateXml(resource, id, fieldsToUpdate);
 
-            const options: IHttpRequestOptions = {
-              method: 'PATCH' as IHttpRequestMethods,
-              url: `${credentials.baseUrl}/${resource}/${id}`,
-              body,
-              auth: {
-                username: credentials.apiKey,
-                password: '',
-              },
-              headers: {
-                'Content-Type': 'application/xml',
-                ...(rawMode ? {} : { 'Output-Format': 'JSON' }),
-              },
-              timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
-              ...(rawMode ? { json: false } : {}),
-            };
-
-            requestUrl = options.url as string;
+            const timeout = this.getNodeParameter('debugOptions.timeout', i, 30000) as number;
+            const options = buildHttpOptions('PATCH', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout, body);
             
-            // Capture complete request information for debug (including XML body)
-            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource, body);
-            requestHeaders = requestDebugInfo.headers;
+            const { response, debugInfo, url } = await executeHttpRequest(
+              this.helpers, options, credentials, rawMode, operation, resource, body
+            );
             
-            const response = await this.helpers.httpRequest(options);
+            requestUrl = url;
+            requestDebugInfo = debugInfo;
+            requestHeaders = debugInfo.headers;
             responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
           }
@@ -581,25 +570,16 @@ export class PrestaShop8 implements INodeType {
               throw new NodeOperationError(this.getNode(), 'ID required for this operation');
             }
 
-            const options: IHttpRequestOptions = {
-              method: 'DELETE' as IHttpRequestMethods,
-              url: `${credentials.baseUrl}/${resource}/${id}`,
-              auth: {
-                username: credentials.apiKey,
-                password: '',
-              },
-              headers: buildHeaders(rawMode),
-              timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
-              ...(rawMode ? { json: false } : {}),
-            };
-
-            requestUrl = options.url as string;
+            const timeout = this.getNodeParameter('debugOptions.timeout', i, 30000) as number;
+            const options = buildHttpOptions('DELETE', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout);
             
-            // Capture complete request information for debug
-            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource);
-            requestHeaders = requestDebugInfo.headers;
+            const { debugInfo, url } = await executeHttpRequest(
+              this.helpers, options, credentials, rawMode, operation, resource
+            );
             
-            await this.helpers.httpRequest(options);
+            requestUrl = url;
+            requestDebugInfo = debugInfo;
+            requestHeaders = debugInfo.headers;
 
             responseData = {
               success: true,
@@ -648,19 +628,7 @@ export class PrestaShop8 implements INodeType {
           };
         }
 
-        if (Array.isArray(responseData)) {
-          responseData.forEach((item: any) => {
-            returnData.push({
-              json: item,
-              pairedItem: { item: i },
-            });
-          });
-        } else {
-          returnData.push({
-            json: responseData,
-            pairedItem: { item: i },
-          });
-        }
+        processResponseData(responseData, returnData, i);
 
       } catch (error) {
         // Extract meaningful PrestaShop error message
