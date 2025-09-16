@@ -28,11 +28,13 @@ export const PrestaShop8Description: INodeTypeDescription = {
       name: 'resource', 
       type: 'options',
       noDataExpression: true,
-      options: Object.values(PRESTASHOP_RESOURCES).map(resource => ({
-        name: resource.displayName,
-        value: resource.name,
-        description: resource.description,
-      })),
+      options: Object.values(PRESTASHOP_RESOURCES)
+        .map(resource => ({
+          name: resource.displayName,
+          value: resource.name,
+          description: resource.description,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
       default: 'products',
       required: true,
       description: 'PrestaShop resource type to work with',
