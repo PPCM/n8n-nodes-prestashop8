@@ -5,7 +5,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
   displayName: 'PrestaShop 8',
   name: 'prestaShop8',
   group: ['transform'],
-  icon: 'file:prestashop8.svg' as any,
+  icon: 'file:../../PrestaShop8/prestashop8.svg' as any,
   version: 1,
   subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
   description: 'n8n node for PrestaShop 8 with automatic XML/JSON conversion and full CRUD support',

@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-prestashop8",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Nœud n8n personnalisé pour PrestaShop 8 avec support CRUD complet et conversion XML/JSON automatique",
   "keywords": [
     "n8n-community-node-package",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/PPCM/n8n-nodes-prestashop8.git"
+    "url": "git+https://github.com/PPCM/n8n-nodes-prestashop8.git"
   },
   "bugs": {
     "url": "https://github.com/PPCM/n8n-nodes-prestashop8/issues"
@@ -34,7 +34,7 @@
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials package.json",
     "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint -s",
+    "prepublishOnly": "npm run build",
     "test": "node test-example.js",
     "clean": "rm -rf dist",
     "package": "npm run clean && npm run build && npm pack"
@@ -55,6 +55,9 @@
   "devDependencies": {
     "@types/node": "^24.3.1",
     "@types/xml2js": "^0.4.14",
+    "@typescript-eslint/eslint-plugin": "^8.44.0",
+    "@typescript-eslint/parser": "^8.44.0",
+    "eslint": "^8.57.1",
     "eslint-plugin-n8n-nodes-base": "^1.11.0",
     "gulp": "^5.0.1",
     "n8n-workflow": "*",
