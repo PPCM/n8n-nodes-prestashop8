@@ -352,7 +352,10 @@ export class PrestaShop8 implements INodeType {
                 const productName = this.getNodeParameter('productName', i, '') as string;
                 const productPrice = this.getNodeParameter('productPrice', i, '') as string;
                 const productCategoryId = this.getNodeParameter('productCategoryId', i, '') as string;
-                if (productName) fieldsToCreate.push({ name: 'name', value: productName });
+                // Auto-convert name to multilingual format for language ID 1
+                if (productName) {
+                  fieldsToCreate.push({ name: 'name-1', value: productName });
+                }
                 if (productPrice) fieldsToCreate.push({ name: 'price', value: productPrice });
                 if (productCategoryId) fieldsToCreate.push({ name: 'id_category_default', value: productCategoryId });
                 break;
@@ -360,7 +363,8 @@ export class PrestaShop8 implements INodeType {
               case 'categories':
                 const categoryName = this.getNodeParameter('categoryName', i, '') as string;
                 const categoryParentId = this.getNodeParameter('categoryParentId', i, '') as string;
-                if (categoryName) fieldsToCreate.push({ name: 'name', value: categoryName });
+                // Auto-convert name to multilingual format for language ID 1
+                if (categoryName) fieldsToCreate.push({ name: 'name-1', value: categoryName });
                 if (categoryParentId) fieldsToCreate.push({ name: 'id_parent', value: categoryParentId });
                 break;
                 

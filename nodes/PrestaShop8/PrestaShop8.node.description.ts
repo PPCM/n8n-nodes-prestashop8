@@ -272,8 +272,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       default: '',
       required: true,
-      placeholder: 'Enter product name (can be multilingual: use name-1, name-2)',
-      description: 'The product name. For multilingual stores, use field name "name-1" for language ID 1, "name-2" for language ID 2, etc.',
+      placeholder: 'My Product Name',
+      description: 'The product name. Will be automatically set for language ID 1. For additional languages, use the Additional Fields section with "name-2", "name-3", etc.',
     },
     {
       displayName: 'Product Price',
@@ -319,8 +319,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       default: '',
       required: true,
-      placeholder: 'Enter category name (can be multilingual: use name-1, name-2)',
-      description: 'The category name. For multilingual stores, use field name "name-1" for language ID 1, "name-2" for language ID 2, etc.',
+      placeholder: 'Electronics',
+      description: 'The category name. Will be automatically set for language ID 1. For additional languages, use the Additional Fields section with "name-2", "name-3", etc.',
     },
     {
       displayName: 'Parent Category ID',
