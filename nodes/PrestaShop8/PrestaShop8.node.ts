@@ -71,7 +71,7 @@ function buildHttpOptions(method: IHttpRequestMethods, url: string, credentials:
 }
 
 /**
- * Execute HTTP request with debug capture
+ * Execute HTTP request with debug capture and response metadata
  */
 async function executeHttpRequest(
   helpers: any,
@@ -80,18 +80,42 @@ async function executeHttpRequest(
   rawMode: boolean,
   operation: string,
   resource: string,
+  neverError: boolean = false,
   body?: string
-): Promise<{ response: any; debugInfo: any; url: string }> {
+): Promise<{ response: any; debugInfo: any; url: string; responseHeaders?: any; statusCode?: number }> {
   const requestUrl = options.url as string;
   const debugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource, body);
   
-  const response = await helpers.httpRequest(options);
-  
-  return {
-    response,
-    debugInfo,
-    url: requestUrl,
-  };
+  try {
+    const response = await helpers.httpRequest(options);
+    
+    // For n8n's httpRequest, the response IS the body, headers are not directly available
+    // We return the response as-is since n8n handles the HTTP layer
+    return {
+      response,
+      debugInfo,
+      url: requestUrl,
+      responseHeaders: {}, // n8n doesn't expose response headers through httpRequest
+      statusCode: 200, // Assume success if no error thrown
+    };
+  } catch (error: any) {
+    if (neverError) {
+      // Return structured error response for Never Error mode
+      const errorResponse = {
+        status: error.httpCode || error.response?.status || 500,
+        message: error.response?.data || ''
+      };
+      
+      return {
+        response: errorResponse,
+        debugInfo,
+        url: requestUrl,
+        responseHeaders: error.response?.headers || {},
+        statusCode: error.httpCode || error.response?.status || 500,
+      };
+    }
+    throw error;
+  }
 }
 
 /**
@@ -315,7 +339,7 @@ export class PrestaShop8 implements INodeType {
         let requestUrl: string = '';
         let requestHeaders: any = {};
         let requestDebugInfo: any = {};
-        const rawMode = this.getNodeParameter('debugOptions.rawMode', i, false) as boolean;
+        const rawMode = this.getNodeParameter('options.response.rawMode', i, false) as boolean;
         
         // Use resource for response processing  
         const currentMode = resource;
@@ -326,12 +350,7 @@ export class PrestaShop8 implements INodeType {
             const display = this.getNodeParameter('display', i, 'full') as string;
             const customFields = this.getNodeParameter('customFields', i, '') as string;
             
-            // Handle display parameter - minimal = no display param (IDs only)
-            const displayValue = processDisplayParameter(
-              display,
-              resource,
-              customFields
-            );
+            const displayValue = display === 'custom' ? customFields : display;
             
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, {
               limit: advancedOptions.limit,
@@ -339,24 +358,10 @@ export class PrestaShop8 implements INodeType {
               display: displayValue,
             }, rawMode);
 
-            const options: IHttpRequestOptions = {
-              method: 'GET' as IHttpRequestMethods,
-              url: requestUrl,
-              auth: {
-                username: credentials.apiKey,
-                password: '',
-              },
-              headers: buildHeaders(rawMode),
-              timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
-              ...(rawMode ? { json: false } : {}),
-            };
-            
-            // Capture complete request information for debug
-            requestDebugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource);
-            requestHeaders = requestDebugInfo.headers;
+            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
+            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
+            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
 
-            let response: any;
-            
             if (rawMode) {
               // In Raw mode, use axios directly to avoid n8n automatic parsing
               const axios = require('axios');
@@ -369,24 +374,76 @@ export class PrestaShop8 implements INodeType {
                     username: credentials.apiKey,
                     password: ''
                   },
-                  headers: options.headers,
-                  timeout: options.timeout || 30000,
-                  transformResponse: [(data: any) => data] // Keep raw response
+                  headers: buildHeaders(rawMode),
+                  timeout: timeout || 30000,
+                  transformResponse: [(data: any) => data], // Keep raw response
+                  validateStatus: neverError ? () => true : undefined // Accept all status codes if neverError is true
                 });
                 
-                response = axiosResponse.data;
+                requestDebugInfo = captureRequestDebugInfo({
+                  method: 'GET',
+                  url: requestUrl,
+                  headers: buildHeaders(rawMode),
+                  timeout: timeout
+                }, credentials, rawMode, operation, resource);
+                requestHeaders = requestDebugInfo.headers;
+
+                // Check if this is an error response with Never Error mode
+                if (neverError && (axiosResponse.status < 200 || axiosResponse.status >= 300)) {
+                  responseData = {
+                    status: axiosResponse.status,
+                    message: axiosResponse.data || ''
+                  };
+                } else {
+                  let processedResponse = { raw: axiosResponse.data };
+                  
+                  // Add response headers and status if requested
+                  if (includeResponseHeaders) {
+                    responseData = {
+                      body: processedResponse,
+                      headers: axiosResponse.headers,
+                      statusCode: axiosResponse.status,
+                      statusMessage: axiosResponse.status >= 200 && axiosResponse.status < 300 ? 'OK' : 'Error'
+                    };
+                  } else {
+                    responseData = processedResponse;
+                  }
+                }
               } catch (error: any) {
-                if (error.response) {
-                  response = error.response.data;
+                if (neverError) {
+                  responseData = {
+                    status: error.response?.status || 500,
+                    message: error.response?.data || ''
+                  };
                 } else {
                   throw error;
                 }
               }
             } else {
-              response = await this.helpers.httpRequest(options);
+              const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
+              
+              const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
+                this.helpers, options, credentials, rawMode, operation, resource, neverError
+              );
+              
+              requestUrl = url;
+              requestDebugInfo = debugInfo;
+              requestHeaders = debugInfo.headers;
+              
+              let processedResponse = processResponseForMode(response, resource, currentMode);
+              
+              // Add response headers and status if requested
+              if (includeResponseHeaders) {
+                responseData = {
+                  body: processedResponse,
+                  headers: responseHeaders,
+                  statusCode: statusCode,
+                  statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
+                };
+              } else {
+                responseData = processedResponse;
+              }
             }
-            
-            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
             break;
           }
 
@@ -402,56 +459,32 @@ export class PrestaShop8 implements INodeType {
               display: advancedOptions.display === 'custom' ? advancedOptions.customFields : advancedOptions.display,
             }, rawMode);
 
-            const timeout = this.getNodeParameter('debugOptions.timeout', i, 30000) as number;
+            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
+            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
+            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
             const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
             
-            const { response, debugInfo, url } = await executeHttpRequest(
-              this.helpers, options, credentials, rawMode, operation, resource
+            const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
+              this.helpers, options, credentials, rawMode, operation, resource, neverError
             );
             
             requestUrl = url;
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
-            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
-            break;
-          }
-
-          case 'search': {
-            const filtersParam = this.getNodeParameter('filters', i, {}) as any;
-            const advancedOptions = this.getNodeParameter('advancedOptions', i, {}) as any;
-            const display = this.getNodeParameter('display', i, 'full') as string;
-            const customFields = this.getNodeParameter('customFields', i, '') as string;
             
-            const filters: IPrestaShopFilter[] = filtersParam.filter || [];
-
-            // Handle display parameter - minimal = no display param (IDs only)
-            const displayValue = processDisplayParameter(
-              display,
-              resource,
-              customFields
-            );
-
-            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, {
-              filters,
-              limit: advancedOptions.limit,
-              sort: advancedOptions.sort,
-              display: displayValue,
-            }, rawMode);
-
-            const options: IHttpRequestOptions = {
-              method: 'GET' as IHttpRequestMethods,
-              url: requestUrl,
-              auth: {
-                username: credentials.apiKey,
-                password: '',
-              },
-              headers: buildHeaders(rawMode),
-              timeout: this.getNodeParameter('debugOptions.timeout', i, 30000) as number,
-              ...(rawMode ? { json: false } : {}),
-            };
-
-            const response = await this.helpers.httpRequest(options);
-            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
+            let processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
+            
+            // Add response headers and status if requested
+            if (includeResponseHeaders) {
+              responseData = {
+                body: processedResponse,
+                headers: responseHeaders,
+                statusCode: statusCode,
+                statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
+              };
+            } else {
+              responseData = processedResponse;
+            }
             break;
           }
 
@@ -503,17 +536,32 @@ export class PrestaShop8 implements INodeType {
             // Build XML using new format
             body = buildCreateXml(resource, fieldsToCreate);
 
-            const timeout = this.getNodeParameter('debugOptions.timeout', i, 30000) as number;
+            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
+            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
+            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
             const options = buildHttpOptions('POST', `${credentials.baseUrl}/${resource}`, credentials, rawMode, timeout, body);
             
-            const { response, debugInfo, url } = await executeHttpRequest(
-              this.helpers, options, credentials, rawMode, operation, resource, body
+            const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
+              this.helpers, options, credentials, rawMode, operation, resource, neverError, body
             );
             
             requestUrl = url;
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
-            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
+            
+            let processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
+            
+            // Add response headers and status if requested
+            if (includeResponseHeaders) {
+              responseData = {
+                body: processedResponse,
+                headers: responseHeaders,
+                statusCode: statusCode,
+                statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
+              };
+            } else {
+              responseData = processedResponse;
+            }
             break;
           }
 
@@ -558,17 +606,176 @@ export class PrestaShop8 implements INodeType {
             // Build XML using new format
             body = buildUpdateXml(resource, id, fieldsToUpdate);
 
-            const timeout = this.getNodeParameter('debugOptions.timeout', i, 30000) as number;
+            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
+            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
+            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
             const options = buildHttpOptions('PATCH', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout, body);
             
-            const { response, debugInfo, url } = await executeHttpRequest(
-              this.helpers, options, credentials, rawMode, operation, resource, body
+            const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
+              this.helpers, options, credentials, rawMode, operation, resource, neverError, body
             );
             
             requestUrl = url;
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
-            responseData = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
+            
+            let processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
+            
+            // Add response headers and status if requested
+            if (includeResponseHeaders) {
+              responseData = {
+                body: processedResponse,
+                headers: responseHeaders,
+                statusCode: statusCode,
+                statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
+              };
+            } else {
+              responseData = processedResponse;
+            }
+            break;
+          }
+
+          case 'search': {
+            const filtersParam = this.getNodeParameter('filters', i, {}) as any;
+            const advancedOptions = this.getNodeParameter('advancedOptions', i, {}) as any;
+            const display = this.getNodeParameter('display', i, 'full') as string;
+            const customFields = this.getNodeParameter('customFields', i, '') as string;
+            
+            const filters: IPrestaShopFilter[] = filtersParam.filter || [];
+            
+            if (!filters.length) {
+              throw new NodeOperationError(this.getNode(), 'At least one filter is required for search');
+            }
+
+            // Build filter parameters for URL
+            const filterParams: Record<string, any> = {};
+            for (const filter of filters) {
+              if (filter.value && filter.value.trim()) {
+                const key = `filter[${filter.field}]`;
+                
+                // Handle different operators
+                switch (filter.operator) {
+                  case 'equals':
+                    filterParams[key] = `[${filter.value}]`;
+                    break;
+                  case 'contains':
+                    filterParams[key] = `[${filter.value}]%`;
+                    break;
+                  case 'starts_with':
+                    filterParams[key] = `[${filter.value}]%`;
+                    break;
+                  case 'greater_than':
+                    filterParams[key] = `[${filter.value},]`;
+                    break;
+                  case 'less_than':
+                    filterParams[key] = `[,${filter.value}]`;
+                    break;
+                  default:
+                    filterParams[key] = `[${filter.value}]`;
+                }
+              }
+            }
+
+            // Handle display parameter
+            const displayValue = processDisplayParameter(
+              display,
+              resource,
+              customFields
+            );
+
+            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, {
+              ...filterParams,
+              limit: advancedOptions.limit,
+              sort: advancedOptions.sort,
+              display: displayValue,
+            }, rawMode);
+
+            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
+            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
+            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
+
+            if (rawMode) {
+              // In Raw mode, use axios directly to avoid n8n automatic parsing
+              const axios = require('axios');
+              
+              try {
+                const axiosResponse = await axios({
+                  method: 'GET',
+                  url: requestUrl,
+                  auth: {
+                    username: credentials.apiKey,
+                    password: ''
+                  },
+                  headers: buildHeaders(rawMode),
+                  timeout: timeout || 30000,
+                  transformResponse: [(data: any) => data], // Keep raw response
+                  validateStatus: neverError ? () => true : undefined // Accept all status codes if neverError is true
+                });
+                
+                requestDebugInfo = captureRequestDebugInfo({
+                  method: 'GET',
+                  url: requestUrl,
+                  headers: buildHeaders(rawMode),
+                  timeout: timeout
+                }, credentials, rawMode, operation, resource);
+                requestHeaders = requestDebugInfo.headers;
+
+                // Check if this is an error response with Never Error mode
+                if (neverError && (axiosResponse.status < 200 || axiosResponse.status >= 300)) {
+                  responseData = {
+                    status: axiosResponse.status,
+                    message: axiosResponse.data || ''
+                  };
+                } else {
+                  let processedResponse = { raw: axiosResponse.data };
+                  
+                  // Add response headers and status if requested
+                  if (includeResponseHeaders) {
+                    responseData = {
+                      body: processedResponse,
+                      headers: axiosResponse.headers,
+                      statusCode: axiosResponse.status,
+                      statusMessage: axiosResponse.status >= 200 && axiosResponse.status < 300 ? 'OK' : 'Error'
+                    };
+                  } else {
+                    responseData = processedResponse;
+                  }
+                }
+              } catch (error: any) {
+                if (neverError) {
+                  responseData = {
+                    status: error.response?.status || 500,
+                    message: error.response?.data || ''
+                  };
+                } else {
+                  throw error;
+                }
+              }
+            } else {
+              const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
+              
+              const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
+                this.helpers, options, credentials, rawMode, operation, resource, neverError
+              );
+              
+              requestUrl = url;
+              requestDebugInfo = debugInfo;
+              requestHeaders = debugInfo.headers;
+              
+              let processedResponse = processResponseForMode(response, resource, currentMode);
+              
+              // Add response headers and status if requested
+              if (includeResponseHeaders) {
+                responseData = {
+                  body: processedResponse,
+                  headers: responseHeaders,
+                  statusCode: statusCode,
+                  statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
+                };
+              } else {
+                responseData = processedResponse;
+              }
+            }
             break;
           }
 
@@ -579,22 +786,36 @@ export class PrestaShop8 implements INodeType {
               throw new NodeOperationError(this.getNode(), 'ID required for this operation');
             }
 
-            const timeout = this.getNodeParameter('debugOptions.timeout', i, 30000) as number;
+            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
+            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
+            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
             const options = buildHttpOptions('DELETE', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout);
             
-            const { debugInfo, url } = await executeHttpRequest(
-              this.helpers, options, credentials, rawMode, operation, resource
+            const { debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
+              this.helpers, options, credentials, rawMode, operation, resource, neverError
             );
             
             requestUrl = url;
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
 
-            responseData = {
+            let deleteResponse = {
               success: true,
               message: `${resource} with ID ${id} deleted successfully`,
               deletedId: id,
             };
+
+            // Add response headers and status if requested
+            if (includeResponseHeaders) {
+              responseData = {
+                body: deleteResponse,
+                headers: responseHeaders,
+                statusCode: statusCode,
+                statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
+              };
+            } else {
+              responseData = deleteResponse;
+            }
             break;
           }
 
@@ -603,37 +824,32 @@ export class PrestaShop8 implements INodeType {
         }
 
         // Add debug metadata if requested
-        const debugOptions = this.getNodeParameter('debugOptions', i, {}) as any;
+        const showRequestUrl = this.getNodeParameter('options.request.showRequestUrl', i, false) as boolean;
+        const showRequestInfo = this.getNodeParameter('options.request.showRequestInfo', i, false) as boolean;
         
         // Capture request information for debug purposes if needed
-        if (debugOptions.showHeaders && Object.keys(requestDebugInfo).length === 0) {
+        if (showRequestInfo && Object.keys(requestDebugInfo).length === 0) {
           // Fallback if no request debug info was captured
           requestDebugInfo = {
             method: 'GET',
             url: requestUrl,
-            headers: {
-              ...buildHeaders(rawMode),
-              'Authorization': `Basic ${Buffer.from(credentials.apiKey + ':').toString('base64')}`,
-              'User-Agent': 'n8n-prestashop8-node/1.0.0',
-            },
-            authentication: {
-              type: 'Basic Auth',
-              username: credentials.apiKey,
-              password: '[HIDDEN]',
-              baseUrl: credentials.baseUrl,
-            },
-            operation: operation,
-            resource: resource,
-            mode: rawMode ? 'Raw XML' : 'JSON',
+            headers: {},
+            auth: 'Basic (hidden)',
+            timeout: 30000,
+            timestamp: new Date().toISOString(),
           };
+        }
+
+        // Add headers to output if requested
+        if (showRequestInfo) {
           requestHeaders = requestDebugInfo.headers;
         }
         
-        if (debugOptions.showUrl || debugOptions.showHeaders) {
+        if (showRequestUrl || showRequestInfo) {
           responseData = {
             data: responseData,
-            ...(debugOptions.showUrl && { requestUrl }),
-            ...(debugOptions.showHeaders && { requestInfo: requestDebugInfo }),
+            ...(showRequestUrl && { requestUrl }),
+            ...(showRequestInfo && { requestInfo: requestDebugInfo }),
           };
         }
 

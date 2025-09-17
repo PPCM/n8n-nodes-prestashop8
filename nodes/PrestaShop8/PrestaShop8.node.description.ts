@@ -626,34 +626,66 @@ export const PrestaShop8Description: INodeTypeDescription = {
       description: 'Fields to update in the resource. Add multiple field/value pairs as needed. For multilingual fields (names, descriptions), use format: fieldname-langid (e.g., name-1, name-2 for different languages).',
     },
 
-    // Debug Options
+    // Options
     {
-      displayName: 'Debug Options',
-      name: 'debugOptions',
+      displayName: 'Options',
+      name: 'options',
       type: 'collection',
-      default: {},
       placeholder: 'Add Option',
+      default: {},
       options: [
         {
-          displayName: 'Raw Mode',
-          name: 'rawMode',
-          type: 'boolean',
-          default: false,
-          description: 'Return raw PrestaShop XML format instead of simplified JSON. Useful for debugging and accessing all original data fields.',
+          displayName: 'Request',
+          name: 'request',
+          type: 'collection',
+          placeholder: 'Add Request Option',
+          default: {},
+          options: [
+            {
+              displayName: 'Show Request Info',
+              name: 'showRequestInfo',
+              type: 'boolean',
+              default: false,
+              description: 'Add complete HTTP request information to the response (method, URL, headers, authentication, body, etc.) - useful for debugging API communication',
+            },
+            {
+              displayName: 'Show Request URL',
+              name: 'showRequestUrl',
+              type: 'boolean',
+              default: false,
+              description: 'Add the complete request URL to the response - useful for debugging API calls',
+            },
+          ],
         },
         {
-          displayName: 'Show Request URL',
-          name: 'showUrl',
-          type: 'boolean',
-          default: false,
-          description: 'Add request URL to the response',
-        },
-        {
-          displayName: 'Show Request Info',
-          name: 'showHeaders',
-          type: 'boolean',
-          default: false,
-          description: 'Add complete HTTP request information to the response (method, URL, headers, authentication, body, etc.) - useful for debugging API communication',
+          displayName: 'Response',
+          name: 'response',
+          type: 'collection',
+          placeholder: 'Add Response Option',
+          default: {},
+          options: [
+            {
+              displayName: 'Include Response Headers and Status',
+              name: 'includeResponseHeaders',
+              type: 'boolean',
+              default: false,
+              description: 'Whether to return the full response (headers and response status code) data instead of only the body',
+            },
+            {
+              displayName: 'Never Error',
+              name: 'neverError',
+              type: 'boolean',
+              default: false,
+              description: 'Whether to succeeds also when status code is not 2xx',
+            },
+            {
+              displayName: 'Raw Mode',
+              name: 'rawMode',
+              type: 'boolean',
+              default: false,
+              description: 'Return raw PrestaShop XML/JSON response without n8n processing - useful for debugging or custom XML handling',
+            },
+          ],
         },
         {
           displayName: 'Timeout (ms)',
