@@ -51,12 +51,8 @@ export class PrestaShop8Api implements ICredentialType {
 
   test: ICredentialTestRequest = {
     request: {
-      baseURL: '={{$credentials.baseUrl}}',
-      url: '/',
+      url: '={{$credentials.baseUrl}}/products?display=[id]&limit=1',
       method: 'GET',
-      headers: {
-        'Output-Format': 'JSON',
-      },
     },
   };
 }
