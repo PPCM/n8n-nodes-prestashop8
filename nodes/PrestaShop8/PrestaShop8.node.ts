@@ -44,6 +44,18 @@ function buildHeaders(rawMode: boolean): any {
  * Build common HTTP request options
  */
 function buildHttpOptions(method: IHttpRequestMethods, url: string, credentials: any, rawMode: boolean, timeout: number, body?: string): IHttpRequestOptions {
+  const headers: any = {};
+  
+  // Only add Content-Type for requests with body (POST, PATCH, PUT)
+  if (body && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
+    headers['Content-Type'] = 'application/xml';
+  }
+  
+  // Add Output-Format for non-raw mode
+  if (!rawMode) {
+    headers['Output-Format'] = 'JSON';
+  }
+  
   return {
     method,
     url,
@@ -51,10 +63,7 @@ function buildHttpOptions(method: IHttpRequestMethods, url: string, credentials:
       username: credentials.apiKey,
       password: '',
     },
-    headers: {
-      'Content-Type': 'application/xml',
-      ...(rawMode ? {} : { 'Output-Format': 'JSON' }),
-    },
+    headers,
     timeout,
     ...(rawMode ? { json: false } : {}),
     ...(body && { body }),
