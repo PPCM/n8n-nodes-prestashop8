@@ -455,18 +455,13 @@ export function buildUrlWithFilters(baseUrl: string, options: any, rawMode?: boo
   // Add all parameters from options object
   for (const [key, value] of Object.entries(options)) {
     if (value !== null && value !== undefined && value !== '') {
-      // Handle filter parameters (keys starting with 'filter[')
-      if (key.startsWith('filter[')) {
+      if (key === 'sort') {
+        // Special handling for sort parameter
+        const normalizedSort = processSortParameter(String(value));
+        if (normalizedSort) params.append('sort', normalizedSort);
+      } else {
+        // Add all other parameters as-is (including custom user parameters)
         params.append(key, String(value));
-      }
-      // Handle other standard parameters
-      else if (key === 'limit' || key === 'sort' || key === 'display') {
-        if (key === 'sort') {
-          const normalizedSort = processSortParameter(String(value));
-          if (normalizedSort) params.append('sort', normalizedSort);
-        } else {
-          params.append(key, String(value));
-        }
       }
     }
   }

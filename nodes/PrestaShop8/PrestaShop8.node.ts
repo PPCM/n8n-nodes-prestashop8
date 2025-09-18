@@ -357,6 +357,11 @@ export class PrestaShop8 implements INodeType {
               sort: advancedOptions.sort,
             };
             
+            // Add date=1 parameter if Date Format option is enabled
+            if (advancedOptions.dateFormat) {
+              urlParams.date = 1;
+            }
+            
             // Only add display parameter if not null (minimal mode returns null)
             if (displayValue !== null) {
               urlParams.display = displayValue;
@@ -677,26 +682,16 @@ export class PrestaShop8 implements INodeType {
               // Handle CUSTOM filter operator
               if (filter.operator === 'CUSTOM') {
                 if (filter.customFilter && filter.customFilter.trim()) {
-                  // Parse custom filter to extract key=value pairs
-                  // Expected format: filter[field]=value or multiple expressions
+                  // Add custom filter directly to URL without any interpretation
+                  // User writes exactly what they want: date=1, filter[name]=test, etc.
                   const customFilter = filter.customFilter.trim();
                   
-                  // Simple parsing - look for filter[...]=... patterns
-                  const filterMatches = customFilter.match(/filter\[([^\]]+)\]=([^&\s]+)/g);
-                  if (filterMatches) {
-                    for (const match of filterMatches) {
-                      const [fullMatch, field, value] = match.match(/filter\[([^\]]+)\]=(.+)/) || [];
-                      if (field && value) {
-                        filterParams[`filter[${field}]`] = value;
-                      }
-                    }
-                  } else {
-                    // If it doesn't match the pattern, treat it as a single filter expression
-                    // Try to extract field name if possible
-                    const simpleMatch = customFilter.match(/^([^=]+)=(.+)$/);
-                    if (simpleMatch) {
-                      const [, field, value] = simpleMatch;
-                      filterParams[field.includes('filter[') ? field : `filter[${field}]`] = value;
+                  // Parse the custom filter to extract key=value pairs for URL construction
+                  const parts = customFilter.split('&');
+                  for (const part of parts) {
+                    const [key, value] = part.split('=', 2);
+                    if (key && value !== undefined) {
+                      filterParams[key.trim()] = value.trim();
                     }
                   }
                 }
@@ -709,12 +704,24 @@ export class PrestaShop8 implements INodeType {
               switch (filter.operator) {
                 case '=':
                   if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `[${filter.value}]`;
+                    const value = filter.value.trim();
+                    // Check if value contains comma for interval (e.g., "10,20" → "[10,20]")
+                    if (value.includes(',') && !value.startsWith('[')) {
+                      filterParams[key] = `[${value}]`;
+                    } else {
+                      filterParams[key] = `[${value}]`;
+                    }
                   }
                   break;
                 case '!=':
                   if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `![${filter.value}]`;
+                    const value = filter.value.trim();
+                    // Check if value contains comma for interval (e.g., "10,20" → "![10,20]")
+                    if (value.includes(',') && !value.startsWith('[')) {
+                      filterParams[key] = `![${value}]`;
+                    } else {
+                      filterParams[key] = `![${value}]`;
+                    }
                   }
                   break;
                 case '>':
@@ -777,6 +784,11 @@ export class PrestaShop8 implements INodeType {
               limit: advancedOptions.limit,
               sort: advancedOptions.sort,
             };
+            
+            // Add date=1 parameter if Date Format option is enabled
+            if (advancedOptions.dateFormat) {
+              urlParams.date = 1;
+            }
             
             // Only add display parameter if not null (minimal mode returns null)
             if (displayValue !== null) {

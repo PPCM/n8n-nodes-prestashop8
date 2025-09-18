@@ -157,6 +157,13 @@ export const PrestaShop8Description: INodeTypeDescription = {
           placeholder: '[id_DESC] ou [name_ASC]',
           description: 'Sort criteria (e.g. [id_DESC], [name_ASC], [date_add_DESC])',
         },
+        {
+          displayName: 'Date Format',
+          name: 'dateFormat',
+          type: 'boolean',
+          default: false,
+          description: 'Enable date processing in filters (adds date=1 parameter)',
+        },
 
       ],
     },
@@ -233,7 +240,6 @@ export const PrestaShop8Description: INodeTypeDescription = {
               name: 'field',
               type: 'string',
               default: '',
-              required: true,
               placeholder: 'name, reference, price, etc.',
               description: 'Name of field to filter. Examples: name, reference, price, active, id_manufacturer, etc.',
               displayOptions: {
@@ -256,9 +262,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
               name: 'value',
               type: 'string',
               default: '',
-              required: true,
-              placeholder: 'search value',
-              description: 'Value to search for. Examples: "Product Name", "1" (for active), "29.99" (for price), etc.',
+              placeholder: 'search value or interval',
+              description: 'Value to search for. Examples: "Product Name", "1" (active), "29.99" (price). For Equal/Not Equal: use "10,20" for intervals (becomes [10,20]).',
               displayOptions: {
                 hide: {
                   operator: ['IS_EMPTY', 'IS_NOT_EMPTY', 'CUSTOM'],
@@ -266,11 +271,10 @@ export const PrestaShop8Description: INodeTypeDescription = {
               },
             },
             {
-              displayName: 'Custom Filter',
+              displayName: 'Custom Filter Expression',
               name: 'customFilter',
               type: 'string',
               default: '',
-              required: true,
               placeholder: 'filter[name]=[Product]%',
               description: 'Complete filter expression in PrestaShop format. Example: filter[name]=[Product]%, filter[price]=>[100], etc.',
               displayOptions: {
