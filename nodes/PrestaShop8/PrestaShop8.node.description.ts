@@ -236,6 +236,11 @@ export const PrestaShop8Description: INodeTypeDescription = {
               required: true,
               placeholder: 'name, reference, price, etc.',
               description: 'Name of field to filter. Examples: name, reference, price, active, id_manufacturer, etc.',
+              displayOptions: {
+                hide: {
+                  operator: ['CUSTOM'],
+                },
+              },
             },
             {
               displayName: 'Operator',
@@ -244,7 +249,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
               options: FILTER_OPERATORS,
               default: '=',
               noDataExpression: true,
-              description: 'Comparison operator for filtering. Available operators: = (exact match), LIKE (contains text), > (greater than), >= (greater or equal), < (less than), <= (less or equal), != (not equal), BEGINS (starts with), ENDS (ends with)',
+              description: 'Comparison operator for filtering. Custom allows you to write your own filter expression.',
             },
             {
               displayName: 'Value',
@@ -253,7 +258,26 @@ export const PrestaShop8Description: INodeTypeDescription = {
               default: '',
               required: true,
               placeholder: 'search value',
-              description: 'Value to search for. Examples: "Product Name" (for LIKE), "1" (for active), "29.99" (for price), etc.',
+              description: 'Value to search for. Examples: "Product Name", "1" (for active), "29.99" (for price), etc.',
+              displayOptions: {
+                hide: {
+                  operator: ['IS_EMPTY', 'IS_NOT_EMPTY', 'CUSTOM'],
+                },
+              },
+            },
+            {
+              displayName: 'Custom Filter',
+              name: 'customFilter',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'filter[name]=[Product]%',
+              description: 'Complete filter expression in PrestaShop format. Example: filter[name]=[Product]%, filter[price]=>[100], etc.',
+              displayOptions: {
+                show: {
+                  operator: ['CUSTOM'],
+                },
+              },
             },
           ],
         },

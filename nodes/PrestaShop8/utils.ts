@@ -452,30 +452,24 @@ export function buildUrlWithFilters(baseUrl: string, options: any, rawMode?: boo
   const url = new URL(baseUrl);
   const params = new URLSearchParams();
 
-  // Ajouter les filtres
-  if (options.filters && Array.isArray(options.filters)) {
-    for (const filter of options.filters) {
-      if (filter.field && filter.value) {
-        const filterKey = `filter[${filter.field}]`;
-        let filterValue = filter.value;
-        
-        // Apply operator if it's not '='
-        if (filter.operator && filter.operator !== '=') {
-          filterValue = `[${filter.operator}]${filterValue}`;
+  // Add all parameters from options object
+  for (const [key, value] of Object.entries(options)) {
+    if (value !== null && value !== undefined && value !== '') {
+      // Handle filter parameters (keys starting with 'filter[')
+      if (key.startsWith('filter[')) {
+        params.append(key, String(value));
+      }
+      // Handle other standard parameters
+      else if (key === 'limit' || key === 'sort' || key === 'display') {
+        if (key === 'sort') {
+          const normalizedSort = processSortParameter(String(value));
+          if (normalizedSort) params.append('sort', normalizedSort);
+        } else {
+          params.append(key, String(value));
         }
-        
-        params.append(filterKey, filterValue);
       }
     }
   }
-
-  // Add other parameters
-  if (options.limit) params.append('limit', options.limit);
-  if (options.sort) {
-    const normalizedSort = processSortParameter(options.sort);
-    if (normalizedSort) params.append('sort', normalizedSort);
-  }
-  if (options.display !== null && options.display !== undefined) params.append('display', options.display);
 
   // Ajouter output_format seulement si pas en mode Raw
   if (!rawMode) {

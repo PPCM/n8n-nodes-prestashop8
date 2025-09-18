@@ -655,6 +655,12 @@ export class PrestaShop8 implements INodeType {
             const display = this.getNodeParameter('display', i, 'full') as string;
             const customFields = this.getNodeParameter('customFields', i, '') as string;
             
+            // Debug: Log the filters parameter structure
+            const showRequestInfo = this.getNodeParameter('options.request.showRequestInfo', i, false) as boolean;
+            if (showRequestInfo) {
+              console.log('DEBUG - filtersParam:', JSON.stringify(filtersParam, null, 2));
+            }
+            
             const filters: IPrestaShopFilter[] = filtersParam.filter || [];
             
             if (!filters.length) {
@@ -664,29 +670,98 @@ export class PrestaShop8 implements INodeType {
             // Build filter parameters for URL
             const filterParams: Record<string, any> = {};
             for (const filter of filters) {
-              if (filter.value && filter.value.trim()) {
-                const key = `filter[${filter.field}]`;
-                
-                // Handle different operators
-                switch (filter.operator) {
-                  case 'equals':
-                    filterParams[key] = `[${filter.value}]`;
-                    break;
-                  case 'contains':
-                    filterParams[key] = `[${filter.value}]%`;
-                    break;
-                  case 'starts_with':
-                    filterParams[key] = `[${filter.value}]%`;
-                    break;
-                  case 'greater_than':
-                    filterParams[key] = `[${filter.value},]`;
-                    break;
-                  case 'less_than':
-                    filterParams[key] = `[,${filter.value}]`;
-                    break;
-                  default:
-                    filterParams[key] = `[${filter.value}]`;
+              if (showRequestInfo) {
+                console.log('DEBUG - Processing filter:', JSON.stringify(filter, null, 2));
+              }
+              
+              // Handle CUSTOM filter operator
+              if (filter.operator === 'CUSTOM') {
+                if (filter.customFilter && filter.customFilter.trim()) {
+                  // Parse custom filter to extract key=value pairs
+                  // Expected format: filter[field]=value or multiple expressions
+                  const customFilter = filter.customFilter.trim();
+                  
+                  // Simple parsing - look for filter[...]=... patterns
+                  const filterMatches = customFilter.match(/filter\[([^\]]+)\]=([^&\s]+)/g);
+                  if (filterMatches) {
+                    for (const match of filterMatches) {
+                      const [fullMatch, field, value] = match.match(/filter\[([^\]]+)\]=(.+)/) || [];
+                      if (field && value) {
+                        filterParams[`filter[${field}]`] = value;
+                      }
+                    }
+                  } else {
+                    // If it doesn't match the pattern, treat it as a single filter expression
+                    // Try to extract field name if possible
+                    const simpleMatch = customFilter.match(/^([^=]+)=(.+)$/);
+                    if (simpleMatch) {
+                      const [, field, value] = simpleMatch;
+                      filterParams[field.includes('filter[') ? field : `filter[${field}]`] = value;
+                    }
+                  }
                 }
+                continue;
+              }
+              
+              const key = `filter[${filter.field}]`;
+              
+              // Handle different operators with correct PrestaShop formats
+              switch (filter.operator) {
+                case '=':
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `[${filter.value}]`;
+                  }
+                  break;
+                case '!=':
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `![${filter.value}]`;
+                  }
+                  break;
+                case '>':
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `>[${filter.value}]`;
+                  }
+                  break;
+                case '>=':
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `>=[${filter.value}]`;
+                  }
+                  break;
+                case '<':
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `<[${filter.value}]`;
+                  }
+                  break;
+                case '<=':
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `<=[${filter.value}]`;
+                  }
+                  break;
+                case 'CONTAINS':
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `%[${filter.value}]%`;
+                  }
+                  break;
+                case 'BEGINS':
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `[${filter.value}]%`;
+                  }
+                  break;
+                case 'ENDS':
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `%[${filter.value}]`;
+                  }
+                  break;
+                case 'IS_EMPTY':
+                  filterParams[key] = `[]`;
+                  break;
+                case 'IS_NOT_EMPTY':
+                  filterParams[key] = `![]`;
+                  break;
+                default:
+                  if (filter.value && filter.value.trim()) {
+                    filterParams[key] = `[${filter.value}]`;
+                  }
               }
             }
 
@@ -708,7 +783,16 @@ export class PrestaShop8 implements INodeType {
               urlParams.display = displayValue;
             }
 
+            if (showRequestInfo) {
+              console.log('DEBUG - Final filterParams:', JSON.stringify(filterParams, null, 2));
+              console.log('DEBUG - Final urlParams:', JSON.stringify(urlParams, null, 2));
+            }
+
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, urlParams, rawMode);
+            
+            if (showRequestInfo) {
+              console.log('DEBUG - Final URL:', requestUrl);
+            }
 
             const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
             const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;

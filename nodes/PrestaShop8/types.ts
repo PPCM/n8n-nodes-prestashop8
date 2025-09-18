@@ -7,6 +7,7 @@ export interface IPrestaShopFilter {
   field: string;
   operator: string;
   value: string;
+  customFilter?: string;
 }
 
 export interface IPrestaShopRequestOptions {
@@ -399,8 +400,10 @@ export const FILTER_OPERATORS = [
   { name: '≥ Greater than or equal to', value: '>=' },
   { name: '< Less than', value: '<' },
   { name: '≤ Less than or equal to', value: '<=' },
-  { name: '∋ Contains', value: 'LIKE' },
-  { name: '∌ Does not contain', value: 'NOT LIKE' },
+  { name: '∋ Contains', value: 'CONTAINS' },
   { name: '↦ Starts with', value: 'BEGINS' },
   { name: '↤ Ends with', value: 'ENDS' },
+  { name: '∅ Is Empty', value: 'IS_EMPTY' },
+  { name: '∄ Is not Empty', value: 'IS_NOT_EMPTY' },
+  { name: '⚙️ Custom Filter', value: 'CUSTOM' },
 ];
