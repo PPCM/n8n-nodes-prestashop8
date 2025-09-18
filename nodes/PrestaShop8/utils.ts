@@ -1,5 +1,6 @@
 import * as xml2js from 'xml2js';
 import * as js2xmlparser from 'js2xmlparser';
+import { convertFromCamelCase } from './fieldMappings';
 
 /**
  * Clean error message by removing PHP warnings and debug info
@@ -47,10 +48,8 @@ export function extractPrestashopError(error: any): string {
   if (error.response && error.response.data) {
     const data = error.response.data;
     
-    // Debug logging for complex error structures
-    if (typeof data === 'object' && data !== null) {
-      console.log('PrestaShop Error Structure:', JSON.stringify(data, null, 2));
-    }
+    // Debug logging for complex error structures (only in debug mode)
+    // Note: Removed console.log to prevent production log pollution
     
     // Try to parse XML error response
     if (typeof data === 'string' && data.includes('<error>')) {
@@ -375,41 +374,7 @@ function convertSimplifiedToPrestaShop(data: any, resource: string): any {
   return converted;
 }
 
-/**
- * Converts camelCase to snake_case with PrestaShop prefixes
- */
-function convertFromCamelCase(fieldName: string): string {
-  // Map certain special fields
-  const fieldMappings: { [key: string]: string } = {
-    'manufacturerId': 'id_manufacturer',
-    'categoryId': 'id_category',
-    'supplierId': 'id_supplier',
-    'customerId': 'id_customer',
-    'orderId': 'id_order',
-    'productId': 'id_product',
-    'carrierId': 'id_carrier',
-    'currencyId': 'id_currency',
-    'languageId': 'id_language',
-    'shopId': 'id_shop',
-    'taxId': 'id_tax',
-    'zoneId': 'id_zone',
-    'countryId': 'id_country',
-    'stateId': 'id_state',
-    'addressId': 'id_address',
-    'groupId': 'id_group',
-  };
-
-  if (fieldMappings[fieldName]) {
-    return fieldMappings[fieldName];
-  }
-
-  // Generic camelCase to snake_case conversion
-  return fieldName
-    .replace(/([A-Z])/g, '_$1')
-    .toLowerCase()
-    .replace(/^_/, '');
-}
-
+// convertFromCamelCase function moved to fieldMappings.ts for centralization
 /**
  * Obtient tous les champs string pour CDATA
  */

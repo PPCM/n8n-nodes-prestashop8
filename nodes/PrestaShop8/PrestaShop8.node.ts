@@ -27,34 +27,21 @@ import {
   processSortParameter,
   extractPrestashopError,
 } from './utils';
-
-// Helper function to build headers based on raw mode (backward compatibility)
-function buildHeaders(rawMode: boolean): any {
-  const headers: any = {};
-  if (rawMode) {
-    // En mode Raw, demandons explicitement le XML
-    headers['Output-Format'] = 'XML';
-  } else {
-    headers['Output-Format'] = 'JSON';
-  }
-  return headers;
-}
+import { getFieldMappingsForResource } from './fieldMappings';
 
 /**
- * Build common HTTP request options
+ * Build HTTP request options with appropriate headers (consolidated)
  */
-function buildHttpOptions(method: IHttpRequestMethods, url: string, credentials: any, rawMode: boolean, timeout: number, body?: string): IHttpRequestOptions {
-  const headers: any = {};
+function buildHttpOptions(method: IHttpRequestMethods, url: string, credentials: IPrestaShopCredentials, rawMode: boolean, timeout: number, body?: string): IHttpRequestOptions {
+  const headers: Record<string, string> = {};
   
-  // Only add Content-Type for requests with body (POST, PATCH, PUT)
-  if (body && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
+  // Add Content-Type for requests with body (POST, PATCH, PUT)
+  if (body && ['POST', 'PATCH', 'PUT'].includes(method)) {
     headers['Content-Type'] = 'application/xml';
   }
   
-  // Add Output-Format for non-raw mode
-  if (!rawMode) {
-    headers['Output-Format'] = 'JSON';
-  }
+  // Add Output-Format header based on mode
+  headers['Output-Format'] = rawMode ? 'XML' : 'JSON';
   
   return {
     method,
@@ -124,36 +111,7 @@ async function executeHttpRequest(
 function collectRequiredFields(executeFunctions: IExecuteFunctions, resource: string, itemIndex: number): Array<{name: string, value: string}> {
   const fieldsToCreate: Array<{name: string, value: string}> = [];
   
-  const fieldMappings: {[resource: string]: {[inputName: string]: string}} = {
-    products: {
-      productName: 'name-1',
-      productPrice: 'price',
-      productCategoryId: 'id_category_default'
-    },
-    categories: {
-      categoryName: 'name-1',
-      categoryParentId: 'id_parent'
-    },
-    customers: {
-      customerFirstname: 'firstname',
-      customerLastname: 'lastname',
-      customerEmail: 'email'
-    },
-    addresses: {
-      addressFirstname: 'firstname',
-      addressLastname: 'lastname',
-      addressAddress1: 'address1',
-      addressCity: 'city',
-      addressCountryId: 'id_country',
-      addressCustomerId: 'id_customer'
-    },
-    manufacturers: {
-      manufacturerName: 'name',
-      manufacturerActive: 'active'
-    }
-  };
-  
-  const mappings = fieldMappings[resource];
+  const mappings = getFieldMappingsForResource(resource);
   if (mappings) {
     for (const [inputName, fieldName] of Object.entries(mappings)) {
       const value = executeFunctions.getNodeParameter(inputName, itemIndex, '') as string;
@@ -385,7 +343,7 @@ export class PrestaShop8 implements INodeType {
                     username: credentials.apiKey,
                     password: ''
                   },
-                  headers: buildHeaders(rawMode),
+                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers,
                   timeout: timeout || 30000,
                   transformResponse: [(data: any) => data], // Keep raw response
                   validateStatus: neverError ? () => true : undefined // Accept all status codes if neverError is true
@@ -394,7 +352,7 @@ export class PrestaShop8 implements INodeType {
                 requestDebugInfo = captureRequestDebugInfo({
                   method: 'GET',
                   url: requestUrl,
-                  headers: buildHeaders(rawMode),
+                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers,
                   timeout: timeout
                 }, credentials, rawMode, operation, resource);
                 requestHeaders = requestDebugInfo.headers;
@@ -822,7 +780,7 @@ export class PrestaShop8 implements INodeType {
                     username: credentials.apiKey,
                     password: ''
                   },
-                  headers: buildHeaders(rawMode),
+                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers,
                   timeout: timeout || 30000,
                   transformResponse: [(data: any) => data], // Keep raw response
                   validateStatus: neverError ? () => true : undefined // Accept all status codes if neverError is true
@@ -831,7 +789,7 @@ export class PrestaShop8 implements INodeType {
                 requestDebugInfo = captureRequestDebugInfo({
                   method: 'GET',
                   url: requestUrl,
-                  headers: buildHeaders(rawMode),
+                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers,
                   timeout: timeout
                 }, credentials, rawMode, operation, resource);
                 requestHeaders = requestDebugInfo.headers;
