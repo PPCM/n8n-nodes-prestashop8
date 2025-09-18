@@ -161,14 +161,14 @@ export const PrestaShop8Description: INodeTypeDescription = {
       ],
     },
 
-    // Display options (always visible for list/search operations)
+    // Display options (always visible for list/search/getById operations)
     {
       displayName: 'Display',
       name: 'display',
       type: 'options',
       displayOptions: {
         show: {
-          operation: ['list', 'search'],
+          operation: ['list', 'search', 'getById'],
         },
       },
       options: [
@@ -199,7 +199,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
       type: 'string',
       displayOptions: {
         show: {
-          operation: ['list', 'search'],
+          operation: ['list', 'search', 'getById'],
           display: ['custom'],
         },
       },

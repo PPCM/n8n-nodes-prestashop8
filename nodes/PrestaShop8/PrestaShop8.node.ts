@@ -350,13 +350,19 @@ export class PrestaShop8 implements INodeType {
             const display = this.getNodeParameter('display', i, 'full') as string;
             const customFields = this.getNodeParameter('customFields', i, '') as string;
             
-            const displayValue = display === 'custom' ? customFields : display;
+            const displayValue = processDisplayParameter(display, resource, customFields);
             
-            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, {
+            const urlParams: any = {
               limit: advancedOptions.limit,
               sort: advancedOptions.sort,
-              display: displayValue,
-            }, rawMode);
+            };
+            
+            // Only add display parameter if not null (minimal mode returns null)
+            if (displayValue !== null) {
+              urlParams.display = displayValue;
+            }
+            
+            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, urlParams, rawMode);
 
             const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
             const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
@@ -449,15 +455,23 @@ export class PrestaShop8 implements INodeType {
 
           case 'getById': {
             const id = this.getNodeParameter('id', i) as string;
-            const advancedOptions = this.getNodeParameter('advancedOptions', i, {}) as any;
+            const display = this.getNodeParameter('display', i, 'full') as string;
+            const customFields = this.getNodeParameter('customFields', i, '') as string;
             
             if (!id) {
               throw new NodeOperationError(this.getNode(), 'ID required for this operation');
             }
 
-            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}/${id}`, {
-              display: advancedOptions.display === 'custom' ? advancedOptions.customFields : advancedOptions.display,
-            }, rawMode);
+            const displayValue = processDisplayParameter(display, resource, customFields);
+            
+            const urlParams: any = {};
+            
+            // Only add display parameter if not null (minimal mode returns null)
+            if (displayValue !== null) {
+              urlParams.display = displayValue;
+            }
+
+            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}/${id}`, urlParams, rawMode);
 
             const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
             const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
@@ -683,12 +697,18 @@ export class PrestaShop8 implements INodeType {
               customFields
             );
 
-            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, {
+            const urlParams: any = {
               ...filterParams,
               limit: advancedOptions.limit,
               sort: advancedOptions.sort,
-              display: displayValue,
-            }, rawMode);
+            };
+            
+            // Only add display parameter if not null (minimal mode returns null)
+            if (displayValue !== null) {
+              urlParams.display = displayValue;
+            }
+
+            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, urlParams, rawMode);
 
             const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
             const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
