@@ -28,7 +28,7 @@ import {
   extractPrestashopError,
 } from './utils';
 import { getFieldMappingsForResource } from './fieldMappings';
-import { convertResourceTypes, convertResourceArray } from './resourceSchemas';
+import { convertResourceTypes, convertResourceArray, RESOURCE_SCHEMAS, getResourceFields } from './resourceSchemas';
 
 /**
  * Build HTTP request options with appropriate headers (consolidated)
@@ -103,6 +103,26 @@ async function executeHttpRequest(
       };
     }
     throw error;
+  }
+}
+
+/**
+ * Helper to get fields based on resource type (images uses customField only, others use standard + custom)
+ */
+function getFieldsByResourceType(
+  executeFunctions: IExecuteFunctions,
+  resource: string,
+  fieldCollectionName: string,
+  itemIndex: number
+): Array<{name: string, value: string}> {
+  if (resource === 'images') {
+    // For images: only custom fields
+    return executeFunctions.getNodeParameter(`${fieldCollectionName}.customField`, itemIndex, []) as Array<{name: string, value: string}>;
+  } else {
+    // For other resources: combine standard and custom fields
+    const standardFields = executeFunctions.getNodeParameter(`${fieldCollectionName}.standardField`, itemIndex, []) as Array<{name: string, value: string}>;
+    const customFields = executeFunctions.getNodeParameter(`${fieldCollectionName}.customField`, itemIndex, []) as Array<{name: string, value: string}>;
+    return [...standardFields, ...customFields];
   }
 }
 
@@ -307,10 +327,7 @@ export class PrestaShop8 implements INodeType {
             return [];
           }
           
-          // Import the resource schemas
-          const { RESOURCE_SCHEMAS, getResourceFields } = await import('./resourceSchemas');
-          
-          // Get fields for this resource
+          // Get fields for this resource (imported at top of file for performance)
           const fields = getResourceFields(resource);
           
           if (!fields || fields.length === 0) {
@@ -550,19 +567,9 @@ export class PrestaShop8 implements INodeType {
             // Collect required fields using factorized function
             const fieldsToCreate = collectRequiredFields(this, resource, i);
             
-            // Add additional fields based on resource type
-            if (resource === 'images') {
-              // For images: only custom fields
-              const customFields = this.getNodeParameter('fieldsToCreate.customField', i, []) as Array<{name: string, value: string}>;
-              fieldsToCreate.push(...customFields);
-            } else {
-              // For other resources: separate standard and custom fields
-              const standardFields = this.getNodeParameter('fieldsToCreate.standardField', i, []) as Array<{name: string, value: string}>;
-              fieldsToCreate.push(...standardFields);
-              
-              const customFields = this.getNodeParameter('fieldsToCreate.customField', i, []) as Array<{name: string, value: string}>;
-              fieldsToCreate.push(...customFields);
-            }
+            // Add additional fields based on resource type (using helper function)
+            const additionalFields = getFieldsByResourceType(this, resource, 'fieldsToCreate', i);
+            fieldsToCreate.push(...additionalFields);
             
             if (!rawMode) {
               // Validate that at least one field is provided
@@ -640,20 +647,8 @@ export class PrestaShop8 implements INodeType {
 
             let body: string;
 
-            // Get fields to update based on resource type
-            let fieldsToUpdate: Array<{name: string, value: string}> = [];
-            
-            if (resource === 'images') {
-              // For images: only custom fields
-              fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.customField', i, []) as Array<{name: string, value: string}>;
-            } else {
-              // For other resources: separate standard and custom fields
-              const standardFields = this.getNodeParameter('fieldsToUpdate.standardField', i, []) as Array<{name: string, value: string}>;
-              const customFields = this.getNodeParameter('fieldsToUpdate.customField', i, []) as Array<{name: string, value: string}>;
-              
-              // Combine both field types
-              fieldsToUpdate = [...standardFields, ...customFields];
-            }
+            // Get fields to update based on resource type (using helper function)
+            const fieldsToUpdate = getFieldsByResourceType(this, resource, 'fieldsToUpdate', i);
             
             if (!rawMode) {
               // Validate that at least one field is provided
@@ -726,16 +721,9 @@ export class PrestaShop8 implements INodeType {
             }
             
             // Get filters based on resource type
-            let filters: IPrestaShopFilter[] = [];
-            if (resource === 'images') {
-              // For images: only custom filters
-              filters = filtersParam.customFilter || [];
-            } else {
-              // For other resources: combine standard and custom filters
-              const standardFilters = filtersParam.standardFilter || [];
-              const customFilters = filtersParam.customFilter || [];
-              filters = [...standardFilters, ...customFilters];
-            }
+            const filters: IPrestaShopFilter[] = resource === 'images'
+              ? (filtersParam.customFilter || [])
+              : [...(filtersParam.standardFilter || []), ...(filtersParam.customFilter || [])];
             
             if (!filters.length) {
               throw new NodeOperationError(this.getNode(), 'At least one filter is required for search');
