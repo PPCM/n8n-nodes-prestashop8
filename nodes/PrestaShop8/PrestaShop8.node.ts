@@ -28,6 +28,7 @@ import {
   extractPrestashopError,
 } from './utils';
 import { getFieldMappingsForResource } from './fieldMappings';
+import { convertResourceTypes, convertResourceArray } from './resourceSchemas';
 
 /**
  * Build HTTP request options with appropriate headers (consolidated)
@@ -126,11 +127,22 @@ function collectRequiredFields(executeFunctions: IExecuteFunctions, resource: st
 }
 
 /**
- * Process response data into appropriate format
+ * Process response data into appropriate format with type conversion
  */
-function processResponseData(responseData: any, returnData: INodeExecutionData[], itemIndex: number): void {
-  if (Array.isArray(responseData)) {
-    responseData.forEach((item: any) => {
+function processResponseData(responseData: any, returnData: INodeExecutionData[], itemIndex: number, resource: string, convertTypes: boolean = true): void {
+  // Convert types if enabled and we have data
+  let processedData = responseData;
+  
+  if (convertTypes && processedData) {
+    if (Array.isArray(processedData)) {
+      processedData = convertResourceArray(processedData, resource);
+    } else {
+      processedData = convertResourceTypes(processedData, resource);
+    }
+  }
+  
+  if (Array.isArray(processedData)) {
+    processedData.forEach((item: any) => {
       returnData.push({
         json: item,
         pairedItem: { item: itemIndex },
@@ -138,7 +150,7 @@ function processResponseData(responseData: any, returnData: INodeExecutionData[]
     });
   } else {
     returnData.push({
-      json: responseData,
+      json: processedData,
       pairedItem: { item: itemIndex },
     });
   }
@@ -553,19 +565,7 @@ export class PrestaShop8 implements INodeType {
             let body: string;
 
             // Get fields to update (key-value pairs)
-            let fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.field', i, []) as Array<{name: string, value: string}>;
-            
-            // For stock_availables, collect required fields from dedicated inputs
-            if (resource === 'stock_availables') {
-              const requiredFields = collectRequiredFields(this, resource, i);
-              // Merge required fields with additional fields, required fields take precedence
-              const existingFieldNames = fieldsToUpdate.map(f => f.name);
-              for (const reqField of requiredFields) {
-                if (!existingFieldNames.includes(reqField.name)) {
-                  fieldsToUpdate.push(reqField);
-                }
-              }
-            }
+            const fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.field', i, []) as Array<{name: string, value: string}>;
             
             if (!rawMode) {
               // Validate that at least one field is provided
@@ -671,63 +671,64 @@ export class PrestaShop8 implements INodeType {
               
               const key = `filter[${filter.field}]`;
               
+              // Convert filter value to string and trim
+              const filterValue = filter.value !== null && filter.value !== undefined ? String(filter.value).trim() : '';
+              
               // Handle different operators with correct PrestaShop formats
               switch (filter.operator) {
                 case '=':
-                  if (filter.value && filter.value.trim()) {
-                    const value = filter.value.trim();
+                  if (filterValue) {
                     // Check if value contains comma for interval (e.g., "10,20" → "[10,20]")
-                    if (value.includes(',') && !value.startsWith('[')) {
-                      filterParams[key] = `[${value}]`;
+                    if (filterValue.includes(',') && !filterValue.startsWith('[')) {
+                      filterParams[key] = `[${filterValue}]`;
                     } else {
-                      filterParams[key] = `[${value}]`;
+                      filterParams[key] = `[${filterValue}]`;
                     }
                   }
                   break;
                 case '!=':
-                  if (filter.value && filter.value.trim()) {
-                    const value = filter.value.trim();
+                  if (filterValue) {
                     // Check if value contains comma for interval (e.g., "10,20" → "![10,20]")
-                    if (value.includes(',') && !value.startsWith('[')) {
-                      filterParams[key] = `![${value}]`;
+                    if (filterValue.includes(',') && !filterValue.startsWith('[')) {
+                      filterParams[key] = `![${filterValue}]`;
                     } else {
-                      filterParams[key] = `![${value}]`;
+                      filterParams[key] = `![${filterValue}]`;
                     }
                   }
                   break;
                 case '>':
-                  if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `>[${filter.value}]`;
+                  if (filterValue) {
+                    filterParams[key] = `>[${filterValue}]`;
                   }
                   break;
                 case '>=':
-                  if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `>=[${filter.value}]`;
+                  if (filterValue) {
+                    filterParams[key] = `>=[${filterValue}]`;
                   }
                   break;
                 case '<':
-                  if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `<[${filter.value}]`;
+                  if (filterValue) {
+                    filterParams[key] = `<[${filterValue}]`;
                   }
                   break;
                 case '<=':
-                  if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `<=[${filter.value}]`;
+                  if (filterValue) {
+                    filterParams[key] = `<=[${filterValue}]`;
                   }
                   break;
                 case 'CONTAINS':
-                  if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `%[${filter.value}]%`;
+                  if (filterValue) {
+                    filterParams[key] = `%[${filterValue}]%`;
                   }
                   break;
                 case 'BEGINS':
-                  if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `[${filter.value}]%`;
+                  if (filterValue) {
+                    filterParams[key] = `[${filterValue}]%`;
                   }
                   break;
                 case 'ENDS':
-                  if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `%[${filter.value}]`;
+                  if (filterValue) {
+                    filterParams[key] = `%[${filterValue}]`;
                   }
                   break;
                 case 'IS_EMPTY':
@@ -737,8 +738,8 @@ export class PrestaShop8 implements INodeType {
                   filterParams[key] = `![]`;
                   break;
                 default:
-                  if (filter.value && filter.value.trim()) {
-                    filterParams[key] = `[${filter.value}]`;
+                  if (filterValue) {
+                    filterParams[key] = `[${filterValue}]`;
                   }
               }
             }
@@ -940,7 +941,7 @@ export class PrestaShop8 implements INodeType {
           };
         }
 
-        processResponseData(responseData, returnData, i);
+        processResponseData(responseData, returnData, i, resource);
 
       } catch (error) {
         // Extract meaningful PrestaShop error message

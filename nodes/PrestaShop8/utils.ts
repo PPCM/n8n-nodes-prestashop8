@@ -603,7 +603,7 @@ export const REQUIRED_FIELDS_BY_RESOURCE: {[key: string]: string[]} = {
   'tax_rules': ['id_country', 'id_tax'],
   'carriers': ['name', 'active'],
   'order_states': ['name', 'color'],
-  'stock_availables': ['id_product', 'id_product_attribute', 'quantity', 'depends_on_stock', 'out_of_stock'],
+  'stock_availables': ['id_product', 'quantity'],
   'images': ['id_product'],
   'combinations': ['id_product'],
   'tags': ['name', 'id_lang'],

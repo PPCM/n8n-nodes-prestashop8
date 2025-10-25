@@ -34,8 +34,10 @@
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials package.json",
     "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build",
-    "test": "node test-example.js",
+    "prepublishOnly": "npm run build && npm run lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "fetch-schemas": "node scripts/fetch-prestashop-schemas.js",
     "clean": "rm -rf dist",
     "package": "npm run clean && npm run build && npm pack"
   },
