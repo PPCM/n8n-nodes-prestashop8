@@ -7,7 +7,7 @@ export interface IPrestaShopFilter {
   field: string;
   operator: string;
   value: string;
-  customFilter?: string;
+  customFilterExpression?: string;
 }
 
 export interface IPrestaShopRequestOptions {

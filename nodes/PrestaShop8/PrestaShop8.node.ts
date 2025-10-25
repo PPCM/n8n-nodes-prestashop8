@@ -725,7 +725,17 @@ export class PrestaShop8 implements INodeType {
               console.log('DEBUG - filtersParam:', JSON.stringify(filtersParam, null, 2));
             }
             
-            const filters: IPrestaShopFilter[] = filtersParam.filter || [];
+            // Get filters based on resource type
+            let filters: IPrestaShopFilter[] = [];
+            if (resource === 'images') {
+              // For images: only custom filters
+              filters = filtersParam.customFilter || [];
+            } else {
+              // For other resources: combine standard and custom filters
+              const standardFilters = filtersParam.standardFilter || [];
+              const customFilters = filtersParam.customFilter || [];
+              filters = [...standardFilters, ...customFilters];
+            }
             
             if (!filters.length) {
               throw new NodeOperationError(this.getNode(), 'At least one filter is required for search');
@@ -740,10 +750,10 @@ export class PrestaShop8 implements INodeType {
               
               // Handle CUSTOM filter operator
               if (filter.operator === 'CUSTOM') {
-                if (filter.customFilter && filter.customFilter.trim()) {
+                if (filter.customFilterExpression && filter.customFilterExpression.trim()) {
                   // Add custom filter directly to URL without any interpretation
                   // User writes exactly what they want: date=1, filter[name]=test, etc.
-                  const customFilter = filter.customFilter.trim();
+                  const customFilter = filter.customFilterExpression.trim();
                   
                   // Parse the custom filter to extract key=value pairs for URL construction
                   const parts = customFilter.split('&');

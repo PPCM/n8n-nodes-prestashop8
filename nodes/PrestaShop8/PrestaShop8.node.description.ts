@@ -215,7 +215,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
       description: 'PrestaShop field list format: [field1,field2,field3] or comma-separated: field1,field2,field3',
     },
 
-    // Search Filters
+    // Search Filters - Images resource (custom filter only)
     {
       displayName: 'Search Filters',
       name: 'filters',
@@ -223,6 +223,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
       displayOptions: {
         show: {
           operation: ['search'],
+          resource: ['images'],
         },
       },
       default: {},
@@ -232,8 +233,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       options: [
         {
-          name: 'filter',
-          displayName: 'Filter',
+          name: 'customFilter',
+          displayName: 'Custom Filter',
           values: [
             {
               displayName: 'Field',
@@ -241,7 +242,86 @@ export const PrestaShop8Description: INodeTypeDescription = {
               type: 'string',
               default: '',
               placeholder: 'name, reference, price, etc.',
-              description: 'Name of field to filter. Examples: name, reference, price, active, id_manufacturer, etc.',
+              description: 'Name of field to filter.',
+              displayOptions: {
+                hide: {
+                  operator: ['CUSTOM'],
+                },
+              },
+            },
+            {
+              displayName: 'Operator',
+              name: 'operator',
+              type: 'options',
+              options: FILTER_OPERATORS,
+              default: '=',
+              noDataExpression: true,
+              description: 'Comparison operator for filtering. Custom allows you to write your own filter expression.',
+            },
+            {
+              displayName: 'Value',
+              name: 'value',
+              type: 'string',
+              default: '',
+              placeholder: 'search value or interval',
+              description: 'Value to search for. For Equal/Not Equal: use "10,20" for intervals (becomes [10,20]).',
+              displayOptions: {
+                hide: {
+                  operator: ['IS_EMPTY', 'IS_NOT_EMPTY', 'CUSTOM'],
+                },
+              },
+            },
+            {
+              displayName: 'Custom Filter Expression',
+              name: 'customFilterExpression',
+              type: 'string',
+              default: '',
+              placeholder: 'filter[name]=[Product]%',
+              description: 'Complete filter expression in PrestaShop format. Example: filter[name]=[Product]%, filter[price]=>[100], etc.',
+              displayOptions: {
+                show: {
+                  operator: ['CUSTOM'],
+                },
+              },
+            },
+          ],
+        },
+      ],
+      description: 'PrestaShop filters to apply to the search. Enter field names directly.',
+    },
+
+    // Search Filters - Other resources (with 2 filter types)
+    {
+      displayName: 'Search Filters',
+      name: 'filters',
+      type: 'fixedCollection',
+      displayOptions: {
+        show: {
+          operation: ['search'],
+        },
+        hide: {
+          resource: ['images'],
+        },
+      },
+      default: {},
+      placeholder: 'Add Filter',
+      typeOptions: {
+        multipleValues: true,
+      },
+      options: [
+        {
+          name: 'standardFilter',
+          displayName: 'Standard Filter',
+          values: [
+            {
+              displayName: 'Field',
+              name: 'field',
+              type: 'options',
+              typeOptions: {
+                loadOptionsMethod: 'getAvailableFields',
+              },
+              default: '',
+              description: 'Select a field from the PrestaShop schema.',
               displayOptions: {
                 hide: {
                   operator: ['CUSTOM'],
@@ -272,7 +352,61 @@ export const PrestaShop8Description: INodeTypeDescription = {
             },
             {
               displayName: 'Custom Filter Expression',
-              name: 'customFilter',
+              name: 'customFilterExpression',
+              type: 'string',
+              default: '',
+              placeholder: 'filter[name]=[Product]%',
+              description: 'Complete filter expression in PrestaShop format. Example: filter[name]=[Product]%, filter[price]=>[100], etc.',
+              displayOptions: {
+                show: {
+                  operator: ['CUSTOM'],
+                },
+              },
+            },
+          ],
+        },
+        {
+          name: 'customFilter',
+          displayName: 'Custom Filter',
+          values: [
+            {
+              displayName: 'Field',
+              name: 'field',
+              type: 'string',
+              default: '',
+              placeholder: 'name, reference, price, etc.',
+              description: 'Enter your custom field name.',
+              displayOptions: {
+                hide: {
+                  operator: ['CUSTOM'],
+                },
+              },
+            },
+            {
+              displayName: 'Operator',
+              name: 'operator',
+              type: 'options',
+              options: FILTER_OPERATORS,
+              default: '=',
+              noDataExpression: true,
+              description: 'Comparison operator for filtering. Custom allows you to write your own filter expression.',
+            },
+            {
+              displayName: 'Value',
+              name: 'value',
+              type: 'string',
+              default: '',
+              placeholder: 'search value or interval',
+              description: 'Value to search for. Examples: "Product Name", "1" (active), "29.99" (price). For Equal/Not Equal: use "10,20" for intervals (becomes [10,20]).',
+              displayOptions: {
+                hide: {
+                  operator: ['IS_EMPTY', 'IS_NOT_EMPTY', 'CUSTOM'],
+                },
+              },
+            },
+            {
+              displayName: 'Custom Filter Expression',
+              name: 'customFilterExpression',
               type: 'string',
               default: '',
               placeholder: 'filter[name]=[Product]%',
@@ -286,7 +420,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           ],
         },
       ],
-      description: 'PrestaShop filters to apply to the search',
+      description: 'PrestaShop filters to apply to the search. Choose "Standard Filter" to select from schema or "Custom Filter" to enter your own field name.',
     },
 
     // === REQUIRED FIELDS FOR PRODUCTS ===
