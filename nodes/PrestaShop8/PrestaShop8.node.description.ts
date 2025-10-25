@@ -588,13 +588,32 @@ export const PrestaShop8Description: INodeTypeDescription = {
             {
               displayName: 'Name',
               name: 'name',
+              type: 'string',
+              displayOptions: {
+                show: {
+                  resource: ['images'],
+                },
+              },
+              default: '',
+              required: true,
+              placeholder: 'Field name',
+              description: 'Name of the field to set. Free text input for images resource.',
+            },
+            {
+              displayName: 'Name',
+              name: 'name',
               type: 'options',
+              displayOptions: {
+                hide: {
+                  resource: ['images'],
+                },
+              },
               typeOptions: {
                 loadOptionsMethod: 'getAvailableFields',
               },
               default: '',
               required: true,
-              description: 'Name of the field to set. Fields are loaded from PrestaShop schema with type information.',
+              description: 'Name of the field to set. Select from available fields or choose "Custom field" to enter your own field name.',
             },
             {
               displayName: 'Value',
@@ -635,13 +654,32 @@ export const PrestaShop8Description: INodeTypeDescription = {
             {
               displayName: 'Name',
               name: 'name',
+              type: 'string',
+              displayOptions: {
+                show: {
+                  resource: ['images'],
+                },
+              },
+              default: '',
+              required: true,
+              placeholder: 'Field name',
+              description: 'Name of the field to update. Free text input for images resource.',
+            },
+            {
+              displayName: 'Name',
+              name: 'name',
               type: 'options',
+              displayOptions: {
+                hide: {
+                  resource: ['images'],
+                },
+              },
               typeOptions: {
                 loadOptionsMethod: 'getAvailableFields',
               },
               default: '',
               required: true,
-              description: 'Name of the field to update. Fields are loaded from PrestaShop schema with type information.',
+              description: 'Name of the field to update. Select from available fields or choose "Custom field" to enter your own field name.',
             },
             {
               displayName: 'Value',

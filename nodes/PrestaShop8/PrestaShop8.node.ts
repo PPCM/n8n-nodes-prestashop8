@@ -315,7 +315,7 @@ export class PrestaShop8 implements INodeType {
           
           // Convert fields to options with metadata
           const schema = RESOURCE_SCHEMAS[resource];
-          return fields.map(field => {
+          const fieldOptions = fields.map(field => {
             const fieldInfo = schema[field];
             let description = `Type: ${fieldInfo.type}`;
             
@@ -345,6 +345,16 @@ export class PrestaShop8 implements INodeType {
             if (!aRequired && bRequired) return 1;
             return a.name.localeCompare(b.name);
           });
+
+          // Add custom field option at the top
+          return [
+            {
+              name: '🔧 Custom field (use expression or edit below)',
+              value: '',
+              description: 'Select this to enter a custom field name not in the schema. You can then edit the field name directly or use an expression.',
+            },
+            ...fieldOptions,
+          ];
         } catch (error) {
           // Schema not available, return empty to allow free text input
           return [];
