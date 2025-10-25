@@ -114,9 +114,10 @@ function collectRequiredFields(executeFunctions: IExecuteFunctions, resource: st
   const mappings = getFieldMappingsForResource(resource);
   if (mappings) {
     for (const [inputName, fieldName] of Object.entries(mappings)) {
-      const value = executeFunctions.getNodeParameter(inputName, itemIndex, '') as string;
-      if (value) {
-        fieldsToCreate.push({ name: fieldName, value });
+      const value = executeFunctions.getNodeParameter(inputName, itemIndex, '') as string | number;
+      if (value !== '' && value !== null && value !== undefined) {
+        // Convert to string for XML generation
+        fieldsToCreate.push({ name: fieldName, value: String(value) });
       }
     }
   }
@@ -552,7 +553,19 @@ export class PrestaShop8 implements INodeType {
             let body: string;
 
             // Get fields to update (key-value pairs)
-            const fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.field', i, []) as Array<{name: string, value: string}>;
+            let fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.field', i, []) as Array<{name: string, value: string}>;
+            
+            // For stock_availables, collect required fields from dedicated inputs
+            if (resource === 'stock_availables') {
+              const requiredFields = collectRequiredFields(this, resource, i);
+              // Merge required fields with additional fields, required fields take precedence
+              const existingFieldNames = fieldsToUpdate.map(f => f.name);
+              for (const reqField of requiredFields) {
+                if (!existingFieldNames.includes(reqField.name)) {
+                  fieldsToUpdate.push(reqField);
+                }
+              }
+            }
             
             if (!rawMode) {
               // Validate that at least one field is provided

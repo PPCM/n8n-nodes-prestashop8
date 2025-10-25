@@ -40,6 +40,13 @@ export const CREATE_FIELD_MAPPINGS: ResourceFieldMappings = {
   manufacturers: {
     manufacturerName: 'name',
     manufacturerActive: 'active'
+  },
+  stock_availables: {
+    stockProductId: 'id_product',
+    stockProductAttributeId: 'id_product_attribute',
+    stockQuantity: 'quantity',
+    stockDependsOnStock: 'depends_on_stock',
+    stockOutOfStock: 'out_of_stock'
   }
 };
 
