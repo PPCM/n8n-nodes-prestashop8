@@ -349,7 +349,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
     displayName: 'Images',
     description: 'Product and category images',
     supportsCreate: true,
-    supportsUpdate: false,
+    supportsUpdate: true,
     supportsDelete: true,
     supportsList: true,
     supportsGetById: true,

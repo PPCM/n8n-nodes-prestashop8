@@ -552,9 +552,9 @@ export class PrestaShop8 implements INodeType {
             
             // Add additional fields based on resource type
             if (resource === 'images') {
-              // For images: simple field array
-              const imageFields = this.getNodeParameter('fieldsToCreate.field', i, []) as Array<{name: string, value: string}>;
-              fieldsToCreate.push(...imageFields);
+              // For images: only custom fields
+              const customFields = this.getNodeParameter('fieldsToCreate.customField', i, []) as Array<{name: string, value: string}>;
+              fieldsToCreate.push(...customFields);
             } else {
               // For other resources: separate standard and custom fields
               const standardFields = this.getNodeParameter('fieldsToCreate.standardField', i, []) as Array<{name: string, value: string}>;
@@ -644,8 +644,8 @@ export class PrestaShop8 implements INodeType {
             let fieldsToUpdate: Array<{name: string, value: string}> = [];
             
             if (resource === 'images') {
-              // For images: simple field array
-              fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.field', i, []) as Array<{name: string, value: string}>;
+              // For images: only custom fields
+              fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.customField', i, []) as Array<{name: string, value: string}>;
             } else {
               // For other resources: separate standard and custom fields
               const standardFields = this.getNodeParameter('fieldsToUpdate.standardField', i, []) as Array<{name: string, value: string}>;

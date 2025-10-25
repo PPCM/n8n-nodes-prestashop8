@@ -564,7 +564,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
     },
 
-    // Additional Fields for Create operation - Images resource (free text)
+    // Additional Fields for Create operation - Images resource (custom field only)
     {
       displayName: 'Additional Fields',
       name: 'fieldsToCreate',
@@ -583,8 +583,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       options: [
         {
-          displayName: 'Field',
-          name: 'field',
+          displayName: 'Custom Field',
+          name: 'customField',
           values: [
             {
               displayName: 'Name',
@@ -684,7 +684,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
       description: 'Additional optional fields for the resource. Choose "Standard Field" to select from schema or "Custom Field" to enter your own.',
     },
 
-    // Fields to Update - Images resource (free text)
+    // Fields to Update - Images resource (custom field only)
     {
       displayName: 'Fields to Update',
       name: 'fieldsToUpdate',
@@ -703,8 +703,8 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       options: [
         {
-          displayName: 'Field',
-          name: 'field',
+          displayName: 'Custom Field',
+          name: 'customField',
           values: [
             {
               displayName: 'Name',
