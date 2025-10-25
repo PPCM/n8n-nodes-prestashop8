@@ -292,6 +292,64 @@ export class PrestaShop8 implements INodeType {
           }];
         }
       },
+
+      // Load available fields from resource schemas for autocomplete
+      async getAvailableFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        try {
+          const resource = this.getCurrentNodeParameter('resource') as string;
+          
+          if (!resource) {
+            return [];
+          }
+          
+          // Import the resource schemas
+          const { RESOURCE_SCHEMAS, getResourceFields } = await import('./resourceSchemas');
+          
+          // Get fields for this resource
+          const fields = getResourceFields(resource);
+          
+          if (!fields || fields.length === 0) {
+            // No schema available, return empty to allow free text input
+            return [];
+          }
+          
+          // Convert fields to options with metadata
+          const schema = RESOURCE_SCHEMAS[resource];
+          return fields.map(field => {
+            const fieldInfo = schema[field];
+            let description = `Type: ${fieldInfo.type}`;
+            
+            if (fieldInfo.required) {
+              description += ' • Required';
+            }
+            if (fieldInfo.readOnly) {
+              description += ' • Read-only';
+            }
+            if (fieldInfo.multilang) {
+              description += ' • Multilingual (use -1, -2, etc.)';
+            }
+            if (fieldInfo.maxSize) {
+              description += ` • Max: ${fieldInfo.maxSize} chars`;
+            }
+            
+            return {
+              name: field,
+              value: field,
+              description,
+            };
+          }).sort((a, b) => {
+            // Sort: required first, then alphabetically
+            const aRequired = schema[a.value]?.required || false;
+            const bRequired = schema[b.value]?.required || false;
+            if (aRequired && !bRequired) return -1;
+            if (!aRequired && bRequired) return 1;
+            return a.name.localeCompare(b.name);
+          });
+        } catch (error) {
+          // Schema not available, return empty to allow free text input
+          return [];
+        }
+      },
     },
   };
 

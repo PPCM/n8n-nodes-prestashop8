@@ -588,11 +588,13 @@ export const PrestaShop8Description: INodeTypeDescription = {
             {
               displayName: 'Name',
               name: 'name',
-              type: 'string',
+              type: 'options',
+              typeOptions: {
+                loadOptionsMethod: 'getAvailableFields',
+              },
               default: '',
               required: true,
-              placeholder: 'Field name (e.g., name, price, active, name-1)',
-              description: 'Name of the field to set. Use the required fields shown above. For multilingual fields, use format: fieldname-langid (e.g., name-1, description-2).',
+              description: 'Name of the field to set. Fields are loaded from PrestaShop schema with type information.',
             },
             {
               displayName: 'Value',
@@ -606,7 +608,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           ],
         },
       ],
-      description: 'Additional optional fields for the resource. Required fields are provided above as dedicated input fields.',
+      description: 'Additional optional fields for the resource. Fields are autocompleted based on PrestaShop schema.',
     },
 
     // Fields to Update (Key-Value pairs like Set node)
@@ -633,11 +635,13 @@ export const PrestaShop8Description: INodeTypeDescription = {
             {
               displayName: 'Name',
               name: 'name',
-              type: 'string',
+              type: 'options',
+              typeOptions: {
+                loadOptionsMethod: 'getAvailableFields',
+              },
               default: '',
               required: true,
-              placeholder: 'Field name (e.g., width, price, name, name-1)',
-              description: 'Name of the field to update. For multilingual fields, use format: fieldname-langid (e.g., name-1 for name in language ID 1, description-2 for description in language ID 2).',
+              description: 'Name of the field to update. Fields are loaded from PrestaShop schema with type information.',
             },
             {
               displayName: 'Value',
@@ -651,7 +655,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           ],
         },
       ],
-      description: 'Fields to update in the resource. Add multiple field/value pairs as needed. For multilingual fields (names, descriptions), use format: fieldname-langid (e.g., name-1, name-2 for different languages).',
+      description: 'Fields to update in the resource. Fields are autocompleted based on PrestaShop schema. For multilingual fields, use format: fieldname-langid (e.g., name-1, name-2).',
     },
 
     // Options
