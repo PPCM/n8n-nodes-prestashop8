@@ -447,8 +447,11 @@ export function buildUrlWithFilters(baseUrl: string, options: any, rawMode?: boo
 /**
  * Escapes XML special characters
  */
-function escapeXml(unsafe: string): string {
-  return unsafe.replace(/[<>&'"]/g, function (c) {
+function escapeXml(unsafe: string | number | boolean | undefined | null): string {
+  // Convert to string if not already
+  const str = unsafe !== null && unsafe !== undefined ? String(unsafe) : '';
+  
+  return str.replace(/[<>&'"]/g, function (c) {
     switch (c) {
       case '<': return '&lt;';
       case '>': return '&gt;';
@@ -547,7 +550,7 @@ export function buildCreateXml(resource: string, fields: Array<{name: string, va
 /**
  * Builds PrestaShop XML for Update operations using key-value pairs
  */
-export function buildUpdateXml(resource: string, id: string, fields: Array<{name: string, value: string}>): string {
+export function buildUpdateXml(resource: string, id: string | number, fields: Array<{name: string, value: string}>): string {
   // Convert resource to singular form for XML tag with special cases
   const singularMap: {[key: string]: string} = {
     'categories': 'category',
