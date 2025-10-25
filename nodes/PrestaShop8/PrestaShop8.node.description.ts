@@ -564,7 +564,53 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
     },
 
-    // Additional Fields for Create operation
+    // Additional Fields for Create operation - Images resource (free text)
+    {
+      displayName: 'Additional Fields',
+      name: 'fieldsToCreate',
+      type: 'fixedCollection',
+      displayOptions: {
+        show: {
+          operation: ['create'],
+          resource: ['images'],
+        },
+      },
+      default: {},
+      placeholder: 'Add field',
+      typeOptions: {
+        multipleValues: true,
+        sortable: true,
+      },
+      options: [
+        {
+          displayName: 'Field',
+          name: 'field',
+          values: [
+            {
+              displayName: 'Name',
+              name: 'name',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'Field name',
+              description: 'Name of the field to set.',
+            },
+            {
+              displayName: 'Value',
+              name: 'value',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'Field value',
+              description: 'Value to set. Will be properly escaped for XML.',
+            },
+          ],
+        },
+      ],
+      description: 'Additional optional fields for images. Enter field names directly.',
+    },
+
+    // Additional Fields for Create operation - Other resources (with 2 field types)
     {
       displayName: 'Additional Fields',
       name: 'fieldsToCreate',
@@ -573,6 +619,81 @@ export const PrestaShop8Description: INodeTypeDescription = {
         show: {
           operation: ['create'],
         },
+        hide: {
+          resource: ['images'],
+        },
+      },
+      default: {},
+      placeholder: 'Add field',
+      typeOptions: {
+        multipleValues: true,
+        sortable: true,
+      },
+      options: [
+        {
+          displayName: 'Standard Field',
+          name: 'standardField',
+          values: [
+            {
+              displayName: 'Name',
+              name: 'name',
+              type: 'options',
+              typeOptions: {
+                loadOptionsMethod: 'getAvailableFields',
+              },
+              default: '',
+              required: true,
+              description: 'Select a field from the PrestaShop schema.',
+            },
+            {
+              displayName: 'Value',
+              name: 'value',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'Field value',
+              description: 'Value to set. Will be properly escaped for XML.',
+            },
+          ],
+        },
+        {
+          displayName: 'Custom Field',
+          name: 'customField',
+          values: [
+            {
+              displayName: 'Name',
+              name: 'name',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'my_custom_field',
+              description: 'Enter your custom field name.',
+            },
+            {
+              displayName: 'Value',
+              name: 'value',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'Field value',
+              description: 'Value to set. Will be properly escaped for XML.',
+            },
+          ],
+        },
+      ],
+      description: 'Additional optional fields for the resource. Choose "Standard Field" to select from schema or "Custom Field" to enter your own.',
+    },
+
+    // Fields to Update - Images resource (free text)
+    {
+      displayName: 'Fields to Update',
+      name: 'fieldsToUpdate',
+      type: 'fixedCollection',
+      displayOptions: {
+        show: {
+          operation: ['update'],
+          resource: ['images'],
+        },
       },
       default: {},
       placeholder: 'Add field',
@@ -589,31 +710,10 @@ export const PrestaShop8Description: INodeTypeDescription = {
               displayName: 'Name',
               name: 'name',
               type: 'string',
-              displayOptions: {
-                show: {
-                  resource: ['images'],
-                },
-              },
               default: '',
               required: true,
               placeholder: 'Field name',
-              description: 'Name of the field to set. Free text input for images resource.',
-            },
-            {
-              displayName: 'Name',
-              name: 'name',
-              type: 'options',
-              displayOptions: {
-                hide: {
-                  resource: ['images'],
-                },
-              },
-              typeOptions: {
-                loadOptionsMethod: 'getAvailableFields',
-              },
-              default: '',
-              required: true,
-              description: 'Name of the field to set. Select from available fields or choose "Custom field" to enter your own field name.',
+              description: 'Name of the field to update.',
             },
             {
               displayName: 'Value',
@@ -627,10 +727,10 @@ export const PrestaShop8Description: INodeTypeDescription = {
           ],
         },
       ],
-      description: 'Additional optional fields for the resource. Fields are autocompleted based on PrestaShop schema.',
+      description: 'Fields to update for images. Enter field names directly.',
     },
 
-    // Fields to Update (Key-Value pairs like Set node)
+    // Fields to Update - Other resources (with 2 field types)
     {
       displayName: 'Fields to Update',
       name: 'fieldsToUpdate',
@@ -639,6 +739,9 @@ export const PrestaShop8Description: INodeTypeDescription = {
         show: {
           operation: ['update'],
         },
+        hide: {
+          resource: ['images'],
+        },
       },
       default: {},
       placeholder: 'Add field',
@@ -648,38 +751,43 @@ export const PrestaShop8Description: INodeTypeDescription = {
       },
       options: [
         {
-          displayName: 'Field',
-          name: 'field',
+          displayName: 'Standard Field',
+          name: 'standardField',
           values: [
             {
               displayName: 'Name',
               name: 'name',
-              type: 'string',
-              displayOptions: {
-                show: {
-                  resource: ['images'],
-                },
-              },
-              default: '',
-              required: true,
-              placeholder: 'Field name',
-              description: 'Name of the field to update. Free text input for images resource.',
-            },
-            {
-              displayName: 'Name',
-              name: 'name',
               type: 'options',
-              displayOptions: {
-                hide: {
-                  resource: ['images'],
-                },
-              },
               typeOptions: {
                 loadOptionsMethod: 'getAvailableFields',
               },
               default: '',
               required: true,
-              description: 'Name of the field to update. Select from available fields or choose "Custom field" to enter your own field name.',
+              description: 'Select a field from the PrestaShop schema.',
+            },
+            {
+              displayName: 'Value',
+              name: 'value',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'Field value',
+              description: 'Value to set. Will be properly escaped for XML.',
+            },
+          ],
+        },
+        {
+          displayName: 'Custom Field',
+          name: 'customField',
+          values: [
+            {
+              displayName: 'Name',
+              name: 'name',
+              type: 'string',
+              default: '',
+              required: true,
+              placeholder: 'my_custom_field',
+              description: 'Enter your custom field name.',
             },
             {
               displayName: 'Value',
@@ -693,7 +801,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
           ],
         },
       ],
-      description: 'Fields to update in the resource. Fields are autocompleted based on PrestaShop schema. For multilingual fields, use format: fieldname-langid (e.g., name-1, name-2).',
+      description: 'Fields to update in the resource. Choose "Standard Field" to select from schema or "Custom Field" to enter your own. For multilingual fields, use format: fieldname-langid (e.g., name-1, name-2).',
     },
 
     // Options

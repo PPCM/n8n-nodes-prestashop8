@@ -302,6 +302,11 @@ export class PrestaShop8 implements INodeType {
             return [];
           }
           
+          // Special handling for images resource - return empty (uses text input, not dropdown)
+          if (resource === 'images') {
+            return [];
+          }
+          
           // Import the resource schemas
           const { RESOURCE_SCHEMAS, getResourceFields } = await import('./resourceSchemas');
           
@@ -309,7 +314,7 @@ export class PrestaShop8 implements INodeType {
           const fields = getResourceFields(resource);
           
           if (!fields || fields.length === 0) {
-            // No schema available, return empty to allow free text input
+            // No schema available, return empty (user can use custom field button)
             return [];
           }
           
@@ -346,15 +351,8 @@ export class PrestaShop8 implements INodeType {
             return a.name.localeCompare(b.name);
           });
 
-          // Add custom field option at the top
-          return [
-            {
-              name: '🔧 Custom field (use expression or edit below)',
-              value: '',
-              description: 'Select this to enter a custom field name not in the schema. You can then edit the field name directly or use an expression.',
-            },
-            ...fieldOptions,
-          ];
+          // Return field options directly (no need for custom option anymore, it's a separate button)
+          return fieldOptions;
         } catch (error) {
           // Schema not available, return empty to allow free text input
           return [];
@@ -552,9 +550,19 @@ export class PrestaShop8 implements INodeType {
             // Collect required fields using factorized function
             const fieldsToCreate = collectRequiredFields(this, resource, i);
             
-            // Add additional fields if any
-            const additionalFields = this.getNodeParameter('fieldsToCreate.field', i, []) as Array<{name: string, value: string}>;
-            fieldsToCreate.push(...additionalFields);
+            // Add additional fields based on resource type
+            if (resource === 'images') {
+              // For images: simple field array
+              const imageFields = this.getNodeParameter('fieldsToCreate.field', i, []) as Array<{name: string, value: string}>;
+              fieldsToCreate.push(...imageFields);
+            } else {
+              // For other resources: separate standard and custom fields
+              const standardFields = this.getNodeParameter('fieldsToCreate.standardField', i, []) as Array<{name: string, value: string}>;
+              fieldsToCreate.push(...standardFields);
+              
+              const customFields = this.getNodeParameter('fieldsToCreate.customField', i, []) as Array<{name: string, value: string}>;
+              fieldsToCreate.push(...customFields);
+            }
             
             if (!rawMode) {
               // Validate that at least one field is provided
@@ -632,8 +640,20 @@ export class PrestaShop8 implements INodeType {
 
             let body: string;
 
-            // Get fields to update (key-value pairs)
-            const fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.field', i, []) as Array<{name: string, value: string}>;
+            // Get fields to update based on resource type
+            let fieldsToUpdate: Array<{name: string, value: string}> = [];
+            
+            if (resource === 'images') {
+              // For images: simple field array
+              fieldsToUpdate = this.getNodeParameter('fieldsToUpdate.field', i, []) as Array<{name: string, value: string}>;
+            } else {
+              // For other resources: separate standard and custom fields
+              const standardFields = this.getNodeParameter('fieldsToUpdate.standardField', i, []) as Array<{name: string, value: string}>;
+              const customFields = this.getNodeParameter('fieldsToUpdate.customField', i, []) as Array<{name: string, value: string}>;
+              
+              // Combine both field types
+              fieldsToUpdate = [...standardFields, ...customFields];
+            }
             
             if (!rawMode) {
               // Validate that at least one field is provided
@@ -649,7 +669,7 @@ export class PrestaShop8 implements INodeType {
                 if (!field.name || !field.name.trim()) {
                   throw new NodeOperationError(
                     this.getNode(),
-                    'All fields must have a name'
+                    'Each field must have a name'
                   );
                 }
                 if (field.value === undefined || field.value === null) {
