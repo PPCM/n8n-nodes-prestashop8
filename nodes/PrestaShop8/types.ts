@@ -118,8 +118,8 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   },
   stock_availables: {
     name: 'stock_availables',
-    displayName: 'Available Stock',
-    description: 'Gestion des stocks produits',
+    displayName: 'Stock Available',
+    description: 'Product stock management (stock_availables)',
     supportsCreate: false,
     supportsUpdate: true,
     supportsDelete: false,

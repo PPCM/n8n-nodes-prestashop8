@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-prestashop8",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Nœud n8n personnalisé pour PrestaShop 8 avec support CRUD complet et conversion XML/JSON automatique",
   "keywords": [
     "n8n-community-node-package",
