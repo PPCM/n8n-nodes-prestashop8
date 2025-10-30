@@ -56,7 +56,9 @@ const RESOURCES = [
   'manufacturers', 'orders', 'order_details', 'order_histories', 'order_states',
   'order_invoices', 'order_carriers', 'carts', 'cart_rules', 'currencies',
   'languages', 'groups', 'stock_availables', 'stocks', 'stock_movements',
-  'combinations', 'images', 'tags', 'specific_prices', 'product_options'
+  'combinations', 'images', 'tags', 'specific_prices', 'product_options',
+  'customer_threads', 'customer_messages', 'product_features', 'product_feature_values',
+  'shops'
 ];
 
 /**
@@ -138,8 +140,10 @@ async function fetchSchema(resource) {
 function parseFormat(format) {
   const formatMap = {
     'isUnsignedId': 'number',
+    'isNullOrUnsignedId': 'number',
     'isInt': 'number',
     'isUnsignedInt': 'number',
+    'isPositiveInt': 'number',
     'isFloat': 'number',
     'isUnsignedFloat': 'number',
     'isPrice': 'number',
@@ -153,6 +157,7 @@ function parseFormat(format) {
     'isPhoneNumber': 'string',
     'isDate': 'string',
     'isDateFormat': 'string',
+    'isDateOrNull': 'string',
     'isCleanHtml': 'string',
     'isMessage': 'string',
     'isAddress': 'string',
@@ -182,6 +187,8 @@ function toSingular(plural) {
     'taxes': 'tax',
     'states': 'state',
     'zones': 'zone',
+    'customer_threads': 'customer_thread',
+    'customer_messages': 'customer_message',
   };
   
   if (specialCases[plural]) {
