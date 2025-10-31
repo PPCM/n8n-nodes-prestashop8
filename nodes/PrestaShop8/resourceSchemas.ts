@@ -3968,6 +3968,53 @@ export function convertFieldValue(value: any, fieldInfo: FieldSchema): any {
 }
 
 /**
+ * Convert numeric fields in associations
+ */
+function convertAssociationIds(associations: any): any {
+  if (!associations || typeof associations !== 'object') {
+    return associations;
+  }
+
+  const converted: any = {};
+
+  for (const [assocName, assocValue] of Object.entries(associations)) {
+    if (Array.isArray(assocValue)) {
+      // Convert array of association items
+      converted[assocName] = assocValue.map((item: any) => {
+        if (item && typeof item === 'object') {
+          const convertedItem: any = {};
+          // Convert all fields based on naming patterns
+          for (const [key, value] of Object.entries(item)) {
+            // Convert ID fields (id, id_*, *_id)
+            if (key === 'id' || key.startsWith('id_') || key.endsWith('_id')) {
+              convertedItem[key] = typeof value === 'string' ? Number(value) : value;
+            }
+            // Convert quantity fields
+            else if (key.includes('quantity')) {
+              convertedItem[key] = typeof value === 'string' ? Number(value) : value;
+            }
+            // Convert price fields (price, unit_price_*, *_price_*)
+            else if (key.includes('price')) {
+              convertedItem[key] = typeof value === 'string' ? Number(value) : value;
+            }
+            // Keep other fields as-is
+            else {
+              convertedItem[key] = value;
+            }
+          }
+          return convertedItem;
+        }
+        return item;
+      });
+    } else {
+      converted[assocName] = assocValue;
+    }
+  }
+
+  return converted;
+}
+
+/**
  * Convert all fields in an object based on resource schema
  */
 export function convertResourceTypes(data: any, resource: string): any {
@@ -3979,7 +4026,10 @@ export function convertResourceTypes(data: any, resource: string): any {
   const converted: any = {};
 
   for (const [field, value] of Object.entries(data)) {
-    if (schema[field]) {
+    if (field === 'associations') {
+      // Special handling for associations: convert numeric fields
+      converted[field] = convertAssociationIds(value);
+    } else if (schema[field]) {
       converted[field] = convertFieldValue(value, schema[field]);
     } else {
       // Keep fields not in schema as-is
