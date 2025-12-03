@@ -1560,6 +1560,14 @@ export const RESOURCE_SCHEMAS: { [resource: string]: ResourceSchema } = {
     },
   },
   'orders': {
+    'reference': {
+      type: 'string',
+      format: 'isReference',
+      required: false,
+      readOnly: false,
+      multilang: false,
+      maxSize: 9,
+    },
     'id_address_delivery': {
       type: 'number',
       format: 'isUnsignedId',

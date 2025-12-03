@@ -383,6 +383,19 @@ export class PrestaShop8 implements INodeType {
     const returnData: INodeExecutionData[] = [];
     const credentials = await this.getCredentials('prestaShop8Api') as IPrestaShopCredentials;
 
+    // Normalize base URL: ensure it ends with /api and has no trailing slash
+    let baseUrl = credentials.baseUrl.trim();
+    // Remove trailing slash if present
+    if (baseUrl.endsWith('/')) {
+      baseUrl = baseUrl.slice(0, -1);
+    }
+    // Add /api if not present
+    if (!baseUrl.endsWith('/api')) {
+      baseUrl = baseUrl + '/api';
+    }
+    // Update credentials with normalized URL
+    credentials.baseUrl = baseUrl;
+
     // Récupérer directement la ressource et l'opération
     const resource = this.getNodeParameter('resource', 0) as string;
     const operation = this.getNodeParameter('operation', 0) as string;
