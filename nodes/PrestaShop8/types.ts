@@ -239,6 +239,17 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
     supportsGetById: true,
     supportsSearch: true,
   },
+  order_carriers: {
+    name: 'order_carriers',
+    displayName: 'Order Carriers',
+    description: 'Transporteurs associés aux commandes',
+    supportsCreate: true,
+    supportsUpdate: true,
+    supportsDelete: true,
+    supportsList: true,
+    supportsGetById: true,
+    supportsSearch: true,
+  },
   carts: {
     name: 'carts',
     displayName: 'Carts',
