@@ -9,6 +9,7 @@ import {
   ILoadOptionsFunctions,
   INodePropertyOptions,
 } from 'n8n-workflow';
+import axios from 'axios';
 
 import { PrestaShop8Description } from './PrestaShop8.node.description';
 import {
@@ -17,14 +18,12 @@ import {
   IPrestaShopFilter,
 } from './types';
 import {
-  simplifyPrestashopResponse,
   buildCreateXml,
   buildUpdateXml,
   buildUrlWithFilters,
   validateFieldsForCreate,
   processResponseForMode,
   processDisplayParameter,
-  processSortParameter,
   extractPrestashopError,
 } from './utils';
 import { getFieldMappingsForResource } from './fieldMappings';
@@ -203,7 +202,20 @@ function captureRequestDebugInfo(options: any, credentials: any, rawMode: boolea
   };
 }
 
-
+/**
+ * Wrap response with optional headers and status information
+ */
+function wrapResponse(processedResponse: any, includeHeaders: boolean, headers?: any, statusCode?: number): any {
+  if (includeHeaders) {
+    return {
+      body: processedResponse,
+      headers: headers || {},
+      statusCode: statusCode || 200,
+      statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
+    };
+  }
+  return processedResponse;
+}
 
 export class PrestaShop8 implements INodeType {
   description: INodeTypeDescription = PrestaShop8Description;
@@ -407,9 +419,6 @@ export class PrestaShop8 implements INodeType {
         let requestHeaders: any = {};
         let requestDebugInfo: any = {};
         const rawMode = this.getNodeParameter('options.response.rawMode', i, false) as boolean;
-        
-        // Use resource for response processing  
-        const currentMode = resource;
 
         switch (operation) {
           case 'list': {
@@ -442,8 +451,6 @@ export class PrestaShop8 implements INodeType {
 
             if (rawMode) {
               // In Raw mode, use axios directly to avoid n8n automatic parsing
-              const axios = require('axios');
-              
               try {
                 const axiosResponse = await axios({
                   method: 'GET',
@@ -452,10 +459,10 @@ export class PrestaShop8 implements INodeType {
                     username: credentials.apiKey,
                     password: ''
                   },
-                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers,
+                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers as Record<string, string>,
                   timeout: timeout || 30000,
-                  transformResponse: [(data: any) => data], // Keep raw response
-                  validateStatus: neverError ? () => true : undefined // Accept all status codes if neverError is true
+                  transformResponse: [(data: any) => data],
+                  validateStatus: neverError ? () => true : undefined
                 });
                 
                 requestDebugInfo = captureRequestDebugInfo({
@@ -466,40 +473,21 @@ export class PrestaShop8 implements INodeType {
                 }, credentials, rawMode, operation, resource);
                 requestHeaders = requestDebugInfo.headers;
 
-                // Check if this is an error response with Never Error mode
                 if (neverError && (axiosResponse.status < 200 || axiosResponse.status >= 300)) {
-                  responseData = {
-                    status: axiosResponse.status,
-                    message: axiosResponse.data || ''
-                  };
+                  responseData = { status: axiosResponse.status, message: axiosResponse.data || '' };
                 } else {
-                  let processedResponse = { raw: axiosResponse.data };
-                  
-                  // Add response headers and status if requested
-                  if (includeResponseHeaders) {
-                    responseData = {
-                      body: processedResponse,
-                      headers: axiosResponse.headers,
-                      statusCode: axiosResponse.status,
-                      statusMessage: axiosResponse.status >= 200 && axiosResponse.status < 300 ? 'OK' : 'Error'
-                    };
-                  } else {
-                    responseData = processedResponse;
-                  }
+                  const processedResponse = { raw: axiosResponse.data };
+                  responseData = wrapResponse(processedResponse, includeResponseHeaders, axiosResponse.headers, axiosResponse.status);
                 }
               } catch (error: any) {
                 if (neverError) {
-                  responseData = {
-                    status: error.response?.status || 500,
-                    message: error.response?.data || ''
-                  };
+                  responseData = { status: error.response?.status || 500, message: error.response?.data || '' };
                 } else {
                   throw error;
                 }
               }
             } else {
               const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
-              
               const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
                 this.helpers, options, credentials, rawMode, operation, resource, neverError
               );
@@ -508,19 +496,8 @@ export class PrestaShop8 implements INodeType {
               requestDebugInfo = debugInfo;
               requestHeaders = debugInfo.headers;
               
-              let processedResponse = processResponseForMode(response, resource, currentMode);
-              
-              // Add response headers and status if requested
-              if (includeResponseHeaders) {
-                responseData = {
-                  body: processedResponse,
-                  headers: responseHeaders,
-                  statusCode: statusCode,
-                  statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
-                };
-              } else {
-                responseData = processedResponse;
-              }
+              const processedResponse = processResponseForMode(response, resource, resource);
+              responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             }
             break;
           }
@@ -558,19 +535,8 @@ export class PrestaShop8 implements INodeType {
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
             
-            let processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
-            
-            // Add response headers and status if requested
-            if (includeResponseHeaders) {
-              responseData = {
-                body: processedResponse,
-                headers: responseHeaders,
-                statusCode: statusCode,
-                statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
-              };
-            } else {
-              responseData = processedResponse;
-            }
+            const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, resource);
+            responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             break;
           }
 
@@ -635,19 +601,8 @@ export class PrestaShop8 implements INodeType {
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
             
-            let processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
-            
-            // Add response headers and status if requested
-            if (includeResponseHeaders) {
-              responseData = {
-                body: processedResponse,
-                headers: responseHeaders,
-                statusCode: statusCode,
-                statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
-              };
-            } else {
-              responseData = processedResponse;
-            }
+            const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, resource);
+            responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             break;
           }
 
@@ -705,19 +660,8 @@ export class PrestaShop8 implements INodeType {
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
             
-            let processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, currentMode);
-            
-            // Add response headers and status if requested
-            if (includeResponseHeaders) {
-              responseData = {
-                body: processedResponse,
-                headers: responseHeaders,
-                statusCode: statusCode,
-                statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
-              };
-            } else {
-              responseData = processedResponse;
-            }
+            const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, resource);
+            responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             break;
           }
 
@@ -883,8 +827,6 @@ export class PrestaShop8 implements INodeType {
 
             if (rawMode) {
               // In Raw mode, use axios directly to avoid n8n automatic parsing
-              const axios = require('axios');
-              
               try {
                 const axiosResponse = await axios({
                   method: 'GET',
@@ -893,10 +835,10 @@ export class PrestaShop8 implements INodeType {
                     username: credentials.apiKey,
                     password: ''
                   },
-                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers,
+                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers as Record<string, string>,
                   timeout: timeout || 30000,
-                  transformResponse: [(data: any) => data], // Keep raw response
-                  validateStatus: neverError ? () => true : undefined // Accept all status codes if neverError is true
+                  transformResponse: [(data: any) => data],
+                  validateStatus: neverError ? () => true : undefined
                 });
                 
                 requestDebugInfo = captureRequestDebugInfo({
@@ -907,40 +849,21 @@ export class PrestaShop8 implements INodeType {
                 }, credentials, rawMode, operation, resource);
                 requestHeaders = requestDebugInfo.headers;
 
-                // Check if this is an error response with Never Error mode
                 if (neverError && (axiosResponse.status < 200 || axiosResponse.status >= 300)) {
-                  responseData = {
-                    status: axiosResponse.status,
-                    message: axiosResponse.data || ''
-                  };
+                  responseData = { status: axiosResponse.status, message: axiosResponse.data || '' };
                 } else {
-                  let processedResponse = { raw: axiosResponse.data };
-                  
-                  // Add response headers and status if requested
-                  if (includeResponseHeaders) {
-                    responseData = {
-                      body: processedResponse,
-                      headers: axiosResponse.headers,
-                      statusCode: axiosResponse.status,
-                      statusMessage: axiosResponse.status >= 200 && axiosResponse.status < 300 ? 'OK' : 'Error'
-                    };
-                  } else {
-                    responseData = processedResponse;
-                  }
+                  const processedResponse = { raw: axiosResponse.data };
+                  responseData = wrapResponse(processedResponse, includeResponseHeaders, axiosResponse.headers, axiosResponse.status);
                 }
               } catch (error: any) {
                 if (neverError) {
-                  responseData = {
-                    status: error.response?.status || 500,
-                    message: error.response?.data || ''
-                  };
+                  responseData = { status: error.response?.status || 500, message: error.response?.data || '' };
                 } else {
                   throw error;
                 }
               }
             } else {
               const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
-              
               const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
                 this.helpers, options, credentials, rawMode, operation, resource, neverError
               );
@@ -949,19 +872,8 @@ export class PrestaShop8 implements INodeType {
               requestDebugInfo = debugInfo;
               requestHeaders = debugInfo.headers;
               
-              let processedResponse = processResponseForMode(response, resource, currentMode);
-              
-              // Add response headers and status if requested
-              if (includeResponseHeaders) {
-                responseData = {
-                  body: processedResponse,
-                  headers: responseHeaders,
-                  statusCode: statusCode,
-                  statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
-                };
-              } else {
-                responseData = processedResponse;
-              }
+              const processedResponse = processResponseForMode(response, resource, resource);
+              responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             }
             break;
           }
@@ -986,23 +898,12 @@ export class PrestaShop8 implements INodeType {
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
 
-            let deleteResponse = {
+            const deleteResponse = {
               success: true,
               message: `${resource} with ID ${id} deleted successfully`,
               deletedId: id,
             };
-
-            // Add response headers and status if requested
-            if (includeResponseHeaders) {
-              responseData = {
-                body: deleteResponse,
-                headers: responseHeaders,
-                statusCode: statusCode,
-                statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
-              };
-            } else {
-              responseData = deleteResponse;
-            }
+            responseData = wrapResponse(deleteResponse, includeResponseHeaders, responseHeaders, statusCode);
             break;
           }
 

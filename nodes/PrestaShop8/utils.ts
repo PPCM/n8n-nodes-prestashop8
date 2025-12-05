@@ -210,7 +210,7 @@ export function simplifyPrestashopResponse(rawData: any, resource: string): any 
 
   let data = rawData.prestashop;
 
-  // Extraire la ressource principale
+  // Extract the main resource
   if (data[resource]) {
     data = data[resource];
   } else if (data[resource + 's']) {
@@ -222,7 +222,7 @@ export function simplifyPrestashopResponse(rawData: any, resource: string): any 
     return data.map(item => simplifyItem(item, resource));
   }
 
-  // Si c'est un objet unique
+  // If it's a single object
   return simplifyItem(data, resource);
 }
 
@@ -240,7 +240,7 @@ function simplifyItem(item: any, resource: string): any {
     const simplifiedKey = convertFieldName(key);
     
     if (key === 'associations' && value && typeof value === 'object') {
-      // Traiter les associations
+      // Process associations
       for (const [assocKey, assocValue] of Object.entries(value)) {
         simplified[convertFieldName(assocKey)] = simplifyAssociation(assocValue);
       }
@@ -255,7 +255,7 @@ function simplifyItem(item: any, resource: string): any {
 }
 
 /**
- * Simplifie une association PrestaShop
+ * Simplifies a PrestaShop association
  */
 function simplifyAssociation(assoc: any): any[] {
   if (!assoc) return [];
@@ -286,12 +286,12 @@ function simplifyAssociation(assoc: any): any[] {
 }
 
 /**
- * Convertit les noms de champs PrestaShop en camelCase
+ * Converts PrestaShop field names to camelCase
  */
 function convertFieldName(fieldName: string): string {
   return fieldName
     .replace(/^id_/, '') // Remove id_ prefix
-    .replace(/_([a-z])/g, (match, letter) => letter.toUpperCase()); // Convertir en camelCase
+    .replace(/_([a-z])/g, (match, letter) => letter.toUpperCase()); // Convert to camelCase
 }
 
 /**
@@ -302,7 +302,7 @@ function convertValue(value: any): any {
     return value;
   }
 
-  // Essayer de convertir en nombre
+  // Try to convert to number
   if (/^\d+$/.test(value)) {
     return parseInt(value, 10);
   }
@@ -319,7 +319,7 @@ function convertValue(value: any): any {
     return false;
   }
 
-  // Retourner la valeur string telle quelle
+  // Return string value as-is
   return value;
 }
 
@@ -376,7 +376,7 @@ function convertSimplifiedToPrestaShop(data: any, resource: string): any {
 
 // convertFromCamelCase function moved to fieldMappings.ts for centralization
 /**
- * Obtient tous les champs string pour CDATA
+ * Gets all string fields for CDATA
  */
 function getAllStringFields(obj: any): string[] {
   const fields: string[] = [];
@@ -399,7 +399,7 @@ function getAllStringFields(obj: any): string[] {
 }
 
 /**
- * Parse XML vers JSON
+ * Parse XML to JSON
  */
 export async function parseXmlToJson(xml: string): Promise<any> {
   const parser = new xml2js.Parser({
@@ -431,7 +431,7 @@ export function buildUrlWithFilters(baseUrl: string, options: any, rawMode?: boo
     }
   }
 
-  // Ajouter output_format seulement si pas en mode Raw
+  // Add output_format only if not in Raw mode
   if (!rawMode) {
     params.append('output_format', 'JSON');
   }
