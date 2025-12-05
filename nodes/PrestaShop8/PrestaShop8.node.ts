@@ -9,7 +9,9 @@ import {
   ILoadOptionsFunctions,
   INodePropertyOptions,
 } from 'n8n-workflow';
-import axios from 'axios';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
 
 import { PrestaShop8Description } from './PrestaShop8.node.description';
 import {
@@ -459,7 +461,7 @@ export class PrestaShop8 implements INodeType {
                     username: credentials.apiKey,
                     password: ''
                   },
-                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers as Record<string, string>,
+                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers as any,
                   timeout: timeout || 30000,
                   transformResponse: [(data: any) => data],
                   validateStatus: neverError ? () => true : undefined
@@ -835,7 +837,7 @@ export class PrestaShop8 implements INodeType {
                     username: credentials.apiKey,
                     password: ''
                   },
-                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers as Record<string, string>,
+                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers as any,
                   timeout: timeout || 30000,
                   transformResponse: [(data: any) => data],
                   validateStatus: neverError ? () => true : undefined
