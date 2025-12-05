@@ -3750,6 +3750,14 @@ export const RESOURCE_SCHEMAS: { [resource: string]: ResourceSchema } = {
     },
   },
   'customer_messages': {
+    'id_customer_thread': {
+      type: 'number',
+      format: 'isUnsignedId',
+      required: false,
+      readOnly: false,
+      multilang: false,
+      maxSize: null,
+    },
     'id_employee': {
       type: 'number',
       format: 'isUnsignedId',
