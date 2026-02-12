@@ -3919,6 +3919,11 @@ export const RESOURCE_SCHEMAS: { [resource: string]: ResourceSchema } = {
   },
 };
 
+// Caches for schema lookups (schemas are static, so cache is permanent)
+const fieldsCache = new Map<string, string[]>();
+const requiredFieldsCache = new Map<string, string[]>();
+const writableFieldsCache = new Map<string, string[]>();
+
 /**
  * Get schema for a specific resource
  */
@@ -3930,32 +3935,53 @@ export function getResourceSchema(resource: string): ResourceSchema | null {
  * Get all field names for a resource
  */
 export function getResourceFields(resource: string): string[] {
+  let cached = fieldsCache.get(resource);
+  if (cached) return cached;
+
   const schema = getResourceSchema(resource);
-  return schema ? Object.keys(schema) : [];
+  cached = schema ? Object.keys(schema) : [];
+  fieldsCache.set(resource, cached);
+  return cached;
 }
 
 /**
  * Get required fields for a resource
  */
 export function getRequiredFields(resource: string): string[] {
+  let cached = requiredFieldsCache.get(resource);
+  if (cached) return cached;
+
   const schema = getResourceSchema(resource);
-  if (!schema) return [];
-  
-  return Object.entries(schema)
+  if (!schema) {
+    requiredFieldsCache.set(resource, []);
+    return [];
+  }
+
+  cached = Object.entries(schema)
     .filter(([_, info]) => info.required)
     .map(([field, _]) => field);
+  requiredFieldsCache.set(resource, cached);
+  return cached;
 }
 
 /**
  * Get writable fields for a resource (not read-only)
  */
 export function getWritableFields(resource: string): string[] {
+  let cached = writableFieldsCache.get(resource);
+  if (cached) return cached;
+
   const schema = getResourceSchema(resource);
-  if (!schema) return [];
-  
-  return Object.entries(schema)
+  if (!schema) {
+    writableFieldsCache.set(resource, []);
+    return [];
+  }
+
+  cached = Object.entries(schema)
     .filter(([_, info]) => !info.readOnly)
     .map(([field, _]) => field);
+  writableFieldsCache.set(resource, cached);
+  return cached;
 }
 
 /**
@@ -3984,6 +4010,21 @@ export function convertFieldValue(value: any, fieldInfo: FieldSchema): any {
 }
 
 /**
+ * Check if a field name matches a numeric pattern (id, quantity, price)
+ * and convert its value to number if it's a string
+ */
+function convertByFieldPattern(key: string, value: any): { matched: boolean; value: any } {
+  const isNumericString = typeof value === 'string' && /^\d+(\.\d+)?$/.test(value);
+  if (key === 'id' || key.startsWith('id_') || key.endsWith('_id')) {
+    return { matched: isNumericString, value: isNumericString ? Number(value) : value };
+  }
+  if (key.includes('quantity') || key.includes('price')) {
+    return { matched: isNumericString, value: isNumericString ? Number(value) : value };
+  }
+  return { matched: false, value };
+}
+
+/**
  * Convert numeric fields in associations
  */
 function convertAssociationIds(associations: any): any {
@@ -3995,28 +4036,12 @@ function convertAssociationIds(associations: any): any {
 
   for (const [assocName, assocValue] of Object.entries(associations)) {
     if (Array.isArray(assocValue)) {
-      // Convert array of association items
       converted[assocName] = assocValue.map((item: any) => {
         if (item && typeof item === 'object') {
           const convertedItem: any = {};
-          // Convert all fields based on naming patterns
-          for (const [key, value] of Object.entries(item)) {
-            // Convert ID fields (id, id_*, *_id)
-            if (key === 'id' || key.startsWith('id_') || key.endsWith('_id')) {
-              convertedItem[key] = typeof value === 'string' ? Number(value) : value;
-            }
-            // Convert quantity fields
-            else if (key.includes('quantity')) {
-              convertedItem[key] = typeof value === 'string' ? Number(value) : value;
-            }
-            // Convert price fields (price, unit_price_*, *_price_*)
-            else if (key.includes('price')) {
-              convertedItem[key] = typeof value === 'string' ? Number(value) : value;
-            }
-            // Keep other fields as-is
-            else {
-              convertedItem[key] = value;
-            }
+          for (const [key, val] of Object.entries(item)) {
+            const result = convertByFieldPattern(key, val);
+            convertedItem[key] = result.matched ? result.value : val;
           }
           return convertedItem;
         }
@@ -4042,20 +4067,17 @@ export function convertResourceTypes(data: any, resource: string): any {
   const converted: any = {};
 
   for (const [field, value] of Object.entries(data)) {
-    if (field === 'id') {
-      // id is always an unsigned integer in PrestaShop
-      converted[field] = typeof value === 'string' ? Number(value) : value;
-    } else if (field === 'associations') {
-      // Special handling for associations: convert numeric fields
+    if (field === 'associations') {
       converted[field] = convertAssociationIds(value);
     } else if (schema[field]) {
       converted[field] = convertFieldValue(value, schema[field]);
-    } else if (field.startsWith('id_') && typeof value === 'string' && /^\d+$/.test(value)) {
-      // Foreign key fields (id_*) not in schema are unsigned integers
-      converted[field] = Number(value);
     } else {
-      // Keep fields not in schema as-is
-      converted[field] = value;
+      const result = convertByFieldPattern(field, value);
+      if (result.matched) {
+        converted[field] = result.value;
+      } else {
+        converted[field] = value;
+      }
     }
   }
 

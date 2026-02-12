@@ -13,7 +13,7 @@
     "alwaysStrict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": false,
+    "noUncheckedIndexedAccess": false, // TODO: enable once all indexed access sites are guarded
     "noImplicitOverride": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,

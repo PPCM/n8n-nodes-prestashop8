@@ -3,22 +3,11 @@ import {
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
-  IHttpRequestMethods,
-  IHttpRequestOptions,
   NodeOperationError,
-  ILoadOptionsFunctions,
-  INodePropertyOptions,
 } from 'n8n-workflow';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const axios = require('axios');
-
 import { PrestaShop8Description } from './PrestaShop8.node.description';
-import {
-  PRESTASHOP_RESOURCES,
-  IPrestaShopCredentials,
-  IPrestaShopFilter,
-} from './types';
+import { IPrestaShopCredentials, IPrestaShopFilter } from './types';
 import {
   buildCreateXml,
   buildUpdateXml,
@@ -29,83 +18,16 @@ import {
   extractPrestashopError,
 } from './utils';
 import { getFieldMappingsForResource } from './fieldMappings';
-import { convertResourceTypes, convertResourceArray, RESOURCE_SCHEMAS, getResourceFields } from './resourceSchemas';
-
-/**
- * Build HTTP request options with appropriate headers (consolidated)
- */
-function buildHttpOptions(method: IHttpRequestMethods, url: string, credentials: IPrestaShopCredentials, rawMode: boolean, timeout: number, body?: string): IHttpRequestOptions {
-  const headers: Record<string, string> = {};
-  
-  // Add Content-Type for requests with body (POST, PATCH, PUT)
-  if (body && ['POST', 'PATCH', 'PUT'].includes(method)) {
-    headers['Content-Type'] = 'application/xml';
-  }
-  
-  // Add Output-Format header based on mode
-  headers['Output-Format'] = rawMode ? 'XML' : 'JSON';
-  
-  return {
-    method,
-    url,
-    auth: {
-      username: credentials.apiKey,
-      password: '',
-    },
-    headers,
-    timeout,
-    ...(rawMode ? { json: false } : {}),
-    ...(body && { body }),
-  };
-}
-
-/**
- * Execute HTTP request with debug capture and response metadata
- */
-async function executeHttpRequest(
-  helpers: any,
-  options: IHttpRequestOptions,
-  credentials: any,
-  rawMode: boolean,
-  operation: string,
-  resource: string,
-  neverError: boolean = false,
-  body?: string
-): Promise<{ response: any; debugInfo: any; url: string; responseHeaders?: any; statusCode?: number }> {
-  const requestUrl = options.url as string;
-  const debugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource, body);
-  
-  try {
-    const response = await helpers.httpRequest(options);
-    
-    // For n8n's httpRequest, the response IS the body, headers are not directly available
-    // We return the response as-is since n8n handles the HTTP layer
-    return {
-      response,
-      debugInfo,
-      url: requestUrl,
-      responseHeaders: {}, // n8n doesn't expose response headers through httpRequest
-      statusCode: 200, // Assume success if no error thrown
-    };
-  } catch (error: any) {
-    if (neverError) {
-      // Return structured error response for Never Error mode
-      const errorResponse = {
-        status: error.httpCode || error.response?.status || 500,
-        message: error.response?.data || ''
-      };
-      
-      return {
-        response: errorResponse,
-        debugInfo,
-        url: requestUrl,
-        responseHeaders: error.response?.headers || {},
-        statusCode: error.httpCode || error.response?.status || 500,
-      };
-    }
-    throw error;
-  }
-}
+import { convertResourceTypes, convertResourceArray } from './resourceSchemas';
+import {
+  FILTER_OPERATOR_FORMATS,
+  getOperationOptions,
+  buildHttpOptions,
+  executeHttpRequest,
+  executeRawModeRequest,
+  wrapResponse,
+} from './helpers/http';
+import { loadOptionsMethods } from './loadOptions';
 
 /**
  * Helper to get fields based on resource type (images uses customField only, others use standard + custom)
@@ -177,220 +99,10 @@ function processResponseData(responseData: any, returnData: INodeExecutionData[]
   }
 }
 
-/**
- * Capture complete request information for debugging
- */
-function captureRequestDebugInfo(options: any, credentials: any, rawMode: boolean, operation: string, resource: string, body?: string): any {
-  return {
-    method: options.method,
-    url: options.url,
-    headers: {
-      ...options.headers,
-      'Authorization': `Basic ${Buffer.from(credentials.apiKey + ':').toString('base64')}`,
-      'User-Agent': 'n8n-prestashop8-node/1.0.0',
-    },
-    authentication: {
-      type: 'Basic Auth',
-      username: credentials.apiKey,
-      password: '[HIDDEN]',
-      baseUrl: credentials.baseUrl,
-    },
-    operation: operation,
-    resource: resource,
-    mode: rawMode ? 'Raw XML' : 'JSON',
-    timeout: options.timeout,
-    ...(body && { body: body }),
-    ...(options.json !== undefined && { jsonParsing: options.json }),
-  };
-}
-
-/**
- * Wrap response with optional headers and status information
- */
-function wrapResponse(processedResponse: any, includeHeaders: boolean, headers?: any, statusCode?: number): any {
-  if (includeHeaders) {
-    return {
-      body: processedResponse,
-      headers: headers || {},
-      statusCode: statusCode || 200,
-      statusMessage: statusCode && statusCode >= 200 && statusCode < 300 ? 'OK' : 'Error'
-    };
-  }
-  return processedResponse;
-}
-
 export class PrestaShop8 implements INodeType {
   description: INodeTypeDescription = PrestaShop8Description;
 
-  methods = {
-    loadOptions: {
-      // Load operations dynamically based on resource
-      async getOperations(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const resource = this.getCurrentNodeParameter('resource') as string;
-        const resourceConfig = PRESTASHOP_RESOURCES[resource];
-        
-        if (!resourceConfig) {
-          return [];
-        }
-
-        const operations: INodePropertyOptions[] = [];
-
-        if (resourceConfig.supportsList) {
-          operations.push({
-            name: 'List all',
-            value: 'list',
-            description: `Get all ${resourceConfig.displayName.toLowerCase()}`,
-          });
-        }
-
-        if (resourceConfig.supportsGetById) {
-          operations.push({
-            name: 'Get by ID',
-            value: 'getById',
-            description: `Get a ${resourceConfig.displayName.toLowerCase()} by its ID`,
-          });
-        }
-
-        if (resourceConfig.supportsSearch) {
-          operations.push({
-            name: 'Search with filters',
-            value: 'search',
-            description: `Search ${resourceConfig.displayName.toLowerCase()} with advanced filters`,
-          });
-        }
-
-        if (resourceConfig.supportsCreate) {
-          operations.push({
-            name: 'Create',
-            value: 'create',
-            description: `Create a new ${resourceConfig.displayName.toLowerCase()}`,
-          });
-        }
-
-        if (resourceConfig.supportsUpdate) {
-          operations.push({
-            name: 'Update',
-            value: 'update',
-            description: `Update an existing ${resourceConfig.displayName.toLowerCase()}`,
-          });
-        }
-
-        if (resourceConfig.supportsDelete) {
-          operations.push({
-            name: 'Delete',
-            value: 'delete',
-            description: `Delete an existing ${resourceConfig.displayName.toLowerCase()}`,
-          });
-        }
-
-        return operations;
-      },
-      
-      // Load required fields for CREATE operation based on resource
-      async getRequiredFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        try {
-          const resource = this.getCurrentNodeParameter('resource') as string;
-          
-          // Don't check operation here as it might not be set yet
-          if (!resource) {
-            return [{
-              name: 'Custom Field',
-              value: '__custom__',
-              description: 'Enter a custom field name',
-            }];
-          }
-          
-          // Import the required fields mapping
-          const { REQUIRED_FIELDS_BY_RESOURCE } = await import('./utils');
-          const requiredFields = REQUIRED_FIELDS_BY_RESOURCE[resource] || [];
-          
-          if (requiredFields.length === 0) {
-            return [{
-              name: 'No specific required fields',
-              value: 'none',
-              description: 'This resource has no specific required fields defined',
-            }];
-          }
-          
-          return requiredFields.map((field: string) => ({
-            name: field,
-            value: field,
-            description: `Required field: ${field}`,
-          }));
-        } catch (error) {
-          // Fallback in case of any error
-          return [{
-            name: 'Custom Field',
-            value: '__custom__',
-            description: 'Enter a custom field name',
-          }];
-        }
-      },
-
-      // Load available fields from resource schemas for autocomplete
-      async getAvailableFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        try {
-          const resource = this.getCurrentNodeParameter('resource') as string;
-          
-          if (!resource) {
-            return [];
-          }
-          
-          // Special handling for images resource - return empty (uses text input, not dropdown)
-          if (resource === 'images') {
-            return [];
-          }
-          
-          // Get fields for this resource (imported at top of file for performance)
-          const fields = getResourceFields(resource);
-          
-          if (!fields || fields.length === 0) {
-            // No schema available, return empty (user can use custom field button)
-            return [];
-          }
-          
-          // Convert fields to options with metadata
-          const schema = RESOURCE_SCHEMAS[resource];
-          const fieldOptions = fields.map(field => {
-            const fieldInfo = schema[field];
-            let description = `Type: ${fieldInfo.type}`;
-            
-            if (fieldInfo.required) {
-              description += ' • Required';
-            }
-            if (fieldInfo.readOnly) {
-              description += ' • Read-only';
-            }
-            if (fieldInfo.multilang) {
-              description += ' • Multilingual (use -1, -2, etc.)';
-            }
-            if (fieldInfo.maxSize) {
-              description += ` • Max: ${fieldInfo.maxSize} chars`;
-            }
-            
-            return {
-              name: field,
-              value: field,
-              description,
-            };
-          }).sort((a, b) => {
-            // Sort: required first, then alphabetically
-            const aRequired = schema[a.value]?.required || false;
-            const bRequired = schema[b.value]?.required || false;
-            if (aRequired && !bRequired) return -1;
-            if (!aRequired && bRequired) return 1;
-            return a.name.localeCompare(b.name);
-          });
-
-          // Return field options directly (no need for custom option anymore, it's a separate button)
-          return fieldOptions;
-        } catch (error) {
-          // Schema not available, return empty to allow free text input
-          return [];
-        }
-      },
-    },
-  };
+  methods = { loadOptions: loadOptionsMethods };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
     const items = this.getInputData();
@@ -420,7 +132,8 @@ export class PrestaShop8 implements INodeType {
         let requestUrl: string = '';
         let requestHeaders: any = {};
         let requestDebugInfo: any = {};
-        const rawMode = this.getNodeParameter('options.response.rawMode', i, false) as boolean;
+        const opts = getOperationOptions(this, i);
+        const { rawMode, timeout, neverError, includeResponseHeaders, showRequestInfo, showRequestUrl } = opts;
 
         switch (operation) {
           case 'list': {
@@ -447,58 +160,22 @@ export class PrestaShop8 implements INodeType {
             
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, urlParams, rawMode);
 
-            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
-            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
-            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
-
             if (rawMode) {
-              // In Raw mode, use axios directly to avoid n8n automatic parsing
-              try {
-                const axiosResponse = await axios({
-                  method: 'GET',
-                  url: requestUrl,
-                  auth: {
-                    username: credentials.apiKey,
-                    password: ''
-                  },
-                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers as any,
-                  timeout: timeout || 30000,
-                  transformResponse: [(data: any) => data],
-                  validateStatus: neverError ? () => true : undefined
-                });
-                
-                requestDebugInfo = captureRequestDebugInfo({
-                  method: 'GET',
-                  url: requestUrl,
-                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers,
-                  timeout: timeout
-                }, credentials, rawMode, operation, resource);
-                requestHeaders = requestDebugInfo.headers;
-
-                if (neverError && (axiosResponse.status < 200 || axiosResponse.status >= 300)) {
-                  responseData = { status: axiosResponse.status, message: axiosResponse.data || '' };
-                } else {
-                  const processedResponse = { raw: axiosResponse.data };
-                  responseData = wrapResponse(processedResponse, includeResponseHeaders, axiosResponse.headers, axiosResponse.status);
-                }
-              } catch (error: any) {
-                if (neverError) {
-                  responseData = { status: error.response?.status || 500, message: error.response?.data || '' };
-                } else {
-                  throw error;
-                }
-              }
+              const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource);
+              responseData = rawResult.responseData;
+              requestDebugInfo = rawResult.requestDebugInfo;
+              requestHeaders = rawResult.requestHeaders;
             } else {
               const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
               const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
                 this.helpers, options, credentials, rawMode, operation, resource, neverError
               );
-              
+
               requestUrl = url;
               requestDebugInfo = debugInfo;
               requestHeaders = debugInfo.headers;
-              
-              const processedResponse = processResponseForMode(response, resource, resource);
+
+              const processedResponse = processResponseForMode(response, resource);
               responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             }
             break;
@@ -524,9 +201,6 @@ export class PrestaShop8 implements INodeType {
 
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}/${id}`, urlParams, rawMode);
 
-            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
-            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
-            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
             const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
             
             const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
@@ -537,7 +211,7 @@ export class PrestaShop8 implements INodeType {
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
             
-            const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, resource);
+            const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource);
             responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             break;
           }
@@ -590,9 +264,6 @@ export class PrestaShop8 implements INodeType {
             // Build XML using new format
             body = buildCreateXml(resource, fieldsToCreate);
 
-            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
-            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
-            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
             const options = buildHttpOptions('POST', `${credentials.baseUrl}/${resource}`, credentials, rawMode, timeout, body);
             
             const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
@@ -603,7 +274,7 @@ export class PrestaShop8 implements INodeType {
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
             
-            const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, resource);
+            const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource);
             responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             break;
           }
@@ -649,9 +320,6 @@ export class PrestaShop8 implements INodeType {
             // Build XML using new format
             body = buildUpdateXml(resource, id, fieldsToUpdate);
 
-            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
-            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
-            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
             const options = buildHttpOptions('PATCH', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout, body);
             
             const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
@@ -662,7 +330,7 @@ export class PrestaShop8 implements INodeType {
             requestDebugInfo = debugInfo;
             requestHeaders = debugInfo.headers;
             
-            const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource, resource);
+            const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource);
             responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             break;
           }
@@ -672,13 +340,7 @@ export class PrestaShop8 implements INodeType {
             const advancedOptions = this.getNodeParameter('advancedOptions', i, {}) as any;
             const display = this.getNodeParameter('display', i, 'full') as string;
             const customFields = this.getNodeParameter('customFields', i, '') as string;
-            
-            // Debug: Log the filters parameter structure
-            const showRequestInfo = this.getNodeParameter('options.request.showRequestInfo', i, false) as boolean;
-            if (showRequestInfo) {
-              console.log('DEBUG - filtersParam:', JSON.stringify(filtersParam, null, 2));
-            }
-            
+
             // Get filters based on resource type
             const filters: IPrestaShopFilter[] = resource === 'images'
               ? (filtersParam.customFilter || [])
@@ -691,10 +353,6 @@ export class PrestaShop8 implements INodeType {
             // Build filter parameters for URL
             const filterParams: Record<string, any> = {};
             for (const filter of filters) {
-              if (showRequestInfo) {
-                console.log('DEBUG - Processing filter:', JSON.stringify(filter, null, 2));
-              }
-              
               // Handle CUSTOM filter operator
               if (filter.operator === 'CUSTOM') {
                 if (filter.customFilterExpression && filter.customFilterExpression.trim()) {
@@ -715,77 +373,15 @@ export class PrestaShop8 implements INodeType {
               }
               
               const key = `filter[${filter.field}]`;
-              
-              // Convert filter value to string and trim
               const filterValue = filter.value !== null && filter.value !== undefined ? String(filter.value).trim() : '';
-              
-              // Handle different operators with correct PrestaShop formats
-              switch (filter.operator) {
-                case '=':
-                  if (filterValue) {
-                    // Check if value contains comma for interval (e.g., "10,20" → "[10,20]")
-                    if (filterValue.includes(',') && !filterValue.startsWith('[')) {
-                      filterParams[key] = `[${filterValue}]`;
-                    } else {
-                      filterParams[key] = `[${filterValue}]`;
-                    }
-                  }
-                  break;
-                case '!=':
-                  if (filterValue) {
-                    // Check if value contains comma for interval (e.g., "10,20" → "![10,20]")
-                    if (filterValue.includes(',') && !filterValue.startsWith('[')) {
-                      filterParams[key] = `![${filterValue}]`;
-                    } else {
-                      filterParams[key] = `![${filterValue}]`;
-                    }
-                  }
-                  break;
-                case '>':
-                  if (filterValue) {
-                    filterParams[key] = `>[${filterValue}]`;
-                  }
-                  break;
-                case '>=':
-                  if (filterValue) {
-                    filterParams[key] = `>=[${filterValue}]`;
-                  }
-                  break;
-                case '<':
-                  if (filterValue) {
-                    filterParams[key] = `<[${filterValue}]`;
-                  }
-                  break;
-                case '<=':
-                  if (filterValue) {
-                    filterParams[key] = `<=[${filterValue}]`;
-                  }
-                  break;
-                case 'CONTAINS':
-                  if (filterValue) {
-                    filterParams[key] = `%[${filterValue}]%`;
-                  }
-                  break;
-                case 'BEGINS':
-                  if (filterValue) {
-                    filterParams[key] = `[${filterValue}]%`;
-                  }
-                  break;
-                case 'ENDS':
-                  if (filterValue) {
-                    filterParams[key] = `%[${filterValue}]`;
-                  }
-                  break;
-                case 'IS_EMPTY':
-                  filterParams[key] = `[]`;
-                  break;
-                case 'IS_NOT_EMPTY':
-                  filterParams[key] = `![]`;
-                  break;
-                default:
-                  if (filterValue) {
-                    filterParams[key] = `[${filterValue}]`;
-                  }
+
+              const format = FILTER_OPERATOR_FORMATS[filter.operator];
+              if (format) {
+                if (!format.requiresValue || filterValue) {
+                  filterParams[key] = format.template.replace('{v}', filterValue);
+                }
+              } else if (filterValue) {
+                filterParams[key] = `[${filterValue}]`;
               }
             }
 
@@ -812,69 +408,24 @@ export class PrestaShop8 implements INodeType {
               urlParams.display = displayValue;
             }
 
-            if (showRequestInfo) {
-              console.log('DEBUG - Final filterParams:', JSON.stringify(filterParams, null, 2));
-              console.log('DEBUG - Final urlParams:', JSON.stringify(urlParams, null, 2));
-            }
-
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, urlParams, rawMode);
-            
-            if (showRequestInfo) {
-              console.log('DEBUG - Final URL:', requestUrl);
-            }
-
-            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
-            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
-            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
 
             if (rawMode) {
-              // In Raw mode, use axios directly to avoid n8n automatic parsing
-              try {
-                const axiosResponse = await axios({
-                  method: 'GET',
-                  url: requestUrl,
-                  auth: {
-                    username: credentials.apiKey,
-                    password: ''
-                  },
-                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers as any,
-                  timeout: timeout || 30000,
-                  transformResponse: [(data: any) => data],
-                  validateStatus: neverError ? () => true : undefined
-                });
-                
-                requestDebugInfo = captureRequestDebugInfo({
-                  method: 'GET',
-                  url: requestUrl,
-                  headers: buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout || 30000).headers,
-                  timeout: timeout
-                }, credentials, rawMode, operation, resource);
-                requestHeaders = requestDebugInfo.headers;
-
-                if (neverError && (axiosResponse.status < 200 || axiosResponse.status >= 300)) {
-                  responseData = { status: axiosResponse.status, message: axiosResponse.data || '' };
-                } else {
-                  const processedResponse = { raw: axiosResponse.data };
-                  responseData = wrapResponse(processedResponse, includeResponseHeaders, axiosResponse.headers, axiosResponse.status);
-                }
-              } catch (error: any) {
-                if (neverError) {
-                  responseData = { status: error.response?.status || 500, message: error.response?.data || '' };
-                } else {
-                  throw error;
-                }
-              }
+              const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource);
+              responseData = rawResult.responseData;
+              requestDebugInfo = rawResult.requestDebugInfo;
+              requestHeaders = rawResult.requestHeaders;
             } else {
               const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
               const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
                 this.helpers, options, credentials, rawMode, operation, resource, neverError
               );
-              
+
               requestUrl = url;
               requestDebugInfo = debugInfo;
               requestHeaders = debugInfo.headers;
-              
-              const processedResponse = processResponseForMode(response, resource, resource);
+
+              const processedResponse = processResponseForMode(response, resource);
               responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
             }
             break;
@@ -887,9 +438,6 @@ export class PrestaShop8 implements INodeType {
               throw new NodeOperationError(this.getNode(), 'ID required for this operation');
             }
 
-            const timeout = this.getNodeParameter('options.timeout', i, 30000) as number;
-            const neverError = this.getNodeParameter('options.response.neverError', i, false) as boolean;
-            const includeResponseHeaders = this.getNodeParameter('options.response.includeResponseHeaders', i, false) as boolean;
             const options = buildHttpOptions('DELETE', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout);
             
             const { debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
@@ -914,9 +462,6 @@ export class PrestaShop8 implements INodeType {
         }
 
         // Add debug metadata if requested
-        const showRequestUrl = this.getNodeParameter('options.request.showRequestUrl', i, false) as boolean;
-        const showRequestInfo = this.getNodeParameter('options.request.showRequestInfo', i, false) as boolean;
-        
         // Capture request information for debug purposes if needed
         if (showRequestInfo && Object.keys(requestDebugInfo).length === 0) {
           // Fallback if no request debug info was captured
