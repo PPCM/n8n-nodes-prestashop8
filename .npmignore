@@ -17,14 +17,8 @@ test/
 *.test.js
 *.test.ts
 
-# Documentation and summaries (not needed for end users)
-summary/
-docs/
-RENAME_SUMMARY.md
-PROJECT_STRUCTURE.md
-README_FULL.md
-README_GITHUB.md
-README_EN.md
+# Documentation (not needed for end users)
+doc/
 
 # Scripts
 scripts/
@@ -49,6 +43,9 @@ n8n-docker-test/
 # Claude Code
 CLAUDE.md
 CLAUDE.local.md
+
+# Packaged tarballs
+*.tgz
 
 # Temporary
 tmp/

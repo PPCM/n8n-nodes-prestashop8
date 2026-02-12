@@ -9,7 +9,7 @@
 Un nodo comunitario completo de n8n para integración con PrestaShop 8 con conversión automática XML/JSON y soporte CRUD completo.
 
 **🌍 Idiomas de la documentación:**
-- 🇬🇧 [**English**](../README_EN.md)
+- 🇬🇧 [**English**](../README.md)
 - 🇫🇷 [**Français**](./README_FR.md)
 - 🇩🇪 [**Deutsch**](./README_DE.md)
 - 🇪🇸 **Español** (este archivo)
@@ -160,7 +160,7 @@ Cron → PrestaShop 8 Node → Calcular KPIs → Email Report
 
 - **[🎯 Ejemplos Prácticos](./EXAMPLES_ES.md)** - Casos de uso detallados
 - **[🛠️ Guía de Instalación](./INSTALLATION_ES.md)** - Configuración paso a paso
-- **[📝 Changelog](../CHANGELOG.md)** - Actualizaciones y correcciones
+- **[📝 Changelog](./CHANGELOG.md)** - Actualizaciones y correcciones
 
 ## 🐛 Problemas y Soporte
 

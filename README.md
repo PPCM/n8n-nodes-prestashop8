@@ -9,12 +9,12 @@
 A comprehensive n8n community node for PrestaShop 8 integration with automatic XML/JSON conversion and full CRUD support.
 
 **🌍 Documentation Languages:**
-- 🇬🇧 **English** (this file) - [Examples](./docs/EXAMPLES_EN.md) | [Installation](./docs/INSTALLATION_EN.md)
-- 🇫🇷 [**Français**](./docs/README_FR.md) - [Exemples](./EXAMPLES.md) | [Installation](./INSTALLATION.md)
-- 🇩🇪 [**Deutsch**](./docs/README_DE.md) - [Beispiele](./docs/EXAMPLES_DE.md) | [Installation](./docs/INSTALLATION_DE.md)
-- 🇪🇸 [**Español**](./docs/README_ES.md) - [Ejemplos](./docs/EXAMPLES_ES.md) | [Instalación](./docs/INSTALLATION_ES.md)
+- 🇬🇧 **English** (this file) - [Examples](./doc/EXAMPLES_EN.md) | [Installation](./doc/INSTALLATION_EN.md)
+- 🇫🇷 [**Français**](./doc/README_FR.md) - [Exemples](./doc/EXAMPLES_FR.md) | [Installation](./doc/INSTALLATION_FR.md)
+- 🇩🇪 [**Deutsch**](./doc/README_DE.md) - [Beispiele](./doc/EXAMPLES_DE.md) | [Installation](./doc/INSTALLATION_DE.md)
+- 🇪🇸 [**Español**](./doc/README_ES.md) - [Ejemplos](./doc/EXAMPLES_ES.md) | [Instalación](./doc/INSTALLATION_ES.md)
 
-**📚 [Complete Documentation Hub](./docs/README.md)**
+**📚 [Complete Documentation Hub](./doc/README.md)**
 
 [🚀 Quick Start](#quick-start) | [✨ Features](#features) | [📚 Documentation](#documentation) | [🎯 Examples](#examples) | [🤝 Contributing](#contributing)
 
@@ -160,10 +160,9 @@ Cron → PrestaShop 8 Node → Calculate KPIs → Email Report
 
 ## 📚 Documentation
 
-- **[🎯 Practical Examples](./docs/EXAMPLES_EN.md)** - Detailed use cases
-- **[🛠️ Installation Guide](./docs/INSTALLATION_EN.md)** - Step-by-step setup
-- **[📝 Changelog](./CHANGELOG.md)** - Updates and fixes
-- **[📋 Project Summaries](./summary/README.md)** - Executive summaries and presentations
+- **[🎯 Practical Examples](./doc/EXAMPLES_EN.md)** - Detailed use cases
+- **[🛠️ Installation Guide](./doc/INSTALLATION_EN.md)** - Step-by-step setup
+- **[📝 Changelog](./doc/CHANGELOG.md)** - Updates and fixes
 
 ## 🐛 Issues & Support
 
@@ -175,7 +174,7 @@ Cron → PrestaShop 8 Node → Calculate KPIs → Email Report
 ### Get Help
 - 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-nodes-prestashop8/issues)** - Bugs and questions
 - 🌐 **[n8n Community](https://community.n8n.io)** - Forum discussions
-- 📖 **[Documentation](./docs/INSTALLATION_EN.md)** - Detailed guides
+- 📖 **[Documentation](./doc/INSTALLATION_EN.md)** - Detailed guides
 
 ## 🤝 Contributing
 

@@ -5,14 +5,14 @@
 ## 🌍 Available Languages
 
 ### 🇬🇧 English
-- **[📖 Main README](../README_EN.md)** - Complete overview and features
+- **[📖 Main README](../README.md)** - Complete overview and features
 - **[🎯 Examples](./EXAMPLES_EN.md)** - Practical usage examples
 - **[🛠️ Installation](./INSTALLATION_EN.md)** - Step-by-step setup guide
 
-### 🇫🇷 Français  
+### 🇫🇷 Français
 - **[📖 README Principal](./README_FR.md)** - Vue d'ensemble et fonctionnalités
-- **[🎯 Exemples](../EXAMPLES.md)** - Exemples d'usage pratiques
-- **[🛠️ Installation](../INSTALLATION.md)** - Guide d'installation détaillé
+- **[🎯 Exemples](./EXAMPLES_FR.md)** - Exemples d'usage pratiques
+- **[🛠️ Installation](./INSTALLATION_FR.md)** - Guide d'installation détaillé
 
 ### 🇩🇪 Deutsch
 - **[📖 Haupt-README](./README_DE.md)** - Vollständiger Überblick und Funktionen
@@ -61,8 +61,8 @@ npm install n8n-nodes-prestashop8
 - **[PrestaShop Documentation](https://devdocs.prestashop-project.org/8/webservice/)** - API reference
 
 ### Development
-- **[📝 Changelog](../CHANGELOG.md)** - Version history and updates
-- **[🚀 Contributing](../README_EN.md#contributing)** - How to contribute
+- **[📝 Changelog](./CHANGELOG.md)** - Version history and updates
+- **[🚀 Contributing](../README.md#-contributing)** - How to contribute
 - **[📄 License](../LICENSE)** - MIT License
 
 ---

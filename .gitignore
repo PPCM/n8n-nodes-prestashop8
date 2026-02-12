@@ -46,11 +46,11 @@ coverage/
 tmp/
 temp/
 
-# Project summaries and presentations (not needed in production)
-summary/
-
 # Test files (not needed in production)
 tests/
+
+# Packaged tarballs
+*.tgz
 
 # n8n Docker test environment
 n8n-docker-test/

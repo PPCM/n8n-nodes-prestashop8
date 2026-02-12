@@ -154,8 +154,8 @@ Cron → PrestaShop 8 Node → Calculate KPIs → Email Report
 ## 📚 Documentation
 
 - **[📖 Guide Complet](./README.md)** - Documentation complète
-- **[🎯 Exemples Pratiques](./EXAMPLES.md)** - Cas d'usage détaillés  
-- **[🛠️ Installation](./INSTALLATION.md)** - Setup pas à pas
+- **[🎯 Exemples Pratiques](./EXAMPLES_FR.md)** - Cas d'usage détaillés
+- **[🛠️ Installation](./INSTALLATION_FR.md)** - Setup pas à pas
 - **[📝 Changelog](./CHANGELOG.md)** - Nouveautés et corrections
 
 ## 🐛 Issues & Support
@@ -168,7 +168,7 @@ Cron → PrestaShop 8 Node → Calculate KPIs → Email Report
 ### Obtenir de l'Aide
 - 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-nodes-prestashop8/issues)** - Bugs et questions
 - 🌐 **[n8n Community](https://community.n8n.io)** - Forum discussions
-- 📖 **[Documentation](./INSTALLATION.md)** - Guides détaillés
+- 📖 **[Documentation](./INSTALLATION_FR.md)** - Guides détaillés
 
 ## 🤝 Contribution
 
@@ -224,7 +224,7 @@ npm run dev  # Mode watch
 
 ## 📄 Licence
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](./LICENSE) pour plus de détails.
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](../LICENSE) pour plus de détails.
 
 ## 🙏 Remerciements
 
