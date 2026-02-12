@@ -43,6 +43,13 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
+# n8n Docker test environment
+n8n-docker-test/
+
+# Claude Code
+CLAUDE.md
+CLAUDE.local.md
+
 # Temporary
 tmp/
 temp/

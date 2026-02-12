@@ -51,3 +51,10 @@ summary/
 
 # Test files (not needed in production)
 tests/
+
+# n8n Docker test environment
+n8n-docker-test/
+
+# Claude Code
+CLAUDE.md
+CLAUDE.local.md
