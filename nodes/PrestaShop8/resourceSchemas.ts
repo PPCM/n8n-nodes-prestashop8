@@ -4042,7 +4042,10 @@ export function convertResourceTypes(data: any, resource: string): any {
   const converted: any = {};
 
   for (const [field, value] of Object.entries(data)) {
-    if (field === 'associations') {
+    if (field === 'id') {
+      // id is always an unsigned integer in PrestaShop
+      converted[field] = typeof value === 'string' ? Number(value) : value;
+    } else if (field === 'associations') {
       // Special handling for associations: convert numeric fields
       converted[field] = convertAssociationIds(value);
     } else if (schema[field]) {
