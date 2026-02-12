@@ -4050,6 +4050,9 @@ export function convertResourceTypes(data: any, resource: string): any {
       converted[field] = convertAssociationIds(value);
     } else if (schema[field]) {
       converted[field] = convertFieldValue(value, schema[field]);
+    } else if (field.startsWith('id_') && typeof value === 'string' && /^\d+$/.test(value)) {
+      // Foreign key fields (id_*) not in schema are unsigned integers
+      converted[field] = Number(value);
     } else {
       // Keep fields not in schema as-is
       converted[field] = value;
