@@ -40,7 +40,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   customers: {
     name: 'customers',
     displayName: 'Customers',
-    description: 'Store customer management',
+    description: 'Store customer management (customers)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -51,7 +51,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   addresses: {
     name: 'addresses',
     displayName: 'Addresses',
-    description: 'Customer and delivery addresses',
+    description: 'Customer and delivery addresses (addresses)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -62,7 +62,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   groups: {
     name: 'groups',
     displayName: 'Customer Groups',
-    description: 'Customer groups and pricing',
+    description: 'Customer groups and pricing (groups)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -73,7 +73,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   customer_threads: {
     name: 'customer_threads',
     displayName: 'Customer Threads',
-    description: 'Customer conversation threads',
+    description: 'Customer conversation threads (customer_threads)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -84,7 +84,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   customer_messages: {
     name: 'customer_messages',
     displayName: 'Customer Messages',
-    description: 'Individual conversation messages',
+    description: 'Individual conversation messages (customer_messages)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -97,7 +97,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   products: {
     name: 'products',
     displayName: 'Products',
-    description: 'Store product catalog',
+    description: 'Store product catalog (products)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -108,7 +108,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   combinations: {
     name: 'combinations',
     displayName: 'Product Combinations',
-    description: 'Product variants and combinations',
+    description: 'Product variants and combinations (combinations)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -127,10 +127,21 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
     supportsGetById: true,
     supportsSearch: true,
   },
+  stock_movements: {
+    name: 'stock_movements',
+    displayName: 'Stock Movements',
+    description: 'Product stock movement history (stock_movements)',
+    supportsCreate: false,
+    supportsUpdate: false,
+    supportsDelete: false,
+    supportsList: true,
+    supportsGetById: true,
+    supportsSearch: true,
+  },
   categories: {
     name: 'categories',
     displayName: 'Categories',
-    description: 'Product category hierarchy',
+    description: 'Product category hierarchy (categories)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -141,7 +152,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   manufacturers: {
     name: 'manufacturers',
     displayName: 'Manufacturers',
-    description: 'Brands and manufacturers',
+    description: 'Brands and manufacturers (manufacturers)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -152,7 +163,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   suppliers: {
     name: 'suppliers',
     displayName: 'Suppliers',
-    description: 'Product suppliers',
+    description: 'Product suppliers (suppliers)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -163,7 +174,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   tags: {
     name: 'tags',
     displayName: 'Tags',
-    description: 'Product tags and keywords',
+    description: 'Product tags and keywords (tags)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -174,7 +185,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   product_features: {
     name: 'product_features',
     displayName: 'Product Features',
-    description: 'Product features and attributes',
+    description: 'Product features and attributes (product_features)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -185,7 +196,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   product_options: {
     name: 'product_options',
     displayName: 'Product Options',
-    description: 'Product customization options',
+    description: 'Product customization options (product_options)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -198,7 +209,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   orders: {
     name: 'orders',
     displayName: 'Orders',
-    description: 'Store orders',
+    description: 'Store orders (orders)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -209,7 +220,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   order_details: {
     name: 'order_details',
     displayName: 'Order Details',
-    description: 'Order line items',
+    description: 'Order line items (order_details)',
     supportsCreate: false,
     supportsUpdate: true,
     supportsDelete: false,
@@ -220,7 +231,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   order_histories: {
     name: 'order_histories',
     displayName: 'Order Histories',
-    description: 'Order status changes',
+    description: 'Order status changes (order_histories)',
     supportsCreate: true,
     supportsUpdate: false,
     supportsDelete: false,
@@ -231,7 +242,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   order_states: {
     name: 'order_states',
     displayName: 'Order States',
-    description: 'Possible order states',
+    description: 'Possible order states (order_states)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -242,7 +253,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   order_carriers: {
     name: 'order_carriers',
     displayName: 'Order Carriers',
-    description: 'Order carrier assignments',
+    description: 'Order carrier assignments (order_carriers)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -253,7 +264,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   carts: {
     name: 'carts',
     displayName: 'Carts',
-    description: 'Customer shopping carts',
+    description: 'Customer shopping carts (carts)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -264,7 +275,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   cart_rules: {
     name: 'cart_rules',
     displayName: 'Cart Rules',
-    description: 'Discount vouchers and promotions',
+    description: 'Discount vouchers and promotions (cart_rules)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -277,7 +288,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   carriers: {
     name: 'carriers',
     displayName: 'Carriers',
-    description: 'Shipping methods and carriers',
+    description: 'Shipping methods and carriers (carriers)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -288,7 +299,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   zones: {
     name: 'zones',
     displayName: 'Geographic Zones',
-    description: 'Delivery zones',
+    description: 'Delivery zones (zones)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -299,7 +310,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   countries: {
     name: 'countries',
     displayName: 'Countries',
-    description: 'Country list',
+    description: 'Country list (countries)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -310,7 +321,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   states: {
     name: 'states',
     displayName: 'States/Regions',
-    description: 'States and regions by country',
+    description: 'States and regions by country (states)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -323,7 +334,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   currencies: {
     name: 'currencies',
     displayName: 'Currencies',
-    description: 'Accepted currencies',
+    description: 'Accepted currencies (currencies)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -334,7 +345,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   taxes: {
     name: 'taxes',
     displayName: 'Taxes',
-    description: 'Tax rates',
+    description: 'Tax rates (taxes)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -347,7 +358,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   content_management_system: {
     name: 'content_management_system',
     displayName: 'CMS Pages',
-    description: 'Static content pages',
+    description: 'Static content pages (content_management_system)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -358,7 +369,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   images: {
     name: 'images',
     displayName: 'Images',
-    description: 'Product and category images',
+    description: 'Product and category images (images)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -371,7 +382,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   configurations: {
     name: 'configurations',
     displayName: 'Configuration',
-    description: 'Store settings',
+    description: 'Store settings (configurations)',
     supportsCreate: false,
     supportsUpdate: true,
     supportsDelete: false,
@@ -382,7 +393,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   languages: {
     name: 'languages',
     displayName: 'Languages',
-    description: 'Supported languages',
+    description: 'Supported languages (languages)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
@@ -393,7 +404,7 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
   shops: {
     name: 'shops',
     displayName: 'Shops',
-    description: 'Multi-store management',
+    description: 'Multi-store management (shops)',
     supportsCreate: true,
     supportsUpdate: true,
     supportsDelete: true,
