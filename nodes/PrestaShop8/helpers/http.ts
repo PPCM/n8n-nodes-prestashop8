@@ -5,7 +5,7 @@ import {
 } from 'n8n-workflow';
 import { IPrestaShopCredentials } from '../types';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const axios = require('axios');
 
 /**

@@ -199,6 +199,7 @@ function convertValue(value: any): any {
  * Builds PrestaShop XML from simplified JSON
  */
 export function buildPrestashopXml(resource: string, data: any): string {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const js2xmlparser = require('js2xmlparser');
 	const convertedData = convertSimplifiedToPrestaShop(data, resource);
 

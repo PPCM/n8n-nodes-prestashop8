@@ -112,7 +112,7 @@ export function validateDataForResource(resource: string, data: any, operation: 
 			errors.push('At least one field must be provided for update (excluding id)');
 		}
 
-		if (data.hasOwnProperty('id')) {
+		if (Object.prototype.hasOwnProperty.call(data, 'id')) {
 			errors.push('Cannot modify id field in update operation. Use the ID parameter instead.');
 		}
 	}
