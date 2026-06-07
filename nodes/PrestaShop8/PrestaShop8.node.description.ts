@@ -22,7 +22,7 @@ function buildOperatorField(): any {
 		name: 'operator',
 		type: 'options',
 		options: FILTER_OPERATORS,
-		default: '=',
+		default: 'EQ',
 		noDataExpression: true,
 		description: 'Comparison operator for filtering. Custom allows you to write your own filter expression.',
 	};
@@ -379,9 +379,11 @@ export const PrestaShop8Description: INodeTypeDescription = {
 		},
 
 		// Search Filters - Images resource (custom filter only)
+		// NOTE: distinct name from the generic 'filters' below. Two parameters sharing
+		// the same name break n8n's NDV value binding (operator could not be selected).
 		{
 			displayName: 'Search Filters',
-			name: 'filters',
+			name: 'filtersImages',
 			type: 'fixedCollection',
 			...showForResourceOp('images', 'search'),
 			default: {},

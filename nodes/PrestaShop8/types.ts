@@ -416,7 +416,9 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
 
 // Available filter operators
 export const FILTER_OPERATORS = [
-  { name: '= Equal to', value: '=' },
+  // Value must NOT be '=': n8n treats any parameter value starting with '='
+  // as an expression, which makes the option impossible to select in the UI.
+  { name: '= Equal to', value: 'EQ' },
   { name: '≠ Not equal to', value: '!=' },
   { name: '> Greater than', value: '>' },
   { name: '≥ Greater than or equal to', value: '>=' },

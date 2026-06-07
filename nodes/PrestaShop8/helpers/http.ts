@@ -13,7 +13,8 @@ const axios = require('axios');
  * {v} is replaced by the filter value.
  */
 export const FILTER_OPERATOR_FORMATS: Record<string, { template: string; requiresValue: boolean }> = {
-	'=':            { template: '[{v}]',  requiresValue: true },
+	'EQ':           { template: '[{v}]',  requiresValue: true },
+	'=':            { template: '[{v}]',  requiresValue: true }, // legacy alias (custom filters / API)
 	'!=':           { template: '![{v}]', requiresValue: true },
 	'>':            { template: '>[{v}]', requiresValue: true },
 	'>=':           { template: '>=[{v}]', requiresValue: true },

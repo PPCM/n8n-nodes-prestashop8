@@ -336,7 +336,11 @@ export class PrestaShop8 implements INodeType {
           }
 
           case 'search': {
-            const filtersParam = this.getNodeParameter('filters', i, {}) as any;
+            // Images uses a separate parameter ('filtersImages') to avoid a duplicate
+            // parameter name that breaks n8n's NDV value binding.
+            const filtersParam = (resource === 'images'
+              ? this.getNodeParameter('filtersImages', i, {})
+              : this.getNodeParameter('filters', i, {})) as any;
             const advancedOptions = this.getNodeParameter('advancedOptions', i, {}) as any;
             const display = this.getNodeParameter('display', i, 'full') as string;
             const customFields = this.getNodeParameter('customFields', i, '') as string;
