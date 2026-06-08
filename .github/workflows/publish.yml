@@ -33,9 +33,7 @@ jobs:
         run: npm install -g npm@latest
 
       - name: Install dependencies
-        # npm install (not ci): package-lock.json may lag behind package.json
-        # (Dependabot overrides). install tolerates the drift; ci would fail.
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Build
         run: npm run build
