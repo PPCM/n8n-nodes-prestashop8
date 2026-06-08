@@ -48,7 +48,7 @@ function buildFieldsXml(fields: Array<{name: string, value: string}>): string {
 	const fieldGroups: {[key: string]: Array<{langId?: string, value: string}>} = {};
 
 	for (const field of fields) {
-		if (field.name && field.value !== undefined) {
+		if (field.name && field.value !== undefined && field.value !== null) {
 			const multilingualMatch = field.name.match(/^(.+)-(\d+)$/);
 
 			if (multilingualMatch) {
