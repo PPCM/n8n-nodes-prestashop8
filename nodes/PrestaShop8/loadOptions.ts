@@ -97,7 +97,7 @@ export const loadOptionsMethods = {
 				value: field,
 				description: `Required field: ${field}`,
 			}));
-		} catch (error) {
+		} catch {
 			return [{
 				name: 'Custom Field',
 				value: '__custom__',
@@ -157,7 +157,7 @@ export const loadOptionsMethods = {
 			});
 
 			return fieldOptions;
-		} catch (error) {
+		} catch {
 			return [];
 		}
 	},

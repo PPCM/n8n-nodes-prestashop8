@@ -106,7 +106,7 @@ export function simplifyPrestashopResponse(rawData: any, resource: string): any 
 /**
  * Simplifies an individual element
  */
-function simplifyItem(item: any, resource: string): any {
+function simplifyItem(item: any, _resource: string): any {
 	if (!item || typeof item !== 'object') {
 		return item;
 	}
@@ -219,7 +219,7 @@ export function buildPrestashopXml(resource: string, data: any): string {
 /**
  * Converts simplified JSON to PrestaShop format
  */
-function convertSimplifiedToPrestaShop(data: any, resource: string): any {
+function convertSimplifiedToPrestaShop(data: any, _resource: string): any {
 	if (!data || typeof data !== 'object') {
 		return data;
 	}

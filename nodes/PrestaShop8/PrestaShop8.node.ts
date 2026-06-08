@@ -130,7 +130,6 @@ export class PrestaShop8 implements INodeType {
       try {
         let responseData: any;
         let requestUrl: string = '';
-        let requestHeaders: any = {};
         let requestDebugInfo: any = {};
         const opts = getOperationOptions(this, i);
         const { rawMode, timeout, neverError, includeResponseHeaders, showRequestInfo, showRequestUrl } = opts;
@@ -164,7 +163,6 @@ export class PrestaShop8 implements INodeType {
               const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource);
               responseData = rawResult.responseData;
               requestDebugInfo = rawResult.requestDebugInfo;
-              requestHeaders = rawResult.requestHeaders;
             } else {
               const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
               const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
@@ -173,7 +171,6 @@ export class PrestaShop8 implements INodeType {
 
               requestUrl = url;
               requestDebugInfo = debugInfo;
-              requestHeaders = debugInfo.headers;
 
               const processedResponse = processResponseForMode(response, resource);
               responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
@@ -209,7 +206,6 @@ export class PrestaShop8 implements INodeType {
             
             requestUrl = url;
             requestDebugInfo = debugInfo;
-            requestHeaders = debugInfo.headers;
             
             const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource);
             responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
@@ -272,7 +268,6 @@ export class PrestaShop8 implements INodeType {
             
             requestUrl = url;
             requestDebugInfo = debugInfo;
-            requestHeaders = debugInfo.headers;
             
             const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource);
             responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
@@ -328,7 +323,6 @@ export class PrestaShop8 implements INodeType {
             
             requestUrl = url;
             requestDebugInfo = debugInfo;
-            requestHeaders = debugInfo.headers;
             
             const processedResponse = rawMode ? { raw: response } : processResponseForMode(response, resource);
             responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
@@ -418,7 +412,6 @@ export class PrestaShop8 implements INodeType {
               const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource);
               responseData = rawResult.responseData;
               requestDebugInfo = rawResult.requestDebugInfo;
-              requestHeaders = rawResult.requestHeaders;
             } else {
               const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
               const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
@@ -427,7 +420,6 @@ export class PrestaShop8 implements INodeType {
 
               requestUrl = url;
               requestDebugInfo = debugInfo;
-              requestHeaders = debugInfo.headers;
 
               const processedResponse = processResponseForMode(response, resource);
               responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
@@ -450,7 +442,6 @@ export class PrestaShop8 implements INodeType {
             
             requestUrl = url;
             requestDebugInfo = debugInfo;
-            requestHeaders = debugInfo.headers;
 
             const deleteResponse = {
               success: true,
@@ -479,11 +470,6 @@ export class PrestaShop8 implements INodeType {
           };
         }
 
-        // Add headers to output if requested
-        if (showRequestInfo) {
-          requestHeaders = requestDebugInfo.headers;
-        }
-        
         if (showRequestUrl || showRequestInfo) {
           responseData = {
             data: responseData,
