@@ -26,6 +26,7 @@ import {
   executeHttpRequest,
   executeRawModeRequest,
   wrapResponse,
+  sleep,
 } from './helpers/http';
 import { loadOptionsMethods } from './loadOptions';
 
@@ -133,6 +134,11 @@ export class PrestaShop8 implements INodeType {
         let requestDebugInfo: any = {};
         const opts = getOperationOptions(this, i);
         const { rawMode, timeout, neverError, includeResponseHeaders, showRequestInfo, showRequestUrl } = opts;
+
+        // Throttle: pause before each PrestaShop call except the first.
+        if (i > 0 && opts.delayBetweenCalls > 0) {
+          await sleep(opts.delayBetweenCalls);
+        }
 
         switch (operation) {
           case 'list': {

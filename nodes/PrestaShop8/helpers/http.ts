@@ -37,6 +37,14 @@ export interface OperationOptions {
 	rawMode: boolean;
 	showRequestInfo: boolean;
 	showRequestUrl: boolean;
+	delayBetweenCalls: number;
+}
+
+/**
+ * Pause execution for the given number of milliseconds (used to throttle calls).
+ */
+export function sleep(ms: number): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -50,6 +58,7 @@ export function getOperationOptions(executeFunctions: IExecuteFunctions, itemInd
 		rawMode: executeFunctions.getNodeParameter('options.response.rawMode', itemIndex, false) as boolean,
 		showRequestInfo: executeFunctions.getNodeParameter('options.request.showRequestInfo', itemIndex, false) as boolean,
 		showRequestUrl: executeFunctions.getNodeParameter('options.request.showRequestUrl', itemIndex, false) as boolean,
+		delayBetweenCalls: executeFunctions.getNodeParameter('options.delayBetweenCalls', itemIndex, 0) as number,
 	};
 }
 
