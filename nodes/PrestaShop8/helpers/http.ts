@@ -49,6 +49,8 @@ export interface RetryOptions {
 	enabled: boolean;
 	maxRetries: number;
 	retryDelay: number;
+	/** Optional hook called before each retry wait, with the upcoming retry number (1-based) and the error. */
+	onRetry?: (attempt: number, error: any) => void;
 }
 
 /**
@@ -95,6 +97,23 @@ export function isRetryableError(error: any): boolean {
 }
 
 /**
+ * Build a short human-readable reason from an error, for retry logging.
+ * Prefers the network code, then the HTTP status, then the message.
+ */
+export function describeError(error: any): string {
+	const code = error?.code || error?.cause?.code;
+	if (code) {
+		return code;
+	}
+	const status = error?.httpCode || error?.response?.status;
+	if (status) {
+		return `HTTP ${status}`;
+	}
+	const message = error?.message;
+	return message ? String(message) : 'unknown error';
+}
+
+/**
  * Run an async HTTP operation with per-call retry on transient errors.
  * Each call gets its own retry budget; on the last attempt the error is rethrown
  * so existing neverError / continueOnFail handling applies unchanged.
@@ -109,6 +128,8 @@ export async function withRetry<T>(retry: RetryOptions, fn: () => Promise<T>): P
 			if (attempt >= maxRetries || !isRetryableError(error)) {
 				throw error;
 			}
+			// attempt is 0-based; report the upcoming retry number (1-based)
+			retry.onRetry?.(attempt + 1, error);
 			if (retry.retryDelay > 0) {
 				await sleep(retry.retryDelay);
 			}

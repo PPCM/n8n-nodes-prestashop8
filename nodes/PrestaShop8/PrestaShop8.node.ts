@@ -27,6 +27,7 @@ import {
   executeRawModeRequest,
   wrapResponse,
   sleep,
+  describeError,
 } from './helpers/http';
 import { loadOptionsMethods } from './loadOptions';
 
@@ -134,6 +135,15 @@ export class PrestaShop8 implements INodeType {
         let requestDebugInfo: any = {};
         const opts = getOperationOptions(this, i);
         const { rawMode, timeout, neverError, includeResponseHeaders, showRequestInfo, showRequestUrl } = opts;
+
+        // Trace each retry attempt to the n8n server logs (Option A).
+        if (opts.retry.enabled) {
+          opts.retry.onRetry = (attempt: number, error: any) => {
+            this.logger.warn(
+              `PrestaShop8: retry ${attempt}/${opts.retry.maxRetries} on ${resource}/${operation} after ${describeError(error)} — waiting ${opts.retry.retryDelay}ms`
+            );
+          };
+        }
 
         // Throttle: pause before each PrestaShop call except the first.
         if (i > 0 && opts.delayBetweenCalls > 0) {

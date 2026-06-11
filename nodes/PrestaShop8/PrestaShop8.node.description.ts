@@ -721,7 +721,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
 							name: 'retryEnabled',
 							type: 'boolean',
 							default: false,
-							description: 'Whether to retry a call that fails on a transient error (network timeout, connection drop, 5xx server error or 429 rate-limit). Never retries client errors (4xx).',
+							description: 'Whether to retry a call that fails on a transient error. Retries on: network timeout, connection drop (ECONNRESET / ECONNREFUSED / socket hang up), 5xx server errors and 429 rate-limit. Never retries client errors (4xx — invalid API key, 404, invalid XML). The retry budget is reset for each failing call.',
 						},
 						{
 							displayName: 'Max Retries',
