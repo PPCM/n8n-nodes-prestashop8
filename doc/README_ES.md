@@ -28,6 +28,7 @@ Un nodo comunitario completo de n8n para integración con PrestaShop 8 con conve
 - ✅ **25+ recursos soportados**: productos, clientes, pedidos, inventario...
 - ✅ **Filtrado avanzado** con 10 operadores de búsqueda
 - ✅ **Modo raw** para depuración y casos de uso avanzados
+- ✅ **Reintento ante errores** para recuperarse automáticamente de errores transitorios (timeouts, cortes de conexión)
 
 ## 🚀 Inicio Rápido
 
@@ -135,6 +136,7 @@ npm install n8n-nodes-prestashop8
 - **Ordenación**: `[price_ASC]`, `[date_add_DESC]`
 - **Campos**: `full`, `minimal` o personalizado
 - **Debug**: URL, headers, timeout
+- **Reintento ante errores**: reintenta automáticamente una llamada que falla por un error transitorio — timeout de red, corte de conexión, error de servidor 5xx o rate-limit 429 (nunca en 4xx). Número máximo de intentos y retardo fijo entre intentos configurables; el presupuesto de reintentos se reinicia para cada llamada fallida. Cada intento se registra en los logs del servidor n8n.
 
 ## 🎯 Ejemplos de Uso
 
@@ -167,7 +169,7 @@ Cron → PrestaShop 8 Node → Calcular KPIs → Email Report
 ### Problemas Comunes
 - **401 Unauthorized** → Verificar clave API y permisos
 - **404 Not Found** → Comprobar URL base y Webservices habilitados
-- **Timeout** → Aumentar timeout en opciones de debug
+- **Timeout** → Aumentar timeout en opciones de debug, o activar **Reintento ante errores** para recuperarse automáticamente de timeouts transitorios
 
 ### Obtener Ayuda
 - 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-nodes-prestashop8/issues)** - Bugs y preguntas

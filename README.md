@@ -30,6 +30,7 @@ A comprehensive n8n community node for PrestaShop 8 integration with automatic X
 - ✅ **25+ resources supported**: products, customers, orders, stocks...
 - ✅ **Advanced filtering** with 10 search operators
 - ✅ **Raw mode** for debugging and advanced use cases
+- ✅ **Retry on error** to automatically recover from transient failures (timeouts, connection drops)
 
 ## 🚀 Quick Start
 
@@ -137,6 +138,7 @@ npm install n8n-nodes-prestashop8
 - **Sorting**: `[price_ASC]`, `[date_add_DESC]`
 - **Fields**: `full`, `minimal`, or custom
 - **Debug**: URL, headers, timeout
+- **Retry on error**: automatically retry a call that fails on a transient error — network timeout, connection drop, 5xx server error or 429 rate-limit (never on 4xx). Configurable max attempts and fixed delay between attempts; the retry budget is reset for each failing call. Each attempt is logged to the n8n server logs.
 
 ## 🎯 Usage Examples
 
@@ -169,7 +171,7 @@ Cron → PrestaShop 8 Node → Calculate KPIs → Email Report
 ### Common Problems
 - **401 Unauthorized** → Check API key and permissions
 - **404 Not Found** → Verify base URL and Webservices enabled
-- **Timeout** → Increase timeout in debug options
+- **Timeout** → Increase timeout in debug options, or enable **Retry on error** to auto-recover from transient timeouts
 
 ### Get Help
 - 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-nodes-prestashop8/issues)** - Bugs and questions

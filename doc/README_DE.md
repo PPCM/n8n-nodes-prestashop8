@@ -28,6 +28,7 @@ Ein umfassender n8n Community-Node für PrestaShop 8-Integration mit automatisch
 - ✅ **25+ unterstützte Ressourcen**: Produkte, Kunden, Bestellungen, Lager...
 - ✅ **Erweiterte Filterung** mit 10 Suchoperatoren
 - ✅ **Raw-Modus** für Debugging und erweiterte Anwendungsfälle
+- ✅ **Wiederholung bei Fehlern** zur automatischen Wiederherstellung nach vorübergehenden Fehlern (Timeouts, Verbindungsabbrüche)
 
 ## 🚀 Schnellstart
 
@@ -135,6 +136,7 @@ npm install n8n-nodes-prestashop8
 - **Sortierung**: `[price_ASC]`, `[date_add_DESC]`
 - **Felder**: `full`, `minimal` oder benutzerdefiniert
 - **Debug**: URL, Header, Timeout
+- **Wiederholung bei Fehlern**: wiederholt automatisch einen Aufruf, der an einem vorübergehenden Fehler scheitert — Netzwerk-Timeout, Verbindungsabbruch, 5xx-Serverfehler oder 429-Rate-Limit (niemals bei 4xx). Maximale Anzahl der Versuche und feste Verzögerung zwischen den Versuchen konfigurierbar; das Wiederholungsbudget wird für jeden fehlgeschlagenen Aufruf zurückgesetzt. Jeder Versuch wird in den n8n-Serverprotokollen festgehalten.
 
 ## 🎯 Anwendungsbeispiele
 
@@ -167,7 +169,7 @@ Cron → PrestaShop 8 Node → KPIs berechnen → E-Mail-Bericht
 ### Häufige Probleme
 - **401 Unauthorized** → API-Schlüssel und Berechtigungen überprüfen
 - **404 Not Found** → Basis-URL überprüfen und Webservices aktiviert
-- **Timeout** → Timeout in Debug-Optionen erhöhen
+- **Timeout** → Timeout in Debug-Optionen erhöhen oder **Wiederholung bei Fehlern** aktivieren, um vorübergehende Timeouts automatisch abzufangen
 
 ### Hilfe erhalten
 - 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-nodes-prestashop8/issues)** - Bugs und Fragen

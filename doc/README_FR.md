@@ -22,6 +22,7 @@ Un nœud n8n communautaire complet pour l'intégration PrestaShop 8 avec convers
 - ✅ **25+ ressources** : produits, clients, commandes, stocks...
 - ✅ **Filtres avancés** avec 10 opérateurs de recherche
 - ✅ **Mode Raw** pour debug et cas avancés
+- ✅ **Reprise sur erreur** pour récupérer automatiquement des erreurs transitoires (timeouts, coupures de connexion)
 
 ## 🚀 Installation
 
@@ -130,6 +131,7 @@ npm install n8n-nodes-prestashop8
 - **Tri** : `[price_ASC]`, `[date_add_DESC]`
 - **Champs** : `full`, `minimal`, ou personnalisé
 - **Debug** : URL, headers, timeout
+- **Reprise sur erreur** : relance automatiquement un appel qui échoue sur une erreur transitoire — timeout réseau, coupure de connexion, erreur serveur 5xx ou rate-limit 429 (jamais sur les 4xx). Nombre de reprises et délai fixe entre tentatives configurables ; le budget de reprises est réinitialisé pour chaque appel en échec. Chaque tentative est tracée dans les logs serveur n8n.
 
 ## 🎯 Exemples d'Usage
 
@@ -163,7 +165,7 @@ Cron → PrestaShop 8 Node → Calculate KPIs → Email Report
 ### Problèmes Fréquents
 - **401 Unauthorized** → Vérifier clé API et permissions
 - **404 Not Found** → Contrôler URL base et Webservices activés
-- **Timeout** → Augmenter timeout dans options debug
+- **Timeout** → Augmenter timeout dans options debug, ou activer **Reprise sur erreur** pour récupérer automatiquement des timeouts transitoires
 
 ### Obtenir de l'Aide
 - 🐞 **[GitHub Issues](https://github.com/PPCM/n8n-nodes-prestashop8/issues)** - Bugs et questions
