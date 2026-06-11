@@ -27,6 +27,10 @@ jobs:
         with:
           node-version: 22 # Trusted Publishing requires Node >= 22.14.0
           registry-url: 'https://registry.npmjs.org'
+          # Disable auto package-manager cache: setup-node@v5 detects the
+          # "packageManager: pnpm" field and tries to run pnpm (not installed).
+          # This workflow installs with npm ci, so the pnpm cache is irrelevant.
+          package-manager-cache: false
 
       # npm Trusted Publishing (OIDC) requires npm >= 11.5.1
       - name: Upgrade npm
