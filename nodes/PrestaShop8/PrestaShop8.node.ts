@@ -166,13 +166,13 @@ export class PrestaShop8 implements INodeType {
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, urlParams, rawMode);
 
             if (rawMode) {
-              const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource);
+              const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource, opts.retry);
               responseData = rawResult.responseData;
               requestDebugInfo = rawResult.requestDebugInfo;
             } else {
               const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
               const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
-                this.helpers, options, credentials, rawMode, operation, resource, neverError
+                this.helpers, options, credentials, rawMode, operation, resource, neverError, undefined, opts.retry
               );
 
               requestUrl = url;
@@ -207,7 +207,7 @@ export class PrestaShop8 implements INodeType {
             const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
             
             const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
-              this.helpers, options, credentials, rawMode, operation, resource, neverError
+              this.helpers, options, credentials, rawMode, operation, resource, neverError, undefined, opts.retry
             );
             
             requestUrl = url;
@@ -269,7 +269,7 @@ export class PrestaShop8 implements INodeType {
             const options = buildHttpOptions('POST', `${credentials.baseUrl}/${resource}`, credentials, rawMode, timeout, body);
             
             const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
-              this.helpers, options, credentials, rawMode, operation, resource, neverError, body
+              this.helpers, options, credentials, rawMode, operation, resource, neverError, body, opts.retry
             );
             
             requestUrl = url;
@@ -324,7 +324,7 @@ export class PrestaShop8 implements INodeType {
             const options = buildHttpOptions('PATCH', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout, body);
             
             const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
-              this.helpers, options, credentials, rawMode, operation, resource, neverError, body
+              this.helpers, options, credentials, rawMode, operation, resource, neverError, body, opts.retry
             );
             
             requestUrl = url;
@@ -415,13 +415,13 @@ export class PrestaShop8 implements INodeType {
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, urlParams, rawMode);
 
             if (rawMode) {
-              const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource);
+              const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource, opts.retry);
               responseData = rawResult.responseData;
               requestDebugInfo = rawResult.requestDebugInfo;
             } else {
               const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
               const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
-                this.helpers, options, credentials, rawMode, operation, resource, neverError
+                this.helpers, options, credentials, rawMode, operation, resource, neverError, undefined, opts.retry
               );
 
               requestUrl = url;
@@ -443,7 +443,7 @@ export class PrestaShop8 implements INodeType {
             const options = buildHttpOptions('DELETE', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout);
             
             const { debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
-              this.helpers, options, credentials, rawMode, operation, resource, neverError
+              this.helpers, options, credentials, rawMode, operation, resource, neverError, undefined, opts.retry
             );
             
             requestUrl = url;

@@ -710,6 +710,38 @@ export const PrestaShop8Description: INodeTypeDescription = {
 					],
 				},
 				{
+					displayName: 'Retry On Error',
+					name: 'retry',
+					type: 'collection',
+					placeholder: 'Add Retry Option',
+					default: {},
+					options: [
+						{
+							displayName: 'Enabled',
+							name: 'retryEnabled',
+							type: 'boolean',
+							default: false,
+							description: 'Whether to retry a call that fails on a transient error (network timeout, connection drop, 5xx server error or 429 rate-limit). Never retries client errors (4xx).',
+						},
+						{
+							displayName: 'Max Retries',
+							name: 'maxRetries',
+							type: 'number',
+							typeOptions: { minValue: 0 },
+							default: 3,
+							description: 'Maximum number of retry attempts per failing call. This budget is reset for each call, it is not a global limit for the whole node execution.',
+						},
+						{
+							displayName: 'Retry Delay (ms)',
+							name: 'retryDelay',
+							type: 'number',
+							typeOptions: { minValue: 0 },
+							default: 1000,
+							description: 'Pause in milliseconds between two successive retry attempts of the same call',
+						},
+					],
+				},
+				{
 					displayName: 'Timeout (ms)',
 					name: 'timeout',
 					type: 'number',
