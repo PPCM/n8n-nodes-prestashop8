@@ -391,9 +391,15 @@ export class PrestaShop8 implements INodeType {
 
               const format = FILTER_OPERATOR_FORMATS[filter.operator];
               if (format) {
-                if (!format.requiresValue || filterValue) {
-                  filterParams[key] = format.template.replace('{v}', filterValue);
+                // Guard: operators that require a value must not be silently dropped
+                // when the value is empty, otherwise PrestaShop returns all records.
+                if (format.requiresValue && !filterValue) {
+                  throw new NodeOperationError(
+                    this.getNode(),
+                    `Filter operator "${filter.operator}" on field "${filter.field}" requires a value. Use the "IS_EMPTY" operator to match empty fields.`,
+                  );
                 }
+                filterParams[key] = format.template.replace('{v}', filterValue);
               } else if (filterValue) {
                 filterParams[key] = `[${filterValue}]`;
               }
