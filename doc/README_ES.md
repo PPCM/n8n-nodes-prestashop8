@@ -80,14 +80,13 @@ npm install n8n-nodes-prestashop8
 ### 📊 Recursos Soportados
 
 <details>
-<summary><strong>👥 CRM y Clientes (6 recursos)</strong></summary>
+<summary><strong>👥 CRM y Clientes (5 recursos)</strong></summary>
 
 - `customers` - Clientes de la tienda
 - `addresses` - Direcciones de envío/facturación
 - `groups` - Grupos de clientes y precios
 - `customer_threads` - Conversaciones de atención al cliente
 - `customer_messages` - Mensajes individuales
-- `guests` - Visitantes no registrados
 </details>
 
 <details>

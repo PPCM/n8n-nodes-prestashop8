@@ -1,150 +1,141 @@
 # Changelog
 
-**🌍 Available in:** [English](#english) | [Français](#français) | [Deutsch](#deutsch) | [Español](#español)
-
----
-
-## English
-
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### [1.0.0] - 2024-01-XX
+## [Unreleased]
 
-#### Added
-- 🎉 **Initial release of PrestaShop 8 node**
-- ✅ **Complete CRUD support**: Create, Read, Update, Delete, Search
-- 🔄 **Automatic XML/JSON conversion** with PrestaShop structure simplification
-- ⚡ **Raw mode** for direct access to raw XML/JSON data
-- 🔍 **Advanced search** with filters, sorting, pagination
-- 🔐 **Secure authentication** via PrestaShop API key
-- 📱 **25+ supported resources**
-- 🏛️ **Intuitive user interface** with dynamic dropdown menus
-- 🧪 **Debug options**: URL display, headers, customizable timeout
-- 📚 **Complete documentation** with practical examples
-- 🌍 **Multilingual documentation**: English, French, German, Spanish
+### Fixed
+- **Security**: the API key is no longer exposed in the "Show Request Info" debug output (Authorization header redacted, username masked)
+- Multilang fields (arrays of `{id, value}` on multi-language shops) are no longer corrupted into `"[object Object]"` by type conversion
+- Delete with "Never Error" now reports `success: false` with the real status code instead of a fabricated success
+- "Include Response Headers" now returns the real response headers and status code (e.g. 201 on create) instead of hardcoded `{}` / 200
+- Type conversion is applied even when "Show Request URL" / "Show Request Info" / "Include Response Headers" wrappers are enabled
+- Get by ID on resources with irregular plurals (`categories`, `addresses`, `countries`, `currencies`, `taxes`, ...) now unwraps the single-item envelope correctly
+- Values are no longer XML-escaped inside CDATA sections (HTML descriptions and `&` characters were stored double-encoded); `]]>` sequences are safely split
+- Field names are validated before being used as XML tag names (prevents element injection)
+- CUSTOM filter expressions keep the full value when it contains `=`
+- Resource IDs are URL-encoded in request paths (prevents path traversal / query injection from upstream data)
+- HTTP 429 responses are retried when "Retry On Error" is enabled (string status codes are now handled)
+- Create (POST) calls are no longer retried on ambiguous network timeouts, preventing duplicate records
+- Display "Custom Fields" with an empty field list now fails with a clear message instead of sending an invalid `display=custom`
+- The credential test now normalizes the base URL (adds `/api` when missing) like the node does
+- `main` entry in package.json now points to a real compiled file (`dist/index.js`)
 
----
+### Added
+- `order_invoices` resource (list, get by ID, search, create, update, delete)
 
-## Français
+### Removed
+- Dead "Test Connection" toggle in credentials (was never read)
+- `guests` was removed from the documentation (it was never implemented)
 
-Toutes les modifications notables de ce projet seront documentées dans ce fichier.
+## [2.7.0] - 2026-06-27
 
-Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
-et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Fixed
+- Search filters: operators that require a value now throw a clear error when the value is empty instead of silently returning all records
+- Bumped `form-data` override to ^4.0.6 (CVE / Dependabot)
 
-### [1.0.0] - 2024-01-XX
+### Added
+- Retry attempts are logged to the n8n server logs
 
-#### Ajouté
-- 🎉 **Version initiale du nœud PrestaShop 8**
-- ✅ **Support CRUD complet** : Create, Read, Update, Delete, Search
-- 🔄 **Conversion automatique XML/JSON** avec simplification des structures PrestaShop
-- ⚡ **Mode Raw** pour accès direct aux données brutes XML/JSON
-- 🔍 **Recherche avancée** avec filtres, tri, pagination
-- 🔐 **Authentification sécurisée** via clé API PrestaShop
-- 📱 **25+ ressources supportées**
-- 🏛️ **Interface utilisateur intuitive** avec menus déroulants dynamiques
-- 🧪 **Options de debug** : affichage URL, headers, timeout personnalisable
-- 📚 **Documentation complète** avec exemples pratiques
-- 🌍 **Documentation multilingue** : Anglais, Français, Allemand, Espagnol
+## [2.6.0] - 2026-06-11
 
----
+### Added
+- **Retry On Error** option: automatic retry on transient failures (network errors, 5xx, rate-limit) with configurable max retries and delay
 
-## Deutsch
+## [2.5.0] - 2026-06-09
 
-Alle bemerkenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
+### Added
+- **Delay Between Calls** option to throttle PrestaShop requests
 
-Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
-und dieses Projekt folgt der [Semantischen Versionierung](https://semver.org/lang/de/).
+## [2.4.2] - 2026-06-09
 
-### [1.0.0] - 2024-01-XX
+### Fixed
+- Skip null field values to prevent a crash on create/update
 
-#### Hinzugefügt
-- 🎉 **Erstveröffentlichung des PrestaShop 8 Nodes**
-- ✅ **Vollständige CRUD-Unterstützung**: Create, Read, Update, Delete, Search
-- 🔄 **Automatische XML/JSON-Konvertierung** mit Vereinfachung der PrestaShop-Strukturen
-- ⚡ **Raw-Modus** für direkten Zugang zu rohen XML/JSON-Daten
-- 🔍 **Erweiterte Suche** mit Filtern, Sortierung, Paginierung
-- 🔐 **Sichere Authentifizierung** über PrestaShop-API-Schlüssel
-- 📱 **25+ unterstützte Ressourcen**
-- 🏛️ **Intuitive Benutzeroberfläche** mit dynamischen Dropdown-Menüs
-- 🧪 **Debug-Optionen**: URL-Anzeige, Headers, anpassbare Timeouts
-- 📚 **Vollständige Dokumentation** mit praktischen Beispielen
-- 🌍 **Mehrsprachige Dokumentation**: Englisch, Französisch, Deutsch, Spanisch
+## [2.4.1] - 2026-06-08
 
----
+### Fixed
+- Equal operator selectable again in the search filters UI
 
-## Español
+### Changed
+- npm trusted publishing (OIDC) workflow on release
 
-Todos los cambios notables de este proyecto serán documentados en este archivo.
+## [2.4.0] - 2026-04-24
 
-El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
-y este proyecto se adhiere al [Versionado Semántico](https://semver.org/lang/es/).
+### Added
+- `stock_movements` resource; API names surfaced in resource descriptions
 
-### [1.0.0] - 2024-01-XX
+### Security
+- Resolved 20 Dependabot alerts via dependency upgrades and overrides
 
-#### Agregado
-- 🎉 **Lanzamiento inicial del nodo PrestaShop 8**
-- ✅ **Soporte CRUD completo**: Create, Read, Update, Delete, Search
-- 🔄 **Conversión automática XML/JSON** con simplificación de estructuras PrestaShop
-- ⚡ **Modo Raw** para acceso directo a datos XML/JSON en bruto
-- 🔍 **Búsqueda avanzada** con filtros, ordenamiento, paginación
-- 🔐 **Autenticación segura** vía clave API de PrestaShop
-- 📱 **25+ recursos soportados**
-- 🏛️ **Interfaz de usuario intuitiva** con menús desplegables dinámicos
-- 🧪 **Opciones de debug**: visualización URL, headers, timeout personalizable
-- 📚 **Documentación completa** con ejemplos prácticos
-- 🌍 **Documentación multilingüe**: Inglés, Francés, Alemán, Español
+## [2.3.0] - 2026-02-12
 
----
+### Changed
+- Split monolithic files into a modular architecture (`utils/`, `helpers/`)
 
-## [1.0.0] - 2024-01-XX
+## [2.2.0] - 2026-02-12
 
-### Ajouté
-- 🎉 **Version initiale du nœud PrestaShop 8**
-- ✅ **Support CRUD complet** : Create, Read, Update, Delete, Search
-- 🔄 **Conversion automatique XML/JSON** avec simplification des structures PrestaShop
-- ⚡ **Mode Raw** pour accès direct aux données brutes XML/JSON
-- 🔍 **Recherche avancée** avec filtres, tri, pagination
-- 🔐 **Authentification sécurisée** via clé API PrestaShop
-- 📱 **25+ ressources supportées** :
-  - 👥 Clients & CRM : customers, addresses, groups, customer_threads, customer_messages
-  - 📦 Catalogue : products, combinations, stock_availables, categories, manufacturers, suppliers, tags
-  - 🛒 Commandes : orders, order_details, order_histories, order_states, carts, cart_rules
-  - 🚚 Logistique : carriers, zones, countries, states
-  - 🏦 Finances : currencies, taxes, tax_rules, tax_rule_groups
-  - 🎨 CMS : content_management_system, images, image_types
-  - ⚙️ Config : configurations, languages, shops, shop_groups
-- 🎛️ **Interface utilisateur intuitive** avec menus déroulants dynamiques
-- 🧪 **Options de debug** : affichage URL, headers, timeout personnalisable
-- 📚 **Documentation complète** avec exemples pratiques
-- 🔧 **Gestion d'erreurs** robuste avec messages explicites
-- 🌐 **Support multilingue** pour les contenus PrestaShop
+### Fixed
+- Convert `id` and `id_*` foreign-key fields from string to number in responses
 
-### Fonctionnalités Techniques
-- **Conversion intelligente des types** : string → number/boolean automatique
-- **Simplification des associations** PrestaShop en tableaux simples
-- **Gestion des champs CDATA** XML automatique
-- **Support des opérateurs de filtre** : =, !=, >, >=, <, <=, LIKE, NOT LIKE, BEGINS, ENDS
-- **Pagination optimisée** pour gros volumes de données
-- **Sélection de champs** personnalisée pour améliorer les performances
-- **Validation des données** avant envoi à l'API
-- **Transformation noms de champs** : id_manufacturer → manufacturerId
+### Added
+- Jest unit test suite (183 tests) and n8n UI integration test suite
 
-### Exemples d'Usage Inclus
-- Synchronisation de catalogue produits
-- Gestion automatisée des commandes
-- Import/Export de données clients
-- Mise à jour de stocks en temps réel
-- Intégration CRM et marketing automation
-- Rapports et analytics e-commerce
+## [2.1.1] - 2025-12-05
 
-## Types de Changements
-- `Added` pour les nouvelles fonctionnalités
-- `Changed` pour les changements dans les fonctionnalités existantes  
-- `Deprecated` pour les fonctionnalités bientôt supprimées
-- `Removed` pour les fonctionnalités maintenant supprimées
-- `Fixed` pour les corrections de bugs
-- `Security` pour les corrections de vulnérabilités
+### Fixed
+- Removed axios from dependencies to fix a module conflict with n8n's bundled axios
+
+## [2.1.0] - 2025-12-05
+
+### Changed
+- Code optimizations and cleanup
+
+## [2.0.5] - 2025-12-04
+
+### Added
+- `order_carriers` resource
+
+## [2.0.4] - 2025-12-03
+
+### Fixed
+- URL normalization; Orders `reference` field
+
+## [2.0.3] - 2025-10-31
+
+### Fixed
+- Enhanced association fields type conversion
+
+## [2.0.2] - 2025-10-31
+
+### Changed
+- Node version array support
+
+## [2.0.1] - 2025-10-30
+
+### Fixed
+- Type corrections
+
+### Added
+- New resources
+
+## [2.0.0] - 2025-10-26
+
+### Added
+- Field autocomplete and performance optimizations
+
+## [1.0.0] - 2025-09-05
+
+### Added
+- Initial release of the PrestaShop 8 node
+- Complete CRUD support: Create, Read, Update, Delete, Search
+- Automatic XML/JSON conversion with PrestaShop structure simplification
+- Raw mode for direct access to raw XML/JSON data
+- Advanced search with filters, sorting, pagination
+- Secure authentication via PrestaShop API key
+- 25+ supported resources
+- Debug options: URL display, headers, customizable timeout
+- Multilingual documentation: English, French, German, Spanish
