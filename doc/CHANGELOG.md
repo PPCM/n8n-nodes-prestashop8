@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.8.0] - 2026-07-03
 
 ### Fixed
 - **Security**: the API key is no longer exposed in the "Show Request Info" debug output (Authorization header redacted, username masked)
@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Display "Custom Fields" with an empty field list now fails with a clear message instead of sending an invalid `display=custom`
 - The credential test now normalizes the base URL (adds `/api` when missing) like the node does
 - `main` entry in package.json now points to a real compiled file (`dist/index.js`)
+- Operation and field dropdowns reload when the resource changes (n8n cached the options of the first resource, e.g. `order_details` wrongly offered Create/Delete)
 
 ### Added
 - `order_invoices` resource (list, get by ID, search, create, update, delete)
