@@ -130,6 +130,7 @@ function buildStandardFieldValues(): any {
 				type: 'options',
 				typeOptions: {
 					loadOptionsMethod: 'getAvailableFields',
+					loadOptionsDependsOn: ['resource'],
 				},
 				default: '',
 				required: true,
@@ -229,6 +230,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
 			},
 			typeOptions: {
 				loadOptionsMethod: 'getOperations',
+				loadOptionsDependsOn: ['resource'],
 			},
 			default: 'list',
 			required: true,
@@ -372,6 +374,7 @@ export const PrestaShop8Description: INodeTypeDescription = {
 							type: 'options',
 							typeOptions: {
 								loadOptionsMethod: 'getAvailableFields',
+								loadOptionsDependsOn: ['resource'],
 							},
 							default: '',
 							description: 'Select a field from the PrestaShop schema.',

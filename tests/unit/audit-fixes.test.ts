@@ -296,6 +296,27 @@ describe('PrestaShop8.node execute() — id is URL-encoded in resource paths', (
 	});
 });
 
+// ─── dynamic dropdowns reload when the resource changes ──────────────────────
+
+describe('description — dynamic dropdowns depend on resource', () => {
+	it('every loadOptionsMethod property declares loadOptionsDependsOn resource', () => {
+		const { PrestaShop8Description } = require('../../nodes/PrestaShop8/PrestaShop8.node.description');
+		const found: any[] = [];
+		const walk = (obj: any) => {
+			if (!obj || typeof obj !== 'object') return;
+			if (obj.typeOptions?.loadOptionsMethod) found.push(obj);
+			for (const value of Object.values(obj)) walk(value);
+		};
+		walk(PrestaShop8Description.properties);
+		expect(found.length).toBeGreaterThan(0);
+		for (const prop of found) {
+			// Without this, n8n caches the options loaded for the first resource
+			// (e.g. order_details would offer Create/Delete from products)
+			expect(prop.typeOptions.loadOptionsDependsOn).toEqual(['resource']);
+		}
+	});
+});
+
 // ─── XML field name validation ───────────────────────────────────────────────
 
 describe('buildCreateXml — field name validation', () => {
