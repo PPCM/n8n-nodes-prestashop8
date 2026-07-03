@@ -23,21 +23,27 @@ function getSingularResource(resource: string): string {
 }
 
 /**
- * Escapes XML special characters
+ * Wraps a value in a CDATA section without altering it.
+ * Content inside CDATA must NOT be XML-escaped (it would be double-encoded
+ * and stored escaped in PrestaShop). Any ']]>' occurrence is split across
+ * two CDATA sections to prevent breaking out of the section.
  */
-function escapeXml(unsafe: string | number | boolean | undefined | null): string {
-	const str = unsafe !== null && unsafe !== undefined ? String(unsafe) : '';
+function cdata(value: string | number | boolean | undefined | null): string {
+	const str = value !== null && value !== undefined ? String(value) : '';
+	return `<![CDATA[${str.replace(/\]\]>/g, ']]]]><![CDATA[>')}]]>`;
+}
 
-	return str.replace(/[<>&'"]/g, function (c) {
-		switch (c) {
-			case '<': return '&lt;';
-			case '>': return '&gt;';
-			case '&': return '&amp;';
-			case "'": return '&apos;';
-			case '"': return '&quot;';
-			default: return c;
-		}
-	});
+/**
+ * Validates a user-provided field name so it can be used as an XML tag name.
+ * Prevents injection of extra elements via crafted field names.
+ */
+function assertValidXmlFieldName(name: string): string {
+	if (!/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(name)) {
+		throw new Error(
+			`Invalid field name "${name}": only letters, digits, "_", "-" and "." are allowed`,
+		);
+	}
+	return name;
 }
 
 /**
@@ -69,16 +75,17 @@ function buildFieldsXml(fields: Array<{name: string, value: string}>): string {
 	let xml = '';
 
 	for (const [fieldName, fieldValues] of Object.entries(fieldGroups)) {
+		assertValidXmlFieldName(fieldName);
 		if (fieldValues.some(f => f.langId)) {
 			xml += `    <${fieldName}>\n`;
 			for (const fieldValue of fieldValues) {
 				if (fieldValue.langId) {
-					xml += `      <language id="${fieldValue.langId}"><![CDATA[${escapeXml(fieldValue.value)}]]></language>\n`;
+					xml += `      <language id="${fieldValue.langId}">${cdata(fieldValue.value)}</language>\n`;
 				}
 			}
 			xml += `    </${fieldName}>\n`;
 		} else {
-			xml += `    <${fieldName}><![CDATA[${escapeXml(fieldValues[0].value)}]]></${fieldName}>\n`;
+			xml += `    <${fieldName}>${cdata(fieldValues[0].value)}</${fieldName}>\n`;
 		}
 	}
 
@@ -111,7 +118,7 @@ export function buildUpdateXml(resource: string, id: string | number, fields: Ar
 	xml += '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">\n';
 	xml += `  <${singularResource}>\n`;
 	xml += buildFieldsXml(fields);
-	xml += `    <id><![CDATA[${escapeXml(id)}]]></id>\n`;
+	xml += `    <id>${cdata(id)}</id>\n`;
 	xml += `  </${singularResource}>\n`;
 	xml += '</prestashop>';
 

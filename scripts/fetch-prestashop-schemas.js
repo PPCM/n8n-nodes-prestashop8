@@ -364,6 +364,12 @@ export function convertFieldValue(value: any, fieldInfo: FieldSchema): any {
     return value;
   }
 
+  // Multilang fields arrive as arrays of {id, value} on multi-language shops;
+  // never stringify objects/arrays or the data would become "[object Object]"
+  if (typeof value === 'object') {
+    return value;
+  }
+
   switch (fieldInfo.type) {
     case 'number':
       const num = Number(value);

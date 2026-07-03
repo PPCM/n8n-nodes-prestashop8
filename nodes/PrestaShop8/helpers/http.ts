@@ -51,6 +51,12 @@ export interface RetryOptions {
 	retryDelay: number;
 	/** Optional hook called before each retry wait, with the upcoming retry number (1-based) and the error. */
 	onRetry?: (attempt: number, error: any) => void;
+	/**
+	 * Set for non-idempotent calls (POST/create): ambiguous network errors
+	 * (timeout, reset) are then NOT retried because the server may already
+	 * have processed the request, which would create duplicate records.
+	 */
+	nonIdempotent?: boolean;
 }
 
 /**
@@ -65,30 +71,30 @@ export function sleep(ms: number): Promise<void> {
  * Retries on network/timeout errors, 5xx server errors and 429 rate-limit.
  * Never retries on 4xx (invalid key, not found, invalid XML, etc.).
  */
-export function isRetryableError(error: any): boolean {
+export function isRetryableError(error: any, nonIdempotent: boolean = false): boolean {
 	// Network / timeout errors expose a code on the error or its cause
 	const code = error?.code || error?.cause?.code;
-	const retryableCodes = [
-		'ETIMEDOUT',
-		'ECONNRESET',
-		'ECONNREFUSED',
-		'ECONNABORTED',
-		'ENOTFOUND',
-		'EAI_AGAIN',
-		'EPIPE',
-	];
-	if (code && retryableCodes.includes(code)) {
+	// Errors raised before the request could reach the server: always safe to retry
+	const preSendCodes = ['ECONNREFUSED', 'ENOTFOUND', 'EAI_AGAIN'];
+	// Errors where the request may already have been processed by the server:
+	// unsafe to retry for non-idempotent calls (duplicate records)
+	const ambiguousCodes = ['ETIMEDOUT', 'ECONNRESET', 'ECONNABORTED', 'EPIPE'];
+	if (code && preSendCodes.includes(code)) {
 		return true;
+	}
+	if (code && ambiguousCodes.includes(code)) {
+		return !nonIdempotent;
 	}
 
 	// "socket hang up" and timeout messages have no stable code
 	const message = String(error?.message || '').toLowerCase();
 	if (message.includes('socket hang up') || message.includes('timeout')) {
-		return true;
+		return !nonIdempotent;
 	}
 
-	// HTTP status: retry on 429 (rate-limit) and 5xx (server errors) only
-	const status = error?.httpCode || error?.response?.status;
+	// HTTP status: retry on 429 (rate-limit) and 5xx (server errors) only.
+	// n8n's NodeApiError exposes httpCode as a string, so coerce to number.
+	const status = Number(error?.httpCode ?? error?.response?.status);
 	if (status === 429 || (status >= 500 && status <= 599)) {
 		return true;
 	}
@@ -125,7 +131,7 @@ export async function withRetry<T>(retry: RetryOptions, fn: () => Promise<T>): P
 		try {
 			return await fn();
 		} catch (error) {
-			if (attempt >= maxRetries || !isRetryableError(error)) {
+			if (attempt >= maxRetries || !isRetryableError(error, retry.nonIdempotent)) {
 				throw error;
 			}
 			// attempt is 0-based; report the upcoming retry number (1-based)
@@ -186,7 +192,21 @@ export function buildHttpOptions(method: IHttpRequestMethods, url: string, crede
 }
 
 /**
- * Capture complete request information for debugging
+ * Mask a secret for debug output: keep the first 4 characters to help
+ * identify which key was used, never expose the full value.
+ */
+export function maskSecret(secret: unknown): string {
+	const str = typeof secret === 'string' ? secret : '';
+	if (!str) {
+		return '';
+	}
+	return str.length > 8 ? `${str.slice(0, 4)}***` : '***';
+}
+
+/**
+ * Capture complete request information for debugging.
+ * The API key is the Basic auth username, so both the Authorization header
+ * and the username must be masked to avoid persisting the key in execution data.
  */
 export function captureRequestDebugInfo(options: any, credentials: any, rawMode: boolean, operation: string, resource: string, body?: string): any {
 	return {
@@ -194,12 +214,12 @@ export function captureRequestDebugInfo(options: any, credentials: any, rawMode:
 		url: options.url,
 		headers: {
 			...options.headers,
-			'Authorization': `Basic ${Buffer.from(credentials.apiKey + ':').toString('base64')}`,
+			'Authorization': 'Basic [REDACTED]',
 			'User-Agent': 'n8n-prestashop8-node/1.0.0',
 		},
 		authentication: {
 			type: 'Basic Auth',
-			username: credentials.apiKey,
+			username: maskSecret(credentials.apiKey),
 			password: '[HIDDEN]',
 			baseUrl: credentials.baseUrl,
 		},
@@ -245,19 +265,33 @@ export async function executeHttpRequest(
 	const debugInfo = captureRequestDebugInfo(options, credentials, rawMode, operation, resource, body);
 
 	try {
-		const response = await withRetry(retry, () => helpers.httpRequest(options));
+		// POST (create) is not idempotent: ambiguous network errors must not be retried
+		const retryOptions = { ...retry, nonIdempotent: options.method === 'POST' };
+		// Request the full response so real headers and status code can be surfaced
+		const rawResponse = await withRetry<any>(retryOptions, () =>
+			helpers.httpRequest({ ...options, returnFullResponse: true }),
+		);
+
+		// Older n8n helpers may ignore returnFullResponse and return the body directly
+		const isFullResponse =
+			rawResponse !== null &&
+			typeof rawResponse === 'object' &&
+			'body' in rawResponse &&
+			('statusCode' in rawResponse || 'headers' in rawResponse);
 
 		return {
-			response,
+			response: isFullResponse ? rawResponse.body : rawResponse,
 			debugInfo,
 			url: requestUrl,
-			responseHeaders: {},
-			statusCode: 200,
+			responseHeaders: (isFullResponse && rawResponse.headers) || {},
+			statusCode: (isFullResponse && rawResponse.statusCode) || 200,
 		};
 	} catch (error: any) {
 		if (neverError) {
+			// n8n's NodeApiError exposes httpCode as a string: coerce to number
+			const errorStatus = Number(error.httpCode ?? error.response?.status) || 500;
 			const errorResponse = {
-				status: error.httpCode || error.response?.status || 500,
+				status: errorStatus,
 				message: error.response?.data || '',
 			};
 
@@ -266,7 +300,7 @@ export async function executeHttpRequest(
 				debugInfo,
 				url: requestUrl,
 				responseHeaders: error.response?.headers || {},
-				statusCode: error.httpCode || error.response?.status || 500,
+				statusCode: errorStatus,
 			};
 		}
 		throw error;

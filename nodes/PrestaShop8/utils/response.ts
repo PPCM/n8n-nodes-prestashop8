@@ -1,4 +1,5 @@
 import { convertFromCamelCase } from '../fieldMappings';
+import { SINGULAR_RESOURCE_MAP } from './xml';
 
 /**
  * Normalize sort parameter to include _DESC by default
@@ -24,14 +25,17 @@ export function processSortParameter(sortValue: string): string {
 export function processDisplayParameter(displayValue: string, resource: string, customFields?: string): string | null {
 	if (displayValue === 'minimal') {
 		return null;
-	} else if (displayValue === 'custom' && customFields) {
-		const fields = customFields.trim();
+	} else if (displayValue === 'custom') {
+		const fields = (customFields || '').trim();
 		if (fields.startsWith('[') && fields.endsWith(']')) {
 			return fields;
-		} else {
-			const fieldList = fields.split(',').map(f => f.trim()).filter(f => f).join(',');
-			return `[${fieldList}]`;
 		}
+		const fieldList = fields.split(',').map(f => f.trim()).filter(f => f).join(',');
+		if (!fieldList) {
+			// 'display=custom' is not a valid PrestaShop value: fail with a clear message
+			throw new Error('Display "Custom Fields" requires at least one field name in Custom Fields');
+		}
+		return `[${fieldList}]`;
 	} else if (displayValue === 'full') {
 		return 'full';
 	}
@@ -61,9 +65,12 @@ export function processResponseForMode(rawData: any, resource: string): any {
 			return simplified[resourceKey];
 		}
 
-		// For single item responses (get by ID), unwrap the resource level
+		// For single item responses (get by ID), unwrap the resource level.
+		// Irregular plurals (categories -> category, addresses -> address, ...)
+		// must use the singular map: a naive 's' strip never matches them.
+		const singular = SINGULAR_RESOURCE_MAP[resource] || (resource.endsWith('s') ? resource.slice(0, -1) : resource);
 		const singleResourceKey = keys.find(key =>
-			(key === resource || key === resource.replace(/s$/, '')) &&
+			(key === resource || key === singular) &&
 			typeof simplified[key] === 'object' &&
 			!Array.isArray(simplified[key])
 		);

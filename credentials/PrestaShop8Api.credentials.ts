@@ -30,13 +30,6 @@ export class PrestaShop8Api implements ICredentialType {
       description: 'PrestaShop API key generated in back office (Advanced Parameters > Web Service)',
       required: true,
     },
-    {
-      displayName: 'Test Connection',
-      name: 'testConnection',
-      type: 'boolean',
-      default: false,
-      description: 'Automatically test the connection when saving credentials',
-    },
   ];
 
   authenticate: IAuthenticateGeneric = {
@@ -51,7 +44,9 @@ export class PrestaShop8Api implements ICredentialType {
 
   test: ICredentialTestRequest = {
     request: {
-      url: '={{$credentials.baseUrl}}/products?display=[id]&limit=1',
+      // Normalize the base URL like the node does (strip trailing slash,
+      // ensure the /api suffix) so the test matches runtime behavior
+      url: '={{ ($credentials.baseUrl.trim().replace(new RegExp("/+$"), "") + "/api").replace(new RegExp("/api/api$"), "/api") }}/products?display=[id]&limit=1',
       method: 'GET',
     },
   };

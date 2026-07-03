@@ -74,18 +74,34 @@ function collectRequiredFields(executeFunctions: IExecuteFunctions, resource: st
 /**
  * Process response data into appropriate format with type conversion
  */
+function convertPayloadTypes(data: any, resource: string): any {
+  if (!data) {
+    return data;
+  }
+  if (Array.isArray(data)) {
+    return convertResourceArray(data, resource);
+  }
+  if (typeof data === 'object') {
+    // Unwrap debug wrapper (Show Request URL / Show Request Info) before converting
+    if ('data' in data && ('requestUrl' in data || 'requestInfo' in data)) {
+      return { ...data, data: convertPayloadTypes(data.data, resource) };
+    }
+    // Unwrap response wrapper (Include Response Headers) before converting
+    if ('body' in data && 'headers' in data && 'statusCode' in data) {
+      return { ...data, body: convertPayloadTypes(data.body, resource) };
+    }
+  }
+  return convertResourceTypes(data, resource);
+}
+
 function processResponseData(responseData: any, returnData: INodeExecutionData[], itemIndex: number, resource: string, convertTypes: boolean = true): void {
   // Convert types if enabled and we have data
   let processedData = responseData;
-  
+
   if (convertTypes && processedData) {
-    if (Array.isArray(processedData)) {
-      processedData = convertResourceArray(processedData, resource);
-    } else {
-      processedData = convertResourceTypes(processedData, resource);
-    }
+    processedData = convertPayloadTypes(processedData, resource);
   }
-  
+
   if (Array.isArray(processedData)) {
     processedData.forEach((item: any) => {
       returnData.push({
@@ -212,7 +228,7 @@ export class PrestaShop8 implements INodeType {
               urlParams.display = displayValue;
             }
 
-            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}/${id}`, urlParams, rawMode);
+            requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}/${encodeURIComponent(id)}`, urlParams, rawMode);
 
             const options = buildHttpOptions('GET', requestUrl, credentials, rawMode, timeout);
             
@@ -331,7 +347,7 @@ export class PrestaShop8 implements INodeType {
             // Build XML using new format
             body = buildUpdateXml(resource, id, fieldsToUpdate);
 
-            const options = buildHttpOptions('PATCH', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout, body);
+            const options = buildHttpOptions('PATCH', `${credentials.baseUrl}/${resource}/${encodeURIComponent(id)}`, credentials, rawMode, timeout, body);
             
             const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
               this.helpers, options, credentials, rawMode, operation, resource, neverError, body, opts.retry
@@ -374,12 +390,17 @@ export class PrestaShop8 implements INodeType {
                   // User writes exactly what they want: date=1, filter[name]=test, etc.
                   const customFilter = filter.customFilterExpression.trim();
                   
-                  // Parse the custom filter to extract key=value pairs for URL construction
+                  // Parse the custom filter to extract key=value pairs for URL construction.
+                  // Split on the FIRST '=' only: values may legitimately contain '='.
                   const parts = customFilter.split('&');
                   for (const part of parts) {
-                    const [key, value] = part.split('=', 2);
-                    if (key && value !== undefined) {
-                      filterParams[key.trim()] = value.trim();
+                    const eqIndex = part.indexOf('=');
+                    if (eqIndex > 0) {
+                      const key = part.slice(0, eqIndex).trim();
+                      const value = part.slice(eqIndex + 1).trim();
+                      if (key) {
+                        filterParams[key] = value;
+                      }
                     }
                   }
                 }
@@ -456,20 +477,30 @@ export class PrestaShop8 implements INodeType {
               throw new NodeOperationError(this.getNode(), 'ID required for this operation');
             }
 
-            const options = buildHttpOptions('DELETE', `${credentials.baseUrl}/${resource}/${id}`, credentials, rawMode, timeout);
-            
-            const { debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
+            const options = buildHttpOptions('DELETE', `${credentials.baseUrl}/${resource}/${encodeURIComponent(id)}`, credentials, rawMode, timeout);
+
+            const { response, debugInfo, url, responseHeaders, statusCode } = await executeHttpRequest(
               this.helpers, options, credentials, rawMode, operation, resource, neverError, undefined, opts.retry
             );
-            
+
             requestUrl = url;
             requestDebugInfo = debugInfo;
 
-            const deleteResponse = {
-              success: true,
-              message: `${resource} with ID ${id} deleted successfully`,
-              deletedId: id,
-            };
+            // With neverError enabled a failed delete returns normally with an
+            // error status code: report the failure instead of a fake success
+            const deleteFailed = typeof statusCode === 'number' && statusCode >= 400;
+            const deleteResponse = deleteFailed
+              ? {
+                  success: false,
+                  status: statusCode,
+                  message: response?.message || `Failed to delete ${resource} with ID ${id}`,
+                  deletedId: id,
+                }
+              : {
+                  success: true,
+                  message: `${resource} with ID ${id} deleted successfully`,
+                  deletedId: id,
+                };
             responseData = wrapResponse(deleteResponse, includeResponseHeaders, responseHeaders, statusCode);
             break;
           }
