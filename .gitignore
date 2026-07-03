@@ -46,8 +46,9 @@ coverage/
 tmp/
 temp/
 
-# Test files (not needed in production)
-tests/
+# Test artifacts (generated, not versioned)
+__pycache__/
+tests/ui/integration-test-results.json
 
 # Packaged tarballs
 *.tgz
