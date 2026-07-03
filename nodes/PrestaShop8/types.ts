@@ -261,6 +261,17 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
     supportsGetById: true,
     supportsSearch: true,
   },
+  order_invoices: {
+    name: 'order_invoices',
+    displayName: 'Order Invoices',
+    description: 'Order invoices (order_invoices)',
+    supportsCreate: true,
+    supportsUpdate: true,
+    supportsDelete: true,
+    supportsList: true,
+    supportsGetById: true,
+    supportsSearch: true,
+  },
   carts: {
     name: 'carts',
     displayName: 'Carts',
