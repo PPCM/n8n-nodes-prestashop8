@@ -216,60 +216,6 @@ export const PrestaShop8Description: INodeTypeDescription = {
 			description: 'PrestaShop resource type to work with',
 		},
 
-		// Integrated documentation
-		{
-			displayName: '📚 Documentation',
-			name: 'documentation',
-			type: 'notice',
-			default: '',
-			displayOptions: {
-				show: {
-					'/': [
-						{
-							_cnd: {
-								eq: 'doc',
-							},
-						},
-					],
-				},
-			},
-			typeOptions: {
-				theme: 'info',
-			},
-			options: [
-				{
-					name: '🚀 Quick Start Guide',
-					value: 'quickstart',
-					description: 'Configuration and first steps with PrestaShop 8',
-				},
-				{
-					name: '🔑 API Authentication',
-					value: 'auth',
-					description: 'PrestaShop API key configuration',
-				},
-				{
-					name: '🔄 XML/JSON Conversion',
-					value: 'conversion',
-					description: 'How automatic simplification works',
-				},
-				{
-					name: '🔍 Search and Filters',
-					value: 'filters',
-					description: 'Using advanced PrestaShop filters',
-				},
-				{
-					name: '⚡ Raw Mode',
-					value: 'rawmode',
-					description: 'Using raw data mode',
-				},
-				{
-					name: '📝 Practical Examples',
-					value: 'examples',
-					description: 'Common use cases and code examples',
-				},
-			],
-		},
-
 		// Operation selection
 		{
 			displayName: 'Operation',

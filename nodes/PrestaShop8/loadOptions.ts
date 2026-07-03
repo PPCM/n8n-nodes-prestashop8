@@ -68,44 +68,6 @@ export const loadOptionsMethods = {
 		return operations;
 	},
 
-	// Load required fields for CREATE operation based on resource
-	async getRequiredFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-		try {
-			const resource = this.getCurrentNodeParameter('resource') as string;
-
-			if (!resource) {
-				return [{
-					name: 'Custom Field',
-					value: '__custom__',
-					description: 'Enter a custom field name',
-				}];
-			}
-
-			const { REQUIRED_FIELDS_BY_RESOURCE } = await import('./utils');
-			const requiredFields = REQUIRED_FIELDS_BY_RESOURCE[resource] || [];
-
-			if (requiredFields.length === 0) {
-				return [{
-					name: 'No specific required fields',
-					value: 'none',
-					description: 'This resource has no specific required fields defined',
-				}];
-			}
-
-			return requiredFields.map((field: string) => ({
-				name: field,
-				value: field,
-				description: `Required field: ${field}`,
-			}));
-		} catch {
-			return [{
-				name: 'Custom Field',
-				value: '__custom__',
-				description: 'Enter a custom field name',
-			}];
-		}
-	},
-
 	// Load available fields from resource schemas for autocomplete
 	async getAvailableFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 		try {
