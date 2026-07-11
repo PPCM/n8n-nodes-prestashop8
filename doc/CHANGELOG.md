@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.2] - 2026-07-11
+
+### Fixed
+- The package still failed to load on n8n 2.x npm installs (`Cannot find module 'xmlbuilder'`): n8n's community-package installer only fetches direct dependencies, not transitive ones. `xml2js` and `js2xmlparser` are now bundled in the published tarball (`bundleDependencies`) together with their own dependencies (`sax`, `xmlbuilder`, `xmlcreate`), so nothing needs to be resolved at install time
+
 ## [2.8.1] - 2026-07-11
 
 ### Fixed
