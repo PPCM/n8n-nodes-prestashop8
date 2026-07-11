@@ -10,10 +10,6 @@
  * - XML field name validation (injection guard)
  */
 
-// Mock axios so executeRawModeRequest doesn't hit the network
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 import { PrestaShop8 } from '../../nodes/PrestaShop8/PrestaShop8.node';
 import {
 	isRetryableError,

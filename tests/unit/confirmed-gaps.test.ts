@@ -9,15 +9,8 @@
  *  5. manufacturers CREATE mapping includes manufacturerActive (active field = 0)
  */
 
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 import { PrestaShop8 } from '../../nodes/PrestaShop8/PrestaShop8.node';
 import { validateFieldsForCreate } from '../../nodes/PrestaShop8/utils/filters';
-
-beforeEach(() => {
-	mockAxios.mockReset();
-});
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
@@ -226,7 +219,6 @@ describe('execute() search — images resource with undefined customFilter in fi
 
 	it('should search when filtersImages.customFilter has one entry', async () => {
 		const rawXml = '<prestashop><images/></prestashop>';
-		mockAxios.mockResolvedValue({ status: 200, data: rawXml, headers: {} });
 
 		const mock = createMock({
 			operation: 'search',
@@ -236,6 +228,7 @@ describe('execute() search — images resource with undefined customFilter in fi
 				customFilter: [{ field: 'id_product', operator: 'EQ', value: '5' }],
 			},
 		});
+		mock.helpers.httpRequest.mockResolvedValue({ statusCode: 200, body: rawXml, headers: {} });
 
 		const node = new PrestaShop8();
 		const result = await node.execute.call(mock as any);

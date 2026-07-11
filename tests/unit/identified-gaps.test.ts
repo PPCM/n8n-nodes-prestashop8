@@ -8,17 +8,9 @@
  *  6. response.ts L56 — third condition in keys.find (unrelated key with non-empty array)
  */
 
-// ─── Mock axios before any imports ────────────────────────────────────────────
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 import { PrestaShop8 } from '../../nodes/PrestaShop8/PrestaShop8.node';
 import { extractPrestashopError } from '../../nodes/PrestaShop8/utils/errors';
 import { processResponseForMode } from '../../nodes/PrestaShop8/utils/response';
-
-beforeEach(() => {
-	mockAxios.mockReset();
-});
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 

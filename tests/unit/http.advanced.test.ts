@@ -1,7 +1,3 @@
-// Mock axios before importing the module that require()'s it
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 import {
 	getOperationOptions,
 	executeHttpRequest,
@@ -157,64 +153,77 @@ describe('executeHttpRequest', () => {
 describe('executeRawModeRequest', () => {
 	const credentials = { apiKey: 'TESTKEY', baseUrl: 'https://shop.com/api' };
 	const url = 'https://shop.com/api/products';
+	const mockHttpRequest = jest.fn();
+	const rawHelpers = { httpRequest: mockHttpRequest };
 
 	beforeEach(() => {
-		mockAxios.mockReset();
+		mockHttpRequest.mockReset();
 	});
 
 	it('should return raw XML response data on success', async () => {
 		const rawXml = '<?xml version="1.0"?><prestashop><products/></prestashop>';
-		mockAxios.mockResolvedValue({
-			status: 200,
-			data: rawXml,
+		mockHttpRequest.mockResolvedValue({
+			statusCode: 200,
+			body: rawXml,
 			headers: { 'content-type': 'text/xml' },
 		});
 
-		const result = await executeRawModeRequest(url, credentials, 30000, false, false, 'list', 'products');
+		const result = await executeRawModeRequest(rawHelpers, url, credentials, 30000, false, false, 'list', 'products');
 
 		expect(result.responseData).toHaveProperty('raw', rawXml);
 		expect(result.requestDebugInfo).toBeDefined();
 		expect(result.requestHeaders).toBeDefined();
 	});
 
-	it('should return error payload when neverError is true and axios rejects', async () => {
-		mockAxios.mockRejectedValue(
+	it('should request an unparsed text body from the helper', async () => {
+		mockHttpRequest.mockResolvedValue({ statusCode: 200, body: '<prestashop/>', headers: {} });
+
+		await executeRawModeRequest(rawHelpers, url, credentials, 30000, false, false, 'list', 'products');
+
+		const options = mockHttpRequest.mock.calls[0][0];
+		expect(options.json).toBe(false);
+		expect(options.encoding).toBe('text');
+		expect(options.returnFullResponse).toBe(true);
+	});
+
+	it('should return error payload when neverError is true and the request rejects', async () => {
+		mockHttpRequest.mockRejectedValue(
 			Object.assign(new Error('Connection refused'), {
 				response: { status: 503, data: 'Service unavailable' },
 			}),
 		);
 
-		const result = await executeRawModeRequest(url, credentials, 30000, true, false, 'list', 'products');
+		const result = await executeRawModeRequest(rawHelpers, url, credentials, 30000, true, false, 'list', 'products');
 
 		expect(result.responseData).toHaveProperty('status', 503);
 		expect(result.responseData).toHaveProperty('message', 'Service unavailable');
 	});
 
 	it('should fall back to status 500 when error has no response', async () => {
-		mockAxios.mockRejectedValue(new Error('Network error'));
+		mockHttpRequest.mockRejectedValue(new Error('Network error'));
 
-		const result = await executeRawModeRequest(url, credentials, 30000, true, false, 'list', 'products');
+		const result = await executeRawModeRequest(rawHelpers, url, credentials, 30000, true, false, 'list', 'products');
 
 		expect(result.responseData).toHaveProperty('status', 500);
 	});
 
-	it('should rethrow when neverError is false and axios rejects', async () => {
-		mockAxios.mockRejectedValue(new Error('Timeout'));
+	it('should rethrow when neverError is false and the request rejects', async () => {
+		mockHttpRequest.mockRejectedValue(new Error('Timeout'));
 
 		await expect(
-			executeRawModeRequest(url, credentials, 30000, false, false, 'list', 'products'),
+			executeRawModeRequest(rawHelpers, url, credentials, 30000, false, false, 'list', 'products'),
 		).rejects.toThrow('Timeout');
 	});
 
 	it('should wrap response with headers when includeResponseHeaders is true', async () => {
 		const rawXml = '<prestashop/>';
-		mockAxios.mockResolvedValue({
-			status: 200,
-			data: rawXml,
+		mockHttpRequest.mockResolvedValue({
+			statusCode: 200,
+			body: rawXml,
 			headers: { 'x-custom': 'header-value' },
 		});
 
-		const result = await executeRawModeRequest(url, credentials, 30000, false, true, 'list', 'products');
+		const result = await executeRawModeRequest(rawHelpers, url, credentials, 30000, false, true, 'list', 'products');
 
 		expect(result.responseData).toHaveProperty('body');
 		expect(result.responseData).toHaveProperty('headers');
@@ -222,13 +231,13 @@ describe('executeRawModeRequest', () => {
 	});
 
 	it('should return error response when server returns non-2xx and neverError is true', async () => {
-		mockAxios.mockResolvedValue({
-			status: 404,
-			data: 'Not found',
+		mockHttpRequest.mockResolvedValue({
+			statusCode: 404,
+			body: 'Not found',
 			headers: {},
 		});
 
-		const result = await executeRawModeRequest(url, credentials, 30000, true, false, 'getById', 'products');
+		const result = await executeRawModeRequest(rawHelpers, url, credentials, 30000, true, false, 'getById', 'products');
 
 		expect(result.responseData).toHaveProperty('status', 404);
 		expect(result.responseData).toHaveProperty('message', 'Not found');

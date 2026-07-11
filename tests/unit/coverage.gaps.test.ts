@@ -371,10 +371,6 @@ describe('buildUrlWithFilters — numeric-zero option value', () => {
 
 describe('PrestaShop8.node execute() — display parameter in URL', () => {
 	// These tests verify that the display parameter is correctly forwarded to the API URL.
-	// Mock setup mirrors node.internal.test.ts to avoid duplication.
-	const mockAxios = jest.fn();
-	jest.mock('axios', () => mockAxios);
-
 	function createMock(params: Record<string, any> = {}) {
 		const defaults: Record<string, any> = {
 			resource: 'products',

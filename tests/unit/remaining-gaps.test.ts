@@ -12,10 +12,6 @@
  * node.ts:          472 (fallback requestDebugInfo when showRequestInfo + empty debugInfo)
  */
 
-// ─── Mock axios before any import ────────────────────────────────────────────
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 // ─── Mock resourceSchemas to expose required/readOnly/multilang fields ────────
 jest.mock('../../nodes/PrestaShop8/resourceSchemas', () => {
 	const actual = jest.requireActual('../../nodes/PrestaShop8/resourceSchemas');
@@ -377,26 +373,29 @@ describe('convertResourceTypes — non-array value in association key (L.4051)',
 
 // ─── http.ts L.195 — neverError=true branch in executeRawModeRequest ─────────
 
-describe('executeRawModeRequest — neverError=true path (L.195)', () => {
+describe('executeRawModeRequest — neverError=true path', () => {
 	const credentials = { apiKey: 'KEY', baseUrl: 'https://shop.com/api' };
+	const mockHttpRequest = jest.fn();
+	const rawHelpers = { httpRequest: mockHttpRequest };
 
 	beforeEach(() => {
-		mockAxios.mockReset();
+		mockHttpRequest.mockReset();
 	});
 
 	it('should not throw on non-2xx status when neverError=true', async () => {
-		// With neverError=true, validateStatus is () => true so axios resolves even for 404
-		mockAxios.mockResolvedValue({
-			status: 404,
-			data: '<errors/>',
+		// With neverError=true, ignoreHttpStatusErrors lets the request resolve even for 404
+		mockHttpRequest.mockResolvedValue({
+			statusCode: 404,
+			body: '<errors/>',
 			headers: { 'content-type': 'text/xml' },
 		});
 
 		const result = await executeRawModeRequest(
+			rawHelpers,
 			'https://shop.com/api/products',
 			credentials,
 			30000,
-			true,  // neverError=true → validateStatus: () => true
+			true,  // neverError=true → ignoreHttpStatusErrors: true
 			false,
 			'list',
 			'products',
@@ -406,19 +405,19 @@ describe('executeRawModeRequest — neverError=true path (L.195)', () => {
 		expect(result.responseData).toBeDefined();
 	});
 
-	it('should use validateStatus=undefined when neverError=false (default behavior)', async () => {
-		// validateStatus: undefined means axios uses its default (throw on 4xx/5xx)
-		mockAxios.mockResolvedValue({
-			status: 200,
-			data: '<?xml version="1.0"?><prestashop/>',
+	it('should surface HTTP errors when neverError=false (default behavior)', async () => {
+		mockHttpRequest.mockResolvedValue({
+			statusCode: 200,
+			body: '<?xml version="1.0"?><prestashop/>',
 			headers: {},
 		});
 
 		const result = await executeRawModeRequest(
+			rawHelpers,
 			'https://shop.com/api/products',
 			credentials,
 			30000,
-			false, // neverError=false → validateStatus: undefined
+			false, // neverError=false → ignoreHttpStatusErrors: false
 			false,
 			'list',
 			'products',

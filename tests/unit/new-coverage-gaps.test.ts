@@ -15,18 +15,10 @@
  * 11. execute() — create/update field with whitespace-only name → NodeOperationError
  */
 
-// ─── Mock axios before any imports ────────────────────────────────────────────
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 import { buildUrlWithFilters, validateFieldsForCreate } from '../../nodes/PrestaShop8/utils/filters';
 import { processDisplayParameter, simplifyPrestashopResponse } from '../../nodes/PrestaShop8/utils/response';
 import { buildCreateXml, buildUpdateXml } from '../../nodes/PrestaShop8/utils/xml';
 import { PrestaShop8 } from '../../nodes/PrestaShop8/PrestaShop8.node';
-
-beforeEach(() => {
-	mockAxios.mockReset();
-});
 
 // ─── Helper: minimal execute mock ─────────────────────────────────────────────
 

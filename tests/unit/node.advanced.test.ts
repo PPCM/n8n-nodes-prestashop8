@@ -3,10 +3,6 @@
  * URL normalisation, delete edge cases, unsupported operation.
  */
 
-// Mock axios so executeRawModeRequest doesn't hit the network
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 import { PrestaShop8 } from '../../nodes/PrestaShop8/PrestaShop8.node';
 
 function createExecuteMock(overrides: Record<string, any> = {}) {
@@ -48,10 +44,6 @@ function createExecuteMock(overrides: Record<string, any> = {}) {
 		continueOnFail: jest.fn().mockReturnValue(false),
 	};
 }
-
-beforeEach(() => {
-	mockAxios.mockReset();
-});
 
 // ─── URL normalisation ────────────────────────────────────────────────────────
 
@@ -99,27 +91,29 @@ describe('PrestaShop8.node execute() — URL normalisation', () => {
 // ─── rawMode — list ───────────────────────────────────────────────────────────
 
 describe('PrestaShop8.node execute() — rawMode list', () => {
-	it('should call axios (not httpRequest) and return raw XML string', async () => {
+	it('should request an unparsed text body and return raw XML string', async () => {
 		const rawXml = '<?xml version="1.0"?><prestashop><products/></prestashop>';
-		mockAxios.mockResolvedValue({ status: 200, data: rawXml, headers: {} });
-
 		const mock = createExecuteMock({ operation: 'list', 'options.response.rawMode': true });
+		mock.helpers.httpRequest.mockResolvedValue({ statusCode: 200, body: rawXml, headers: {} });
+
 		const node = new PrestaShop8();
 		const result = await node.execute.call(mock as any);
 
-		expect(mock.helpers.httpRequest).not.toHaveBeenCalled();
-		expect(mockAxios).toHaveBeenCalledTimes(1);
+		expect(mock.helpers.httpRequest).toHaveBeenCalledTimes(1);
+		const options = mock.helpers.httpRequest.mock.calls[0][0];
+		expect(options.json).toBe(false);
+		expect(options.encoding).toBe('text');
 		expect(result[0][0].json).toHaveProperty('raw', rawXml);
 	});
 
 	it('should not append output_format=JSON in raw mode URL', async () => {
-		mockAxios.mockResolvedValue({ status: 200, data: '<prestashop/>', headers: {} });
-
 		const mock = createExecuteMock({ operation: 'list', 'options.response.rawMode': true });
+		mock.helpers.httpRequest.mockResolvedValue({ statusCode: 200, body: '<prestashop/>', headers: {} });
+
 		const node = new PrestaShop8();
 		await node.execute.call(mock as any);
 
-		const calledUrl: string = mockAxios.mock.calls[0][0].url;
+		const calledUrl: string = mock.helpers.httpRequest.mock.calls[0][0].url;
 		expect(calledUrl).not.toContain('output_format=JSON');
 	});
 });
@@ -197,10 +191,8 @@ describe('PrestaShop8.node execute() — rawMode create', () => {
 // ─── rawMode — search ─────────────────────────────────────────────────────────
 
 describe('PrestaShop8.node execute() — rawMode search', () => {
-	it('should use axios for rawMode search and return raw XML', async () => {
+	it('should return raw XML for rawMode search', async () => {
 		const rawXml = '<prestashop><products/></prestashop>';
-		mockAxios.mockResolvedValue({ status: 200, data: rawXml, headers: {} });
-
 		const mock = createExecuteMock({
 			operation: 'search',
 			'options.response.rawMode': true,
@@ -209,12 +201,12 @@ describe('PrestaShop8.node execute() — rawMode search', () => {
 				customFilter: [],
 			},
 		});
+		mock.helpers.httpRequest.mockResolvedValue({ statusCode: 200, body: rawXml, headers: {} });
 
 		const node = new PrestaShop8();
 		const result = await node.execute.call(mock as any);
 
-		expect(mock.helpers.httpRequest).not.toHaveBeenCalled();
-		expect(mockAxios).toHaveBeenCalledTimes(1);
+		expect(mock.helpers.httpRequest).toHaveBeenCalledTimes(1);
 		expect(result[0][0].json).toHaveProperty('raw', rawXml);
 	});
 });

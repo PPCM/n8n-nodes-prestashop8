@@ -18,10 +18,6 @@
  *  EAI_AGAIN / EPIPE retryable codes
  */
 
-// ─── Mock axios before any import ────────────────────────────────────────────
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 // ─── Patch resourceSchemas so getRequiredFields processes required:true fields ──
 // Real schemas have required:false on all fields, so the .map() at L3962 is dead.
 // We cannot patch the module-internal cache variable, so we supply a mock with
@@ -73,10 +69,6 @@ import { simplifyPrestashopResponse } from '../../nodes/PrestaShop8/utils/respon
 import { getRequiredFields } from '../../nodes/PrestaShop8/resourceSchemas';
 import { PrestaShop8 } from '../../nodes/PrestaShop8/PrestaShop8.node';
 import { PrestaShop8Description } from '../../nodes/PrestaShop8/PrestaShop8.node.description';
-
-beforeEach(() => {
-	mockAxios.mockReset();
-});
 
 // ─── Helper: minimal execute mock ─────────────────────────────────────────────
 function createMock(overrides: Record<string, any> = {}) {

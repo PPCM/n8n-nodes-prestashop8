@@ -11,10 +11,6 @@
  *   PrestaShop8.node.ts     — 92.7% branch  → improved
  */
 
-// ─── Axios mock (must be first) ───────────────────────────────────────────────
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 import { extractPrestashopError } from '../../nodes/PrestaShop8/utils/errors';
 import { buildCreateXml, buildUpdateXml } from '../../nodes/PrestaShop8/utils/xml';
 import {
@@ -27,10 +23,6 @@ import {
 } from '../../nodes/PrestaShop8/helpers/http';
 import { convertResourceTypes } from '../../nodes/PrestaShop8/resourceSchemas';
 import { PrestaShop8 } from '../../nodes/PrestaShop8/PrestaShop8.node';
-
-beforeEach(() => {
-	mockAxios.mockReset();
-});
 
 // ─── 1. utils/errors.ts ──────────────────────────────────────────────────────
 
@@ -309,61 +301,54 @@ describe('executeHttpRequest — error with response.status but no httpCode (L15
 	});
 });
 
-describe('executeRawModeRequest — L193 timeout fallback and L207 empty data', () => {
+describe('executeRawModeRequest — timeout fallback and empty data', () => {
 	const credentials = { apiKey: 'KEY', baseUrl: 'https://shop.com/api' };
 	const url = 'https://shop.com/api/products';
+	const mockHttpRequest = jest.fn();
+	const rawHelpers = { httpRequest: mockHttpRequest };
 
-	// L193 binary-expr branch[1]: timeout=0 → uses 30000 default
-	it('should fall back to 30000 timeout when timeout argument is 0', async () => {
-		mockAxios.mockResolvedValue({ status: 200, data: '<prestashop/>', headers: {} });
-
-		await executeRawModeRequest(url, credentials, 0, false, false, 'list', 'products');
-
-		const axiosConfig = mockAxios.mock.calls[0][0];
-		expect(axiosConfig.timeout).toBe(30000);
+	beforeEach(() => {
+		mockHttpRequest.mockReset();
 	});
 
-	// L207 binary-expr branch[1]: neverError=true with non-2xx status and empty data → message=''
-	it('should set message to empty string when neverError=true and axiosResponse.data is empty', async () => {
-		mockAxios.mockResolvedValue({ status: 400, data: '', headers: {} });
+	// timeout=0 → uses 30000 default
+	it('should fall back to 30000 timeout when timeout argument is 0', async () => {
+		mockHttpRequest.mockResolvedValue({ statusCode: 200, body: '<prestashop/>', headers: {} });
 
-		const result = await executeRawModeRequest(url, credentials, 30000, true, false, 'list', 'products');
+		await executeRawModeRequest(rawHelpers, url, credentials, 0, false, false, 'list', 'products');
+
+		const options = mockHttpRequest.mock.calls[0][0];
+		expect(options.timeout).toBe(30000);
+	});
+
+	// neverError=true with non-2xx status and empty body → message=''
+	it('should set message to empty string when neverError=true and response body is empty', async () => {
+		mockHttpRequest.mockResolvedValue({ statusCode: 400, body: '', headers: {} });
+
+		const result = await executeRawModeRequest(rawHelpers, url, credentials, 30000, true, false, 'list', 'products');
 
 		expect(result.responseData.status).toBe(400);
 		expect(result.responseData.message).toBe('');
 	});
 
-	// validateStatus callback (L195): when neverError=true, axios accepts all status codes
-	// This tests that the validateStatus function is invoked and returns true for any status
-	it('should have validateStatus returning true for non-2xx when neverError=true', async () => {
-		let capturedValidateStatus: ((status: number) => boolean) | undefined;
-		mockAxios.mockImplementation((config: any) => {
-			capturedValidateStatus = config.validateStatus;
-			return Promise.resolve({ status: 400, data: 'Bad Request', headers: {} });
-		});
+	// when neverError=true, non-2xx statuses must not throw (ignoreHttpStatusErrors)
+	it('should set ignoreHttpStatusErrors when neverError=true', async () => {
+		mockHttpRequest.mockResolvedValue({ statusCode: 400, body: 'Bad Request', headers: {} });
 
-		await executeRawModeRequest(url, credentials, 30000, true, false, 'list', 'products');
+		await executeRawModeRequest(rawHelpers, url, credentials, 30000, true, false, 'list', 'products');
 
-		expect(capturedValidateStatus).toBeDefined();
-		expect(capturedValidateStatus!(400)).toBe(true);
-		expect(capturedValidateStatus!(200)).toBe(true);
+		const options = mockHttpRequest.mock.calls[0][0];
+		expect(options.ignoreHttpStatusErrors).toBe(true);
 	});
 
-	// transformResponse callback (L194): always returns data as-is
-	it('should have transformResponse that returns data unchanged', async () => {
-		let capturedTransformResponse: Array<(data: any) => any> | undefined;
-		mockAxios.mockImplementation((config: any) => {
-			capturedTransformResponse = config.transformResponse;
-			return Promise.resolve({ status: 200, data: '<prestashop/>', headers: {} });
-		});
+	// when neverError=false, HTTP errors must surface (no ignoreHttpStatusErrors)
+	it('should not ignore HTTP status errors when neverError=false', async () => {
+		mockHttpRequest.mockResolvedValue({ statusCode: 200, body: '<prestashop/>', headers: {} });
 
-		await executeRawModeRequest(url, credentials, 30000, false, false, 'list', 'products');
+		await executeRawModeRequest(rawHelpers, url, credentials, 30000, false, false, 'list', 'products');
 
-		expect(capturedTransformResponse).toBeDefined();
-		expect(Array.isArray(capturedTransformResponse)).toBe(true);
-		const identity = capturedTransformResponse![0];
-		const sentinel = { xml: '<test/>' };
-		expect(identity(sentinel)).toBe(sentinel);
+		const options = mockHttpRequest.mock.calls[0][0];
+		expect(options.ignoreHttpStatusErrors).toBe(false);
 	});
 });
 

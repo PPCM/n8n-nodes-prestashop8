@@ -192,7 +192,7 @@ export class PrestaShop8 implements INodeType {
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, urlParams, rawMode);
 
             if (rawMode) {
-              const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource, opts.retry);
+              const rawResult = await executeRawModeRequest(this.helpers, requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource, opts.retry);
               responseData = rawResult.responseData;
               requestDebugInfo = rawResult.requestDebugInfo;
             } else {
@@ -452,7 +452,7 @@ export class PrestaShop8 implements INodeType {
             requestUrl = buildUrlWithFilters(`${credentials.baseUrl}/${resource}`, urlParams, rawMode);
 
             if (rawMode) {
-              const rawResult = await executeRawModeRequest(requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource, opts.retry);
+              const rawResult = await executeRawModeRequest(this.helpers, requestUrl, credentials, timeout, neverError, includeResponseHeaders, operation, resource, opts.retry);
               responseData = rawResult.responseData;
               requestDebugInfo = rawResult.requestDebugInfo;
             } else {

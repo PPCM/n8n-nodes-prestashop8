@@ -14,10 +14,6 @@
  *  resourceSchemas.ts  — getRequiredFields map callback (L3962)
  */
 
-// ─── Mock axios before any import ────────────────────────────────────────────
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 // ─── Patch resourceSchemas so getRequiredFields returns required fields ───────
 // All real PrestaShop schemas have required:false on every field, so L3962 (.map
 // callback inside getRequiredFields) is dead code for production data.
@@ -44,10 +40,6 @@ import { extractPrestashopError } from '../../nodes/PrestaShop8/utils/errors';
 import { buildPrestashopXml } from '../../nodes/PrestaShop8/utils/response';
 import { getRequiredFields } from '../../nodes/PrestaShop8/resourceSchemas';
 import { PrestaShop8 } from '../../nodes/PrestaShop8/PrestaShop8.node';
-
-beforeEach(() => {
-	mockAxios.mockReset();
-});
 
 // ─── Helper: minimal execute mock ────────────────────────────────────────────
 

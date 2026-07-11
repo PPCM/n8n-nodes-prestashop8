@@ -8,10 +8,6 @@
  * - filters.ts branches (sort whitespace, rawMode empty params)
  */
 
-// ─── Mock axios BEFORE any import ────────────────────────────────────────────
-const mockAxios = jest.fn();
-jest.mock('axios', () => mockAxios);
-
 import {
 	processResponseForMode,
 	simplifyPrestashopResponse,

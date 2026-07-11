@@ -5,9 +5,6 @@ import {
 } from 'n8n-workflow';
 import { IPrestaShopCredentials } from '../types';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const axios = require('axios');
-
 /**
  * Map of filter operators to their PrestaShop format templates.
  * {v} is replaced by the filter value.
@@ -308,9 +305,11 @@ export async function executeHttpRequest(
 }
 
 /**
- * Execute a raw mode request using axios directly (bypasses n8n parsing)
+ * Execute a raw mode request through n8n's httpRequest helper.
+ * encoding 'text' + json false keep the body as a raw string (no parsing).
  */
 export async function executeRawModeRequest(
+	helpers: any,
 	requestUrl: string,
 	credentials: IPrestaShopCredentials,
 	timeout: number,
@@ -322,18 +321,32 @@ export async function executeRawModeRequest(
 ): Promise<{ responseData: any; requestDebugInfo: any; requestHeaders: any }> {
 	let responseData: any;
 	try {
-		const axiosResponse = await withRetry<any>(retry, () => axios({
-			method: 'GET',
-			url: requestUrl,
-			auth: {
-				username: credentials.apiKey,
-				password: '',
-			},
-			headers: { 'Output-Format': 'XML' },
-			timeout: timeout || 30000,
-			transformResponse: [(data: any) => data],
-			validateStatus: neverError ? () => true : undefined,
-		}));
+		const rawResponse = await withRetry<any>(retry, () =>
+			helpers.httpRequest({
+				method: 'GET',
+				url: requestUrl,
+				auth: {
+					username: credentials.apiKey,
+					password: '',
+				},
+				headers: { 'Output-Format': 'XML' },
+				timeout: timeout || 30000,
+				json: false,
+				encoding: 'text',
+				returnFullResponse: true,
+				ignoreHttpStatusErrors: neverError,
+			}),
+		);
+
+		// Older n8n helpers may ignore returnFullResponse and return the body directly
+		const isFullResponse =
+			rawResponse !== null &&
+			typeof rawResponse === 'object' &&
+			'body' in rawResponse &&
+			('statusCode' in rawResponse || 'headers' in rawResponse);
+		const body = isFullResponse ? rawResponse.body : rawResponse;
+		const statusCode = (isFullResponse && rawResponse.statusCode) || 200;
+		const responseHeaders = (isFullResponse && rawResponse.headers) || {};
 
 		const requestDebugInfo = captureRequestDebugInfo({
 			method: 'GET',
@@ -343,16 +356,20 @@ export async function executeRawModeRequest(
 		}, credentials, true, operation, resource);
 		const requestHeaders = requestDebugInfo.headers;
 
-		if (neverError && (axiosResponse.status < 200 || axiosResponse.status >= 300)) {
-			responseData = { status: axiosResponse.status, message: axiosResponse.data || '' };
+		if (neverError && (statusCode < 200 || statusCode >= 300)) {
+			responseData = { status: statusCode, message: body || '' };
 		} else {
-			const processedResponse = { raw: axiosResponse.data };
-			responseData = wrapResponse(processedResponse, includeResponseHeaders, axiosResponse.headers, axiosResponse.status);
+			const processedResponse = { raw: body };
+			responseData = wrapResponse(processedResponse, includeResponseHeaders, responseHeaders, statusCode);
 		}
 		return { responseData, requestDebugInfo, requestHeaders };
 	} catch (error: any) {
 		if (neverError) {
-			responseData = { status: error.response?.status || 500, message: error.response?.data || '' };
+			// n8n's NodeApiError exposes httpCode as a string: coerce to number
+			responseData = {
+				status: Number(error.httpCode ?? error.response?.status) || 500,
+				message: error.response?.data || '',
+			};
 			return { responseData, requestDebugInfo: {}, requestHeaders: {} };
 		}
 		throw error;
