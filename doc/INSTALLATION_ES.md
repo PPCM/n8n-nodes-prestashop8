@@ -224,6 +224,22 @@ npm install n8n-nodes-prestashop8
 # Reiniciar n8n
 ```
 
+#### ❌ El paquete no se carga tras una actualización (`Cannot find module 'axios'` / `Cannot find module 'xmlbuilder'` / `ENOENT ... xmlbuilder/lib/index.js`)
+
+Las versiones hasta la 2.8.1 podían dejar una instalación rota, y n8n mantiene la versión rota fijada en `~/.n8n/nodes/package.json` — cada reinicio del pod/contenedor la reinstala. Para recuperar:
+
+```bash
+# 1. Eliminar la carpeta de nodos comunitarios (restos + versión fijada)
+rm -rf ~/.n8n/nodes
+
+# 2. Reiniciar n8n (arranca sin el nodo, sin errores)
+
+# 3. Reinstalar desde la interfaz: Settings → Community nodes → Install
+#    → n8n-nodes-prestashop8 (instala ≥ 2.8.2, que es autónomo)
+```
+
+Las credenciales se almacenan en la base de datos y **no** se pierden con esta operación. Nota: si un menú de credenciales aparece vacío después, compruebe que la credencial esté compartida con el **proyecto** del workflow (n8n delimita las credenciales por proyecto).
+
 #### ❌ "401 Unauthorized" 
 1. **Verificar clave API** en PrestaShop
 2. **Comprobar permisos** de la clave
