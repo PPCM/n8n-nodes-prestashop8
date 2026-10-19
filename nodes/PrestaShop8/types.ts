@@ -138,6 +138,17 @@ export const PRESTASHOP_RESOURCES: { [key: string]: IPrestaShopResource } = {
     supportsGetById: true,
     supportsSearch: true,
   },
+  specific_prices: {
+    name: 'specific_prices',
+    displayName: 'Specific Prices',
+    description: 'Customer, group, quantity or date based prices and discounts (specific_prices)',
+    supportsCreate: true,
+    supportsUpdate: true,
+    supportsDelete: true,
+    supportsList: true,
+    supportsGetById: true,
+    supportsSearch: true,
+  },
   categories: {
     name: 'categories',
     displayName: 'Categories',
