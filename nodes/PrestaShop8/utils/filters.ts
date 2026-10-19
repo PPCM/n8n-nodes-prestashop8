@@ -23,6 +23,8 @@ export const REQUIRED_FIELDS_BY_RESOURCE: {[key: string]: string[]} = {
 	'stock_availables': ['id_product', 'quantity'],
 	'images': ['id_product'],
 	'combinations': ['id_product'],
+	// 0 means "all" for the id_* fields; from/to accept '0000-00-00 00:00:00' for no limit
+	'specific_prices': ['id_shop', 'id_cart', 'id_product', 'id_currency', 'id_country', 'id_group', 'id_customer', 'price', 'from_quantity', 'reduction', 'reduction_tax', 'reduction_type', 'from', 'to'],
 	'tags': ['name', 'id_lang'],
 	'groups': ['name'],
 };

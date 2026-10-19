@@ -90,6 +90,7 @@ npm install n8n-nodes-prestashop8
 - `products` - Catalogue des produits
 - `combinations` - Déclinaisons produits (taille, couleur...)
 - `stock_availables` - Gestion des stocks
+- `specific_prices` - Prix spécifiques (par client, groupe, quantité ou dates)
 - `categories` - Arborescence des catégories
 - `manufacturers` - Marques et fabricants
 - `suppliers` - Fournisseurs

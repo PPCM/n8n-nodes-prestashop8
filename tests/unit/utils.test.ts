@@ -483,6 +483,30 @@ describe('validateFieldsForCreate', () => {
 		expect(result.errors).toHaveLength(0);
 	});
 
+	it('should require all PrestaShop mandatory fields for specific_prices', () => {
+		const customerPrice = [
+			{ name: 'id_shop', value: '0' },
+			{ name: 'id_cart', value: '0' },
+			{ name: 'id_product', value: '20' },
+			{ name: 'id_currency', value: '0' },
+			{ name: 'id_country', value: '0' },
+			{ name: 'id_group', value: '0' },
+			{ name: 'id_customer', value: '32' },
+			{ name: 'price', value: '12.50' },
+			{ name: 'from_quantity', value: '1' },
+			{ name: 'reduction', value: '0' },
+			{ name: 'reduction_tax', value: '0' },
+			{ name: 'reduction_type', value: 'amount' },
+			{ name: 'from', value: '0000-00-00 00:00:00' },
+			{ name: 'to', value: '0000-00-00 00:00:00' },
+		];
+		expect(validateFieldsForCreate('specific_prices', customerPrice).isValid).toBe(true);
+
+		const result = validateFieldsForCreate('specific_prices', customerPrice.filter((f) => f.name !== 'id_cart'));
+		expect(result.isValid).toBe(false);
+		expect(result.errors[0]).toContain('id_cart');
+	});
+
 	it('should handle multilingual base field matching', () => {
 		const result = validateFieldsForCreate('categories', [
 			{ name: 'name-1', value: 'Category' },

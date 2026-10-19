@@ -5,8 +5,15 @@ import {
 } from '../../nodes/PrestaShop8/types';
 
 describe('PRESTASHOP_RESOURCES', () => {
-	it('should contain exactly 34 resources', () => {
-		expect(Object.keys(PRESTASHOP_RESOURCES).length).toBe(34);
+	it('should contain exactly 35 resources', () => {
+		expect(Object.keys(PRESTASHOP_RESOURCES).length).toBe(35);
+	});
+
+	it('should expose specific_prices with full CRUD support', () => {
+		const specificPrices = PRESTASHOP_RESOURCES['specific_prices'];
+		expect(specificPrices).toBeDefined();
+		expect(specificPrices.supportsCreate).toBe(true);
+		expect(specificPrices.supportsDelete).toBe(true);
 	});
 
 	it('should expose order_invoices with full CRUD support', () => {

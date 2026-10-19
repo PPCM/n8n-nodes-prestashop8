@@ -95,6 +95,7 @@ npm install n8n-nodes-prestashop8
 - `products` - Produktkatalog
 - `combinations` - Produktvarianten (Größe, Farbe...)
 - `stock_availables` - Lagerverwaltung
+- `specific_prices` - Spezifische Preise (pro Kunde, Gruppe, Menge oder Zeitraum)
 - `categories` - Kategoriebaum
 - `manufacturers` - Marken und Hersteller
 - `suppliers` - Lieferanten
